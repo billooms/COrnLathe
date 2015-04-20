@@ -1,0 +1,156 @@
+<html>
+  <head>
+    <title>OutlineEditor</title>
+    <link rel="stylesheet" href="nbdocs://org.netbeans.modules.usersguide/org/netbeans/modules/usersguide/ide.css" type="text/css">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  </head>
+  <body>
+    <h2>OutlineEditor</h2>
+    <p>
+      The Outline Editor window is the main editing window to change the outline of the work 
+      and the location of cuts. It also allows you to change information about the cutter being used. 
+      For more information on the cutter parameters, see the Help section on Cutters. 
+    </p>
+    <p>
+      Just below the editing window at the far left, you select whether you are editing 
+      the Outline or you wish to edit CutPoints. 
+      To the right of that you see the location of the cursor at any time, along with 
+      any measured distance (the distance between pressing the mouse button and lifting the mouse button). 
+      On the far right edge is the total length of the curve (either inside or outside, 
+      depending on where the cutter is located).
+    </p>
+    <p>
+      You can change the thickness of your bowl by setting a new value for the "Thickness" field. 
+    </p>
+    <p>
+      The "Resolution" field is the over-all accuracy of the outline (and the 3D shape). 
+      A good number for this is around 0.020". 
+      Values below 0.005" will result in much slower response time when rendering a 3D cut surface. 
+      However, for very fine patterns you may need to set this to a small value to see the details 
+      of your cut surface.
+    </p>
+    <p>
+      You have the option of showing CutPoints for all cutters (when multiple cutters are used) or 
+      show only the CutPoints which use the selected cutter.
+    </p>
+    <p>
+      The "Offset" button is enabled after digitizing points from the stage (probing the surface). 
+      Such points represent the center of the cutter which is not the outline of the shape (when using 
+      an HCF or UCF cutting frame). Pressing this button will correct the curve after all points of the 
+      shape have been probed. 
+    </p>
+    <p>
+      The panel on the bottom is for editing Cutter information. You can select which cutter is 
+      being used. See the Help file on Cutters for more information on the other cutter parameters. 
+    </p>
+    <h3>Maneuvering</h3>
+    <p>
+      To zoom in/out, use the scroll wheel on your mouse or two-finger up/down on a trackpad. 
+      To pan, do a right click and move the mouse or control-click on a trackpad (two-finger click followed by 
+      one finger drag). 
+      Command-F (on a Mac) will zoom to fit the curve in the window.
+    </p>
+    <h3>Editing outline points</h3>
+    <p>
+      There are several different curves that you might see in the window:
+    </p>
+    <ul>
+      <li>
+        The inside surface is a purple/magenta color.
+      </li>
+      <li>
+        The outside surface is an orange/tan color.
+      </li>
+      <li>
+        A solid white line indicates the path of the cutter. 
+        CutPoints will snap onto this path (unless snap is disabled fot that CutPoint).
+      </li>
+      <li>
+        A light dotted gray line with round dots is the curve-fitted line that determines 
+        the shape of the work. The dots are the points which you entered and can move. 
+        These digitized points might be on the path of the cutter (for files imported from 
+        older versions of RESurface). 
+        On new shapes that are digitized by clicking with the mouse, these will be 
+        points on either the inside or outside of the curve (depending on where the cutter is 
+        when you first start making the shape). 
+      </li>
+    </ul>
+    <p>
+      To enter a point in the "Edit Outline" mode, simply double-click where you want the new point to go. 
+      To move a point, click on it and drag it somewhere else. 
+      To remove a point, drag it outside the window and it will go away.
+    </p>
+    <p>
+      Points should be entered starting at the bottom.
+      As you enter additional points, they are in sorted order from bottom to top.
+      If you want a point that is out of this order (as when you have a rim of a bowl that
+      recurves downward), first enter the point up higher (to get it in proper sequence)
+      then drag it down to where you want it.
+    </p>
+    <p>
+      To get tighter curves, put points closer together.
+      For example, one can approximate a corner by using a very tight curve
+      with several points close together.
+    </p>
+    <p>
+      If you see funny kinks in your curves, this is generally an indication that you won't 
+      be able to cut that shape with a cutter of the given radius. 
+      For example, you can't make a shape with an internal curvature that is a smaller radius 
+      than your cutter. 
+      Also, going around the outside edge of a corner can give an unusual appearance.
+    </p>
+    <h3>Menu for the "Outline"</h3>
+    <p>
+      The menu bar has several items that only relate to the Outline Editor:
+    </p>
+    <ul>
+      <li>
+        <b>2Pts: Vertical</b> -- If you only have 2 points, this will make them perfectly vertical.
+      </li>
+      <li>
+        <b>2Pts: Horizontal</b> -- If you only have 2 points, this will make them perfectly horizontal.
+      </li>
+      <li>
+        <b>Offset Curve...</b> -- This brings up a menu with several options. 
+        You can move all the curves vertically so that the top or bottom of the selected curve is zero. 
+        Alternately you can move all the curves vertically so that the top or bottom of 
+        the selected curve is at a specified location. 
+        You can also move the curves perpendicular to the curvature with a given offset.
+      </li>
+      <li>
+        <b>Invert</b> -- Inverts the shape (i.e. turns it upside-down).
+      </li>
+      <li>
+        <b>Clear CutPoints</b> -- Deletes all CutPoints, leaving the outline.
+      </li>
+      <li>
+        <b>Clear All</b> -- Clears the CutPoints and the outline (for a fresh start).
+      </li>
+      <li>
+        <b>Zoom to Fit</b> -- The window is zoomed in or out so that the curves fit nicely within the window.
+      </li>
+      <li>
+        <b>Spiral to Cutpoints</b> -- A SpiralRosette or SpiralIndex can be converted to a number of discrete RosettePoints or 
+        IndexPoints with some uniform spacing. The spacing can be uniform in X, uniform in Z, or uniform in distance following 
+        the spiral.
+      </li>
+    </ul>
+    <h3>Editing CutPoints</h3>
+    <p>
+      To add a CutPoint in the "Edit CutPoints" mode, select the desired CutPoint on the pallet and 
+      double-click close to the white line (which is the path of the cutter). 
+      The added CutPoint will snap to the curve. 
+      Alternately, drag and drop a CutPoint from the pallet to a point close to the white line. 
+      The first CutPoint will have default values which can be edited by selecting the CutPoint in the 
+      DataNavigator and editing the properties in the Property Editor. 
+      Additional CutPoints with the edited values can be added by simply double-clicking at the desired 
+      location. The most recently added CutPoint will be duplicated at the new position.
+      To move a CutPoint, click on it and drag it somewhere else. 
+      To remove a CutPoint, drag it outside the window and it will go away. 
+    </p>
+    <p>
+      For more information on the various types of CutPoints and what the colored curves mean, 
+      see the Help section on CutPoints.
+    </p>
+  </body>
+</html>

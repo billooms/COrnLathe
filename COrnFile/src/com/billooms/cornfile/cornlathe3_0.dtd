@@ -1,0 +1,287 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<!--
+    Defines the XML file structure for COrnLathe software.
+
+    PUBLIC ID: -//IDN billooms.com//DTD COrnLathe file format 3.0//EN
+    SYSTEM ID: http://www.billooms.com/dtds/cornlathe3_0.dtd
+
+-->
+
+<!--
+    An example how to use this DTD from your XML document:
+
+    <?xml version="1.0"?>
+    <!DOCTYPE COrnLathe PUBLIC "-//IDN billooms.com//DTD COrnLathe file format 3.0//EN" "http://www.billooms.com/dtds/cornlathe3_0.dtd">
+    <COrnLathe version="3.0">
+    ...
+    </COrnLathe>
+-->
+
+<!--
+	COrnLathe files are composed of sections defining control parameters, patterns, 
+	profiles, cutters, outline, and cutpoints.
+	A version number is required.
+-->
+<!ELEMENT COrnLathe (Comment?, Controls, Patterns?, Profiles?, Cutters, Outline, CutPoints?)>
+<!ATTLIST COrnLathe
+    version CDATA #REQUIRED
+  >
+
+<!--- Various kinds of controls. -->
+<!ELEMENT Controls (FeedRate, (CoarseFine|CutCurve|Threads))>
+<!ATTLIST Controls
+    active (NORMAL|OUTLINE|THREADS) "NORMAL"
+  >
+
+<!--- Feed Rate controls for all kinds of cutting. -->
+<!ELEMENT FeedRate EMPTY>
+<!ATTLIST FeedRate
+	rpm CDATA "3.0"
+	velocity CDATA "4.0"
+  >
+
+<!--- Coarse/Fine controls for NORMAL cutting. -->
+<!ELEMENT CoarseFine EMPTY>
+<!ATTLIST CoarseFine
+	passDepth CDATA "0.025"
+	passStep CDATA "5"
+	lastDepth CDATA "0.005"
+	lastStep CDATA "1"
+	rotation (PLUS_ALWAYS|NEG_ALWAYS|NEG_LAST) "NEG_LAST"
+  >
+
+<!--- Curve cutting controls for cutting OUTLINE. -->
+<!ELEMENT CutCurve EMPTY>
+<!ATTLIST CutCurve
+	step CDATA "0.050"
+	backoff CDATA "0.000"
+	direction (LAST_TO_FIRST|FIRST_TO_LAST) "LAST_TO_FIRST"
+	count1 CDATA "0"
+	depth1 CDATA "0.000"
+	count2 CDATA "1"
+	depth2 CDATA "0.000"
+  >
+
+<!--- Controls for cutting THREADS. -->
+<!ELEMENT Threads EMPTY>
+<!ATTLIST Threads
+	tpi CDATA "20"
+	starts CDATA "1"
+	percent CDATA "60"
+  >
+
+<!--- Each point in 2D or 3D space. -->
+<!ELEMENT Pt EMPTY>
+<!ATTLIST Pt
+    x CDATA #REQUIRED
+    y CDATA #IMPLIED
+    z CDATA #IMPLIED
+    y2 CDATA #IMPLIED
+  >
+
+<!--- Optional Comment. -->
+<!ELEMENT Comment EMPTY>
+<!ATTLIST Comment
+    text CDATA ""
+  >
+
+<!--- For custom rosette patterns -->
+<!ELEMENT Patterns (CustomPattern*)>
+<!ATTLIST Patterns
+  >
+
+<!--- Attribues for custom rosette patterns -->
+<!ELEMENT CustomPattern (Pt+)>
+<!ATTLIST CustomPattern
+    name CDATA #REQUIRED
+    displayName CDATA #REQUIRED
+    style CDATA #REQUIRED
+    dual CDATA "false"
+  >
+
+<!--- For custom cutter profiles -->
+<!ELEMENT Profiles (CustomProfile*)>
+<!ATTLIST Profiles
+  >
+
+<!--- Attributes for custom cutter profiles -->
+<!ELEMENT CustomProfile (Pt+)>
+<!ATTLIST CustomProfile
+    name CDATA #REQUIRED
+    displayName CDATA #REQUIRED
+    style CDATA #REQUIRED
+  >
+
+<!--- For cutters -->
+<!ELEMENT Cutters (Cutter+)>
+<!ATTLIST Cutters
+  >
+
+<!--- These attributes define the cutter. -->
+<!ELEMENT Cutter EMPTY>
+<!ATTLIST Cutter
+    name CDATA #REQUIRED
+    displayName CDATA #REQUIRED
+    frame (HCF|UCF|Drill|ECF) #REQUIRED
+    location (FRONT_INSIDE|BACK_INSIDE|FRONT_OUTSIDE|BACK_OUTSIDE) #REQUIRED
+    profile CDATA #REQUIRED
+    tipWidth CDATA #REQUIRED
+    radius CDATA "0.5"
+    ucfAngle CDATA "0.0"
+    ucfRotate CDATA "0.0"
+  >
+
+<!--- Points define a curve for the outline of the shape. -->
+<!ELEMENT Outline (Pt+, SafePath?)>
+<!ATTLIST Outline
+    dotLocation (FRONT_INSIDE|BACK_INSIDE|FRONT_OUTSIDE|BACK_OUTSIDE) "FRONT_INSIDE"
+    thickness CDATA "0.1"
+    resolution CDATA "0.01"
+    color CDATA "rgb(186, 99, 18)"
+    layer1 CDATA "0.0"
+    color1 CDATA "rgb(186, 99, 18)"
+    layer2 CDATA "0.0"
+    color2 CDATA "rgb(186, 99, 18)"
+  >
+
+<!--- Points define a safe path around the shape. -->
+<!ELEMENT SafePath (Pt+)>
+<!ATTLIST SafePath
+  >
+
+<!--- For CutPoints -->
+<!ELEMENT CutPoints (GoToPoint*, IndexPoint*, PiercePoint*, RosettePoint*, SpiralIndex*, SpiralRosette*, SpiralLine*, PatternPoint*, OffsetGroup*)*>
+<!ATTLIST CutPoints
+  >
+
+<!--- GoToPoint -->
+<!ELEMENT GoToPoint (Pt)>
+<!ATTLIST GoToPoint
+    n CDATA #REQUIRED
+  >
+
+<!--- Indexed CutPoint -->
+<!ELEMENT IndexPoint (Pt)>
+<!ATTLIST IndexPoint
+    n CDATA #REQUIRED
+    snap CDATA "true"
+    cutter CDATA #REQUIRED
+    depth CDATA #REQUIRED
+    direction (INDEX_X|INDEX_Z|INDEX_CURVE) "INDEX_X"
+    repeat CDATA #REQUIRED
+    phase CDATA #REQUIRED
+    mask CDATA #IMPLIED
+  >
+
+<!--- PiercePoint -->
+<!ELEMENT PiercePoint (Pt)>
+<!ATTLIST PiercePoint
+    n CDATA #REQUIRED
+    snap CDATA "true"
+    cutter CDATA #REQUIRED
+    depth CDATA #REQUIRED
+    direction (MOVE_X|MOVE_Z|MOVE_CURVE) "MOVE_Z"
+  >
+
+<!--- RosettePoint -->
+<!ELEMENT RosettePoint (Pt, Rosette+)>
+<!ATTLIST RosettePoint
+    n CDATA #REQUIRED
+    snap CDATA "true"
+    cutter CDATA #REQUIRED
+    depth CDATA #REQUIRED
+    motion (ROCK|PUMP|PERP|TANGENT|BOTH) "ROCK"
+  >
+
+<!--- LinePoint -->
+<!ELEMENT LinePoint (Pt, PatternBar)>
+<!ATTLIST LinePoint
+    n CDATA #REQUIRED
+    snap CDATA "true"
+    cutter CDATA #REQUIRED
+    depth CDATA #REQUIRED
+    repeat CDATA #REQUIRED
+    phase CDATA #REQUIRED
+    mask CDATA #IMPLIED
+  >
+
+<!--- SpiralIndex CutPoint -->
+<!ELEMENT SpiralIndex (Pt, IndexPoint, Spiral, GoToPoint*)>
+<!ATTLIST SpiralIndex
+    n CDATA #REQUIRED
+    endDepth CDATA #REQUIRED
+  >
+
+<!--- SpiralRosette CutPoint -->
+<!ELEMENT SpiralRosette (Pt, RosettePoint, Spiral, GoToPoint*)>
+<!ATTLIST SpiralRosette
+    n CDATA #REQUIRED
+    endDepth CDATA #REQUIRED
+  >
+
+<!--- SpiralLine CutPoint -->
+<!ELEMENT SpiralLine (Pt, LinePoint, Spiral, GoToPoint*)>
+<!ATTLIST SpiralLine
+    n CDATA #REQUIRED
+    scaleDepth CDATA #REQUIRED
+    endDepth CDATA #REQUIRED
+  >
+
+<!--- PatternPoint CutPoint -->
+<!ELEMENT PatternPoint (Pt)>
+<!ATTLIST PatternPoint
+    n CDATA #REQUIRED
+    snap CDATA "true"
+    cutter CDATA #REQUIRED
+    depth CDATA #REQUIRED
+    repeat CDATA #REQUIRED
+    indexOffset CDATA #REQUIRED
+    pattern CDATA #REQUIRED
+    patternRepeat CDATA "1"
+    phase CDATA "0.0"
+    optimize CDATA "false"
+  >
+
+<!--- OffsetGroup CutPoint -->
+<!ELEMENT OffsetGroup (Pt, RosettePoint+)>
+<!ATTLIST OffsetGroup
+    n CDATA #REQUIRED
+    repeat CDATA #REQUIRED
+    indexOffset CDATA #REQUIRED
+  >
+
+<!--- These attributes define a rosette -->
+<!ELEMENT Rosette EMPTY>
+<!ATTLIST Rosette
+    pattern CDATA #REQUIRED
+    repeat CDATA #REQUIRED
+    amp CDATA #REQUIRED
+    phase CDATA #REQUIRED
+    invert CDATA "false"
+    mask CDATA ""
+    hilo (HIGH|LOW) "HIGH"
+    maskPhase CDATA "0.0"
+    n2 CDATA "0.0"
+    amp2 CDATA "0.0"
+  >
+
+<!--- These attributes define a pattern bar -->
+<!ELEMENT PatternBar EMPTY>
+<!ATTLIST PatternBar
+    pattern CDATA #REQUIRED
+    amp CDATA #REQUIRED
+    period CDATA #REQUIRED
+    phase CDATA #REQUIRED
+    invert CDATA "false"
+    n2 CDATA "0.0"
+    amp2 CDATA "0.0"
+  >
+
+<!--- These attributes define a spiral -->
+<!ELEMENT Spiral EMPTY>
+<!ATTLIST Spiral
+    style CDATA #REQUIRED
+    twist CDATA "90.0"
+    amp CDATA "0.0"
+  >

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- You may freely edit this file. See harness/README in the NetBeans platform -->
+<!-- for some information on what you could do (e.g. targets to override). -->
+<!-- If you delete this file and reopen the project it will be recreated. -->
+<project name="COrnLathe3" basedir=".">
+    <description>Builds the module suite COrnLathe3.</description>
+    <import file="nbproject/build-impl.xml"/>
+	<property name="app.icon.icns" value="${basedir}/COrnLathe3.icns"/>
+    <!-- Override to change Mac application icon. -->
+	<target name="build-mac" depends="suite.build-mac" description="Build Mac OS X Application">
+		<property name="nbdist-contents.dir" value="${dist.dir}/${app.name}.app/Contents"/>
+		<property name="nbdist-resources.dir" value="${nbdist-contents.dir}/Resources"/>
+
+		<!-- Replace the icns file. -->
+		<delete file="${nbdist-resources.dir}/${app.name}.icns"/>
+		<copy tofile="${nbdist-resources.dir}/${app.name}.icns" file="${app.name}.icns" />
+	</target>
+</project>

@@ -1,0 +1,70 @@
+<html>
+  <head>
+    <title>ProfileEditor</title>
+    <link rel="stylesheet" href="nbdocs://org.netbeans.modules.usersguide/org/netbeans/modules/usersguide/ide.css" type="text/css">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  </head>
+  <body>
+    <h2>ProfileEditor</h2>
+    <p>
+      The Profile Editor allows you to quickly create your own cutter profile. 
+      The display shows the outline of the cutter tip -- the orientation is such that 
+      the shank of the cutter is up, and the point of the cutter is down. 
+      The line in the center of the window represents the center of the cutter. 
+      As changes are made, you will see a small icon below the profile selection box. 
+    </p>
+    <p>
+      Important -- for the software to work properly, the bottom point must go all the 
+      way down to the bottom line in the display window. Also, the width of the curve 
+      you enter must go all the way to the left line and all the way to the right line. 
+    </p>
+    <ul>
+      <li>
+        <b>New Profile</b> -- This creates a new profile with the name that you provide. 
+        You have the option of creating the outline with straight lines between the points 
+        or curve-fit lines between the points.
+      </li>
+      <li>
+        <b>Adding Points</b> -- Double click on the display window to add a point. 
+        To move a point, click near it and drag it to a new location. 
+        To delete a point, drag it off the display area. 
+        Points are in sorted order from left to right. 
+      </li>
+      <li>
+        <b>Manually editing points</b> -- you can manually edit the precise positions of the 
+        coordinates by using the DataNavigator Window together with the Properties Window. 
+        Click on "Profiles:" and expand the listing to see all the points. 
+        When you select a point, you will be able to manually edit the coordinates in the 
+        "Properties" window. 
+        See the Help file on the DataNavigator Window for more information.
+      </li>
+      <li>
+        <b>Normalize</b> -- This re-adjusts the curve you entered so that the bottom point 
+        goes exactly to the bottom and the left and right sides go all the way to the edges. 
+        This is important for the software to work properly. 
+        You should always use the Normalize function at the end of all edits. 
+      </li>
+      <li>
+        <b>L<-R Mirror</b> -- This takes the points on the right half of the display and mirrors 
+        them to the left side of the display. 
+        Any prior points on the left side of the display are deleted. 
+        This is a convenient way to make a symmetrical cutter profile.  
+      </li>
+      <li>
+        <b>Clear</b> -- Clear all points and start over again. 
+      </li>
+      <li>
+        <b>Delete</b> -- Delete this profile.  
+      </li>
+    </ul>
+    <p>
+      The built-in profiles cannot be edited or deleted. 
+    </p>
+    <p>
+      You can also write a short program for your own custom profiles and have them 
+      permanently added to your copy of the software. 
+      This enables you do write a profile module and share it with 
+      other users of this software. 
+    </p>
+  </body>
+</html>

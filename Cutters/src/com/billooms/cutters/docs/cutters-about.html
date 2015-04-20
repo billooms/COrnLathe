@@ -1,0 +1,113 @@
+<html>
+  <head>
+    <title>Cutters</title>
+    <link rel="stylesheet" href="nbdocs://org.netbeans.modules.usersguide/org/netbeans/modules/usersguide/ide.css" type="text/css">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  </head>
+  <body>
+    <h2>Cutters</h2>
+    <p>
+      There are a variety of cutting frames supported by this program.
+      Current options are:
+    </p>
+    <ul>
+      <li>
+        <b>HCF</b> -- Horizontal Cutting Frame
+      </li>
+      <li>
+        <b>UCF</b> -- Universal Cutting Frame
+      </li>
+      <li>
+        <b>Drill</b> -- Drilling Frame
+      </li>
+      <li>
+        <b>ECF</b> -- Eccentric Cutting Frame
+      </li>
+    </ul>
+    <h3>Cut Location</h3>
+    <p>
+      The cutter can be in one of 4 positions relative to a bowl:
+    </p>
+    <ul>
+      <li>
+        <b>Front, Inside</b> -- Inside the bowl and forward of the axis of the spindle.
+      </li>
+      <li>
+        <b>Front, Outside</b> -- Outside the bowl and forward of the axis of the spindle.
+      </li>
+      <li>
+        <b>Back, Inside</b> -- Inside the bowl and behind the axis of the spindle.
+      </li>
+      <li>
+        <b>Back, Outside</b> -- Outside the bowl and behind the axis of the spindle.
+      </li>
+    </ul>
+    <p>
+      A small icon is shown below the selection to illustrate the position.
+    </p>
+    <h3>Cutter Profile</h3>
+    <p>
+      This is the profile of the cutting tip:
+    </p>
+    <ul>
+      <li>
+        <b>Ideal</b> -- A infinitely sharp and narrow cutter. 
+        If the cutting is all done by a very sharp tip, then this is a good approximation. 
+        Note: Using any other option will <b>significantly</b> slow down the rendering of the cut surface!
+      </li>
+      <li>
+        <b>Point60</b> -- The cutting tip is a 60 degree angle (as with a triangluar carbide insert). 
+        Use this only if your cut pattern depends on significant cutting on the side of the cutter 
+        (rather than just the tip). 
+      </li>
+      <li>
+        <b>Point90</b> -- The cutting tip is a 90 degree angle. Use this only if your cut pattern 
+        depends on significant cutting on the side of the cutter (rather than just the tip). 
+      </li>
+      <li>
+        <b>Point1200</b> -- The cutting tip is a 1200 degree angle. Use this only if your cut pattern 
+        depends on significant cutting on the side of the cutter (rather than just the tip). 
+      </li>
+      <li>
+        <b>Flat</b> -- The cutting tip is flat on the end. 
+        You would use this, for example, when doing a "basket" style pattern. 
+      </li>
+      <li>
+        <b>Round</b> -- The cutting tip is a convex half circle. 
+        Use this only if your cut pattern depends on significant cutting on the side of the cutter 
+        (rather than just the tip). 
+      </li>
+      <li>
+        <b>Concave</b> -- The cutting tip is a concave half circle. 
+        You would use this, for example, when doing a "bamboo" style pattern. 
+      </li>
+    </ul>
+    <p>
+      You can create your own cutter profiles with the Profile Editor. 
+      See the Help file for the Profile Editor for more information.
+    </p>
+    <h3>Cut Radius</h3>
+    <p>
+      Cut Radius is the radius of the circle inscribed by the cutting tip. 
+      This has meaning for HCF, UCF, and ECF but not for Drill.
+    </p>
+    <h3>Cutter Diameter</h3>
+    <p>
+      This is the diameter (or width) of the cutting tip. 
+      If you have a sharpened rod (or rectangular stock) that is spinning, this is the diameter (or width) of that cutter. 
+      In the case of a Drill, it is the diameter of the drill.
+    </p>
+    <h3>UCF/Drill Angle</h3>
+    <p>
+      Rotation of the cutting frame around y-axis. 
+      Zero means oriented along Z-axis, + angle is rotated toward front, - angle is rotated toward the back. 
+      This has no meaning for a HCF.
+    </p>
+    <h3>UCF Rotation</h3>
+    <p>
+      Rotation of UCF on it's axis. 
+      Zero is horizontal, + angle is CCW looking at the wood, - angle is CW looking at the wood.
+      This has no meaning for a HCF or Drill.
+    </p>
+  </body>
+</html>

@@ -1,0 +1,218 @@
+<html>
+  <head>
+    <title>Patterns</title>
+    <link rel="stylesheet" href="nbdocs://org.netbeans.modules.usersguide/org/netbeans/modules/usersguide/ide.css" type="text/css">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  </head>
+  <body>
+    <h2>Patterns</h2>
+    <p>
+      Each rosette has a specified pattern which describes the fundamental shape of each lobe.
+      Although users with traditional machines may prefer the "A, B, C..." designation,
+      many newcomers find the nomenclature to be difficult to remember as it is not descriptive.
+      This program attempts to use more descriptive terms for the rosette patterns. 
+      A full collection of the traditional Holtzapffel patterns is also available.
+    </p>
+    <p>
+      Any pattern may be inverted by checking the "invert" box in the property editor.
+    </p>
+    <p>
+      The following patterns are "built-in" to the software. 
+      Additional patterns may be added by the user (see the help file on the Pattern Editor). 
+      Also, a user may program their own patterns and make them permanent additions to their 
+      copy of the software (or distribute them as plug-ins to others). 
+    </p>
+    <ul>
+      <li>
+        <img src="None.png" width="50" height="50" align="middle">
+        <b>NONE</b> is just a plain round circle with no bumps or lobes.
+      </li>
+      <li>
+        <img src="Nside.png" width="50" height="50" align="middle">
+        <b>NSIDE</b> is similar to a <b>C</b> rosette on traditional rose engines.
+        It is made from an n-sided polygon (i.e. triangle, square, pentagon, hexagon, etc).
+        At some amplitude, it will accurately reproduce the n-sided polygon.
+      </li>
+      <li>
+        <img src="Flower.png" width="50" height="50" align="middle">
+        <b>FLOWER</b> is similar to a <b>D</b> rosette on traditional rose engines.
+        It is the inverse of the <b>N-Side</b> rosette.
+        That is, you get the same effect from rubbing on the front side of a <b>Flower</b> rosette
+        as you get by rubbing on the back of an <b>N-Side</b> rosette.
+      </li>
+      <li>
+        <img src="Sine.png" width="50" height="50" align="middle">
+        <b>SINE</b> is similar to an <b>A</b> rosette on traditional rose engines.
+        The lobes are defined by a sine wave function.
+      </li>
+      <li>
+        <img src="HalfSine.png" width="50" height="50" align="middle">
+        <b>HALFSINE</b> is the first half of a sine wave.
+      </li>
+      <li>
+        <img src="Heart.png" width="50" height="50" align="middle">
+        <b>HEART</b> is similar to an <b>F</b> rosette on traditional rose engines.
+        With a single repeat, it will show a traditional heart shape.
+        With more repeats, the heart pattern is repeated around the rosette.
+      </li>
+      <li>
+        <img src="Lotus.png" width="50" height="50" align="middle">
+        <b>LOTUS</b> is similar to the lotus pattern on a rosette made for the MDF rose engine by Jon Magill.
+      </li>
+      <li>
+        <img src="BigSmall.png" width="50" height="50" align="middle">
+        <b>BIGSMALL</b> is similar to a <b>B</b> rosette on traditional rose engines.
+        The larger lobe consumes 2/3 of the pattern repeat distance,
+        and the smaller lobe consumes 1/3 of the pattern repeat distance.
+        Each lobe is the same as a <b>Flower</b> lobe.
+      </li>
+      <li>
+        <img src="Triangle.png" width="50" height="50" align="middle">
+        <b>TRIANGLE</b> is a simple triangle that is "bent" around the round shape of a rosette.
+      </li>
+      <li>
+        <img src="Tudor.png" width="50" height="50" align="middle">
+        <b>TUDOR</b> is inspired by a traditional tudor rose pattern.
+        Although the traditional pattern has 5 repeats, the user is free to specify any number of repeats around the rosette.
+      </li>
+    </ul>
+    <h2>Holtzapffel Patterns</h2>
+    <p>
+      For those who prefer using the Holtzapffel rosette system, I've added the full library of lettered rosettes.
+      For more details on the Holtzapffel rosettes, John Edwards has spent a lot of time documenting the characteristics of the 
+      various rosettes on historic machines. 
+      Also, John Tarpley recently published an excellent article on rosettes in the Lindow newsletter (Vol 3, Number 1). 
+    </p>
+    <p>
+      The numbering system used with the Holtzapffel rosettes is inconsistent. 
+      Computers don't like inconsistencies in handling parameters. 
+      So for the purpose of this program the following guidelines are used:
+    </p>
+    <ul>
+      <li>
+        The <b>amplitude</b> parameter is always the maximum amplitude of the total pattern. 
+      </li>
+      <li>
+        The <b>repeat</b> parameter is always the number of repetitions of the total pattern. 
+      </li>
+      <li>
+        Some patterns use the optional <b>n2</b> parameter which is the number of small bumps within a repeat. 
+        For example -- an E rosette with 5 repeats and n2=6 will have a total of 30 bumps. 
+      </li>
+      <li>
+        Some patterns use the optional <b>amplitude2</b> parameter which is the amplitude of the small bumps as a 
+        fraction if the total amplitude. 
+        For example -- a Q rosette with a total amplitude of 0.3" and amplitude2=0.2" will have small bumps that are 
+        0.06" (0.3 * 0.2 = 0.06) high superimposed on the major shape.
+      </li>
+    </ul>
+    <p>
+      Note that these rosettes are very close approximations to the historic Holtzapffel rosettes. 
+      There is insufficient documentation to reproduce the exact patterns without digitizing the actual historic rosettes. 
+      Following is a list of the lettered Holtzapffel rosettes:
+    </p>
+    <ul>
+      <li>
+        <b>HoltzA</b>
+        <img src="A10.png" width="50" height="50" align="middle"> 
+        Sine Wave.
+      </li>
+      <li>
+        <b>HoltzB</b>
+        <img src="B15.png" width="50" height="50" align="middle"> 
+        Interrupted sine wave, where every third valley is omitted.
+      </li>
+      <li>
+        <b>HoltzC</b>
+        <img src="C10.png" width="50" height="50" align="middle"> 
+        Concave dips between peaks.
+      </li>
+      <li>
+        <b>HoltzD</b>
+        <img src="D10.png" width="50" height="50" align="middle"> 
+        Convex bumps, i.e. the opposite of C.
+      </li>
+      <li>
+        <b>HoltzE</b>
+        <img src="E30.png" width="50" height="50" align="middle"> 
+        Sine wave gradually diminishing and then increasing in amplitude. 
+        This pattern uses the optional <b>n2</b> parameter.
+      </li>
+      <li>
+        <b>HoltzF</b>
+        <img src="F4.png" width="50" height="50" align="middle"> 
+        Heart shape or Cupid’s Bow shape.
+      </li>
+      <li>
+        <b>HoltzG</b>
+        <img src="G8.png" width="50" height="50" align="middle"> 
+        Like 'B' except that every second wave is omitted.
+      </li>
+      <li>
+        <b>HoltzH</b>
+        <img src="H12.png" width="50" height="50" align="middle"> 
+        Like 'E' except that there is just one diminution after two full-sized waves. 
+        This pattern uses the optional <b>n2</b> and <b>amp2</b> parameters.
+      </li>
+      <li>
+        <b>HoltzI</b>
+        <img src="I24.png" width="50" height="50" align="middle"> 
+        A 'Puffy Polygon' with a sine wave superimposed. 
+        This pattern uses the optional <b>n2</b> and <b>amp2</b> parameters.
+      </li>
+      <li>
+        <b>HoltzJ</b>
+        <img src="J24.png" width="50" height="50" align="middle"> 
+        Arcs of eccentric circles then superimposing on each resulting arc a sine wave. 
+        This pattern uses the optional <b>n2</b> and <b>amp2</b> parameters.
+      </li>
+      <li>
+        <b>HoltzK</b>
+        <img src="K4.png" width="50" height="50" align="middle"> 
+        Cupid’s Bow shapes, as in 'F', each separated by two elements of a sine wave.
+      </li>
+      <li>
+        <b>HoltzL</b>
+        <img src="L12.png" width="50" height="50" align="middle"> 
+        Each element comprises a short wave followed by a wave of twice its length.
+      </li>
+      <li>
+        <b>HoltzM</b>
+        <img src="M18.png" width="50" height="50" align="middle"> 
+        Each element comprises three short convex bumps followed by a long bump of three times the length of a short bump.
+      </li>
+      <li>
+        <b>HoltzN</b>
+        <img src="N15.png" width="50" height="50" align="middle"> 
+        Each element comprises four short convex bumps followed by a long bump of twice the length of a short bump.
+      </li> 
+      <li>
+        <b>HoltzO</b>
+        <img src="O18.png" width="50" height="50" align="middle"> 
+        Each element comprises five short convex bumps followed by a long bump of three times the length of a short bump.
+      </li>
+      <li>
+        <b>HoltzP</b>
+        <img src="P18.png" width="50" height="50" align="middle"> 
+        Interrupted sine wave, where the fifth and sixth valleys are omitted.
+      </li>
+      <li>
+        <b>HoltzQ</b>
+        <img src="Q24.png" width="50" height="50" align="middle"> 
+        A 'Puffy Polygon' with convex bumps superimposed. 
+        This pattern uses the optional <b>n2</b> and <b>amp2</b> parameters.
+      </li>
+      <li>
+        <b>HoltzR</b>
+        <img src="R18.png" width="50" height="50" align="middle"> 
+        Two short convex bumps followed by one convex bumps of twice the length of the short ones.
+      </li>
+      <li>
+        <b>HoltzS</b>
+        <img src="S32.png" width="50" height="50" align="middle"> 
+        Heart shape with superimposed convex bumps. 
+        This pattern uses the optional <b>n2</b> and <b>amp2</b> parameters.
+      </li>
+    </ul>
+  </body>
+</html>

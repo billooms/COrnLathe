@@ -1,0 +1,51 @@
+<html>
+  <head>
+    <title>Built-In Spirals</title>
+    <link rel="stylesheet" href="nbdocs://org.netbeans.modules.usersguide/org/netbeans/modules/usersguide/ide.css" type="text/css">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  </head>
+  <body>
+    <h2>Built-In Spirals</h2>
+    <p>
+      Various kinds of spirals are used by SpiralRosette, SpiralIndex, and SpiralLine CutPoints. 
+      The following spirals are "built-in" to the software. 
+      A user may program their own spirals and make them permanent additions to 
+      their copy of the software (or distribute them as plug-ins to others).
+    </p>
+    <ul>
+      <li>
+        <b>UNIFORMZ:</b> The angle varies as a function of height (z-distance).
+      </li>
+      <li>
+        <b>UNIFORMD:</b> The angle varies uniformly with the distance traveled.
+      </li>
+      <li>
+        <b>PROPORTION:</b> The angle varies more at big diameters than small diameters.
+      </li>
+      <li>
+        <b>SINE:</b> Superimpose a sine wave on a UNIFORM_D spiral. 
+        The amplitude of the sine wave is entered in the "Spiral Amplitude" field and can be 
+        positive or negative.
+      </li>
+      <li>
+        <b>SIN4:</b> Superimpose a quarter of a sine wave on a UNIFORM_D spiral.
+      </li>
+      <li>
+        <b>COS4:</b> Superimpose a quarter of a cosine wave on a UNIFORM_D spiral.
+      </li>
+    </ul>
+    <p>
+      In addition to selecting the style of the spiral, there are additional parameters:
+    </p>
+    <ul>
+      <li>
+        <b>Twist:</b> This is the total twist of the spiral. 
+        It is measured in total rotation of the spindle in degrees (not relative to the number of repeats).
+      </li>
+      <li>
+        <b>Amplitude:</b> This optional amplitude is used by the SINE spiral to indicate the 
+        amplitude of the superimposed sine wave (may be positive or negative).
+      </li>
+    </ul>
+  </body>
+</html>

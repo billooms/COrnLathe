@@ -1,0 +1,492 @@
+<html>
+  <head>
+    <title>About CutPoints</title>
+    <link rel="stylesheet" href="nbdocs://org.netbeans.modules.usersguide/org/netbeans/modules/usersguide/ide.css" type="text/css">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  </head>
+  <body>
+    <h2>About CutPoints</h2>
+    <p>
+      A CutPoint describes how a cutter will perform at a given position. 
+      There are a number of different kinds of CutPoints, 
+      and they may behave in different fashions depending on the type of cutter being used.
+    </p>
+    <h3>Common to all CutPoints:</h3>
+    <p>
+      All CutPoints have a location and an option to snap to the white cutting curve (shown in the Outline Editor).
+    </p>
+    <ul>
+      <li>
+        <b>X-Location:</b> the radial distance from the centerline of the lathe.
+      </li>
+      <li>
+        <b>Z-Location:</b> the distance along the axis of the lathe.
+      </li>
+      <li>
+        <b>Snap:</b> this forces the CutPoint to be on the cutting curve (i.e. the white solid line shown in the 
+        Outline Editor). This is the preferred setting in most situations.
+      </li>
+      <li>
+        <b>Visible:</b> flag which if un-checked will keep the CutPoint from being drawn in the 
+        Outline Editor window. This is mainly used when there are a lot of CutPoints and you only want 
+        to view certain ones to make positioning easier. Note that this does NOT hide the CutPoint for cutting 
+        purposes. Also note that this information is not saved in the file.
+      </li>
+      <li>
+        <b>Cutter:</b> The cutter to use for this CutPoint. Note that one build a design using multiple 
+        cutters. When generating g-code, only the CutPoints using the cutter which is selected in the 
+        Outline Editor will generate g-code.
+      </li>
+      <li>
+        <b>Cut Depth:</b> The total cutting depth from the at-rest position.
+      </li>
+    </ul>
+    <p>
+      What you will see in the Outline Editor is a dotted yellow line which represents the very tip of the 
+      cutter at any given location. 
+      You will also see a text number to help in identifying the various CutPoints. 
+    </p>
+    <h3>IndexPoints:</h3>
+    <p>
+      An IndexPoint will make cuts only at certain spindle rotations (like locking a pin on various 
+      holes on an index wheel). The parameters for an IndexPoint are:
+    </p>
+    <ul>
+      <li>
+        <b>Direction:</b> Describes the direction of movement:
+        <ul>
+          <li>
+            <b>INDEX_X:</b> cutting movement is in the x-direction only
+          </li>
+          <li>
+            <b>INDEX_Z:</b> cutting movement is in the z-direction only
+          </li>
+          <li>
+            <b>INDEX_CURVE:</b> cutting movement is always perpendicular to the surface
+          </li>
+        </ul>
+      </li>
+      <li>
+        <b>Repeat:</b> The number of cuts that are made around the rotation of the work piece.
+      </li>
+      <li>
+        <b>Phase:</b> Phase shift for the cut. 
+        Phase shift can be displayed in two different ways depending on how you have set 
+        your preferences (see the Help topic on Preferences). 
+        In "Engineering" mode, phase shift is a value between 0 and 360 degrees where 360 degrees 
+        represents a full pattern shift, 180 degrees means 1/2 pattern shift, 90 degrees 
+        means 1/4 pattern shift, etc. 
+        Note that this is NOT the actual spindle rotation. 
+        The other mode you can set in the Preferences is "Fraction" mode where 1.0 means a 
+        full pattern shift, 0.5 means 1/2 pattern shift, etc.
+      </li>
+      <li>
+        <b>Mask:</b> Optional information for skipping some of the index positions. 
+        When left blank, all index positions are used. 
+        To mask certain positions, enter a series of 0 and 1 digits. 
+        A 0 (zero) means to skip the position. 
+        A 1 (one) means to enable the position. 
+        If the sequence of digits is shorter than the repeat value, then the sequence will 
+        be used repeatedly. 
+        For example -- entering 0111 with Repeat=12 will skip the 1st position, the 
+        5th position, and the 9th position and use all other positions. 
+      </li>
+    </ul>
+    <p>
+      What you see in the Outline Editor is a solid cyan arc showing the maximum depth of the cut. 
+      There is also a short solid cyan line originating at the center of the IndexPoint showing the 
+      depth and direction of the cut. 
+    </p>
+    <h3>RosettePoints:</h3>
+    <p>
+      A RosettePoint can have a rocking motion (most common), or a pumping motion, or both rocking and 
+      pumping together (with different rosettes for each). The parameters for a RosettePoint are:
+    </p>
+    <ul>
+      <li>
+        <b>Motion:</b> The direction of the motion of the rosette:
+        <ul>
+          <li>
+            <b>ROCK:</b> Traditional rocking motion.
+          </li>
+          <li>
+            <b>PUMP:</b> Pumping motion (parallel to the axis of the spindle).
+          </li>
+          <li>
+            <b>PERP:</b> Motion is always perpendicular to the curve of the shape. 
+            Note that this is not a typical option on a traditional (analog) ornamental lathe.
+          </li>
+          <li>
+            <b>TANGENT:</b> Motion is always tangental to curve of the shape. 
+            Note that this is not a typical option on a traditional (analog) ornamental lathe.
+          </li>
+          <li>
+            <b>BOTH:</b> Both rocking and pumping motion. 
+            A different rosette is used for each.
+          </li>
+        </ul> 
+      </li>
+    </ul>
+    <p>
+      For rosettes, you have the following parameters:
+    </p>
+    <ul>
+      <li>
+        <b>Pattern:</b> See the help file on Patterns for more information on the various patterns. 
+      </li>
+      <li>
+        <b>Repeat:</b> The number of times the pattern is repeated around the perimeter of the rosette.
+      </li>
+      <li>
+        <b>Amplitude:</b> The peak-to-peak amplitude of the rosette. 
+      </li>
+      <li>
+        <b>Phase:</b> Phase shift for the cut. 
+        Phase shift can be displayed in two different ways depending on how you have set 
+        your preferences (see the Help topic on Preferences). 
+        In "Engineering" mode, phase shift is a value between 0 and 360 degrees where 360 degrees 
+        represents a full pattern shift, 180 degrees means 1/2 pattern shift, 90 degrees 
+        means 1/4 pattern shift, etc. 
+        Note that this is NOT the actual spindle rotation. 
+        The other mode you can set in the Preferences is "Fraction" mode where 1.0 means a 
+        full pattern shift, 0.5 means 1/2 pattern shift, etc.
+      </li>
+      <li>
+        <b>Invert</b> -- Invert the pattern on the rosette. 
+      </li>
+      <li>
+        <b>Mask:</b> Optional information for skipping some of the repeats. 
+        When left blank, all repeats are used. 
+        To mask certain repeat, enter a series of 0 and 1 digits. 
+        A 0 (zero) means to skip the repeat. 
+        A 1 (one) means to enable the repeat. 
+        If the sequence of digits is shorter than the repeat value, then the sequence will 
+        be used repeatedly. 
+        For example -- entering 0111 with Repeat=12 will skip the 1st repeat, the 
+        5th repeat, and the 9th repeat and use all other repeats. 
+      </li>
+
+      <li>
+        <b>MaskPhase:</b> Optional information for shifting the point in the pattern where 
+        the masking will start. 
+        As with Phase above, the number is either "Engineering" mode or "Fraction" mode 
+        depending on how you have set your preferences. 
+        In general, when you are cutting on the inside of a shape, you will probably want to 
+        start the masking at a point in the pattern where the pattern is at "1.0" in the pattern 
+        editor (which corresponds to a valley on the rosette). 
+        Likewise, when you are cutting on the outside of a shape, you will probably want to 
+        start the masking at a point in the pattern where the pattern is at "0.0" in the pattern 
+        editor (which corresponds to a peak on the rosette). 
+      </li>
+      <li>
+        <b>MaskHiLo:</b> Flag indicating if masking causes rosette to be the highest or the lowest in the pattern. 
+      </li>
+      <li>
+        <b>N2:</b> Some patterns use the optional <b>N2</b> parameter which is the number of small bumps within a repeat. 
+        For example -- an E rosette with 5 repeats and N2=6 will have a total of 30 bumps. 
+      </li>
+      <li>
+        <b>Amplitude2:</b> Some patterns use the optional <b>Amplitude2</b> parameter which is the amplitude of the small bumps as a 
+        fraction if the total amplitude. 
+        For example -- a Q rosette with a total amplitude of 0.3" and amplitude2=0.2" will have small bumps that are 
+        0.06" (0.3 * 0.2 = 0.06) high superimposed on the major shape.
+      </li>
+    </ul>
+    <p>
+      What you see in the Outline Editor is a solid yellow arc to indicate the maximum depth of the cut which is 
+      always perpendicular to the surface. 
+      There is also a short solid yellow line originating at the center of the RosettePoint showing the 
+      depth and direction of the cut. 
+      You will also see a solid green arc to indicate the minimum depth of the cut for 
+      a given cut depth and rosette amplitude. 
+      When using BOTH rocking and pumping, you will also see a solid green arc to indicate the minimum depth of 
+      the rocking motion and a solid blue arc to indicate the minimum depth of the pumping motion.
+    </p>
+    <h3>PiercePoint:</h3>
+    <p>
+      This is used when you want to move a tool into the work with the spindle running 
+      at a high rpm (as with plain turning). The parameters for a PiercePoint are:
+    </p>
+    <ul>
+      <li>
+        <b>Direction:</b> Describes the direction of movement (similar to IndexPoints above):
+        <ul>
+          <li>
+            <b>MOVE_X:</b> cutting movement is in the x-direction only
+          </li>
+          <li>
+            <b>MOVE_Z:</b> cutting movement is in the z-direction only
+          </li>
+          <li>
+            <b>MOVE_CURVE:</b> cutting movement is always perpendicular to the surface
+          </li>
+        </ul>
+      </li>
+    </ul>
+    <p>
+      What you see in the Outline Editor is a solid orange arc to indicate the maximum depth of the cut which is 
+      always perpendicular to the surface. 
+      There is also a short solid orange line originating at the center of the RosettePoint showing the 
+      depth and direction of the cut. 
+    </p>
+    <h3>Various Spiral Cuts:</h3>
+    <p>
+      There are 3 kinds of spiral cuts: SpiralIndex, SpiralLine, and SpiralRosette. They have a start point 
+      and an end point. 
+    </p>
+    <ul>
+      <li>
+        <b>End Cut Depth:</b> The cut depth may be different at the end than at the beginning. If so, 
+        the depth is changed proportionally over the length of the spiral.
+      </li>
+    </ul>
+    <p>
+      See the help file on Spirals for more information on the various kinds of spirals and parameters. 
+    </p>
+    <p>
+      The step size when moving is the value in the "Curve Resolution" field of the Outline Editor window. 
+      For smooth cuts, you will want something on the order of 0.030" or less. 
+      Note that this type of can will take a long time to render even on the more powerful computers. 
+    </p>
+    <h3>SpiralIndex:</h3>
+    <p>
+      The SpiralIndex CutPoint starts cutting at a number of points around the work piece (just like the IndexPoint above). 
+      Then it moves along the outside of the shape (following the white cut curve in the Outline Editor) 
+      while the spindle is rotating. 
+      This produces simple fluting (when twist=0) or it can produce a variety of spiral cuts.
+    </p>
+    <p>
+      The parameters for the starting point are the same as for IndexPoint listed above. 
+    </p>
+    <p>
+      What you see in the Outline Editor is a starting IndexPoint and a separate end point 
+      (with the same text number ending with "E"). 
+      The end point can be moved independent of the start point. 
+      (Note that initially, the end point will be coincident with the start point until you move it.)
+    </p>
+    <h3>SpiralRosette:</h3>
+    <p>
+      The SpiralRosette CutPoint starts cutting with a rosette just (like the RosettePoint above). 
+      Then it moves along the outside of the shape (following the white cut curve in the Outline Editor) 
+      while the spindle is rotating. 
+      This produces a rosette pattern that varies smoothly as it spirals around the piece. 
+    </p>
+    <p>
+      The parameters for the starting point are the same as for RosettePoint listed above. 
+    </p>
+    <p>
+      If the starting depth is the same as the amplitude of the rosette (either rocking amplitude or 
+      pumping amplitude) and the end depth is different from the starting depth, then the rosette 
+      amplitude will be tapered as well.
+      If you desire a taper in the depth without changing the amplitude of the rosette, then make 
+      one of them slightly different and the rosette amplitude will not be tapered.
+    </p>
+    <p>
+      What you see in the Outline Editor is a starting RosettePoint and a separate end point 
+      (with the same text number ending with "E"). 
+      The end point can be moved independent of the start point. 
+      (Note that initially, the end point will be coincident with the start point until you move it.)
+    </p>
+    <h3>SpiralLine:</h3>
+    <p>
+      The SpiralLine CutPoint starts cutting at a number of points around the work piece (similar to the SpiralIndex above). 
+      Then it moves along the outside of the shape (following the white cut curve in the Outline Editor) 
+      while the spindle is rotating forward and reverse to create a wave pattern in the line similar to 
+      what is produced on a straight line machine. The pattern is controlled by a PatternBar.
+    </p>
+    <p>
+      The parameters for the starting LinePoint are: 
+    </p>
+    <ul>
+      <li>
+        <b>Repeat:</b> The number of lines that are made around the rotation of the work piece.
+      </li>
+      <li>
+        <b>Phase:</b> Phase shift for the lines. 
+        Phase shift can be displayed in two different ways depending on how you have set 
+        your preferences (see the Help topic on Preferences). 
+        In "Engineering" mode, phase shift is a value between 0 and 360 degrees where 360 degrees 
+        represents a full pattern shift, 180 degrees means 1/2 pattern shift, 90 degrees 
+        means 1/4 pattern shift, etc. 
+        Note that this is NOT the actual spindle rotation. 
+        The other mode you can set in the Preferences is "Fraction" mode where 1.0 means a 
+        full pattern shift, 0.5 means 1/2 pattern shift, etc.
+      </li>
+      <li>
+        <b>Mask:</b> Optional information for skipping some of the line positions. 
+        When left blank, all line positions are used. 
+        To mask certain positions, enter a series of 0 and 1 digits. 
+        A 0 (zero) means to skip the position. 
+        A 1 (one) means to enable the position. 
+        If the sequence of digits is shorter than the repeat value, then the sequence will 
+        be used repeatedly. 
+        For example -- entering 0111 with Repeat=12 will skip the 1st position, the 
+        5th position, and the 9th position and use all other positions. 
+      </li>
+    </ul>
+    <p>
+      For a PatternBar, you have the following parameters:
+    </p>
+    <ul>
+      <li>
+        <b>Pattern:</b> See the help file on Patterns for more information on the various patterns. 
+      </li>
+      <li>
+        <b>Amplitude:</b> The peak-to-peak amplitude of the PatternBar. 
+      </li>
+      <li>
+        <b>Period:</b> The distance before the pattern repeats.
+      </li>
+      <li>
+        <b>Phase:</b> Phase shift for the cut. 
+        Phase shift can be displayed in two different ways depending on how you have set 
+        your preferences (see the Help topic on Preferences). 
+        In "Engineering" mode, phase shift is a value between 0 and 360 degrees where 360 degrees 
+        represents a full pattern shift, 180 degrees means 1/2 pattern shift, 90 degrees 
+        means 1/4 pattern shift, etc. 
+        Note that this is NOT the actual spindle rotation. 
+        The other mode you can set in the Preferences is "Fraction" mode where 1.0 means a 
+        full pattern shift, 0.5 means 1/2 pattern shift, etc.
+      </li>
+      <li>
+        <b>Invert</b> -- Invert the pattern on the PatternBar. 
+      </li>
+      <li>
+        <b>N2:</b> Some patterns use the optional <b>N2</b> parameter which is the number of small bumps within a repeat. 
+        For example -- an E pattern with 5 repeats and N2=6 will have a total of 30 bumps. 
+      </li>
+      <li>
+        <b>Amplitude2:</b> Some patterns use the optional <b>Amplitude2</b> parameter which is the amplitude of the small bumps as a 
+        fraction if the total amplitude. 
+        For example -- a Q pattern with a total amplitude of 0.3" and amplitude2=0.2" will have small bumps that are 
+        0.06" (0.3 * 0.2 = 0.06) high superimposed on the major shape.
+      </li>
+    </ul>
+    <p>
+      What you see in the Outline Editor is a starting LinePoint and a separate end point 
+      (with the same text number ending with "E"). 
+      The end point can be moved independent of the start point. 
+      (Note that initially, the end point will be coincident with the start point until you move it.)
+    </p>
+    <h3>GoToPoint:</h3>
+    <p>
+      A GoToPoint does not do any cutting. It merely directs the motion of the cutter when moving from 
+      one CutPoint to another. This is typically used when you need to go around a convex curve section 
+      of the work. If no GoToPoints occur between two CutPoints, the movement of the cutter is a 
+      straight line from one to the next. 
+    </p>
+    <p>
+      A GoToPoint has cutter information so that when there are multiple cutters we can filter only those 
+      GoToPoints that are required for a given cutter's CutPoints. 
+    </p>
+    <p>
+      GoToPoints may also be used to direct the motion of the cutter from the end of a SpiralLine or 
+      SpiralIndex CutPoint back to the beginning of the CutPoint. This is often needed to prevent the 
+      cutter from hitting a portion of the work as multiple spirals are being cut. To add GoToPoints
+      to a SpiralLine or SpiralIndex, first add one or more GoToPoints, then drag/drop them onto the end point 
+      of the SpiralLine or SpiralIndex in the order that should be followed. Note that after the last cut of 
+      such a spiral the cutter does NOT follow these GoToPoints but the cutter remains at the end of the 
+      last spiral.
+    </p>
+    <h3>Various Offset CutPoints:</h3>
+    <p>
+      Offset CutPoints include a PatternPoint and an OffsetGroup (one or more RosettePoints).  
+    </p>
+    <p>
+      Offset CutPoints are used to cut the work when it is held in a dome or eccentric chuck. 
+      The location of the Offset CutPoint becomes the top/center of the work when it is positioned 
+      by the dome/eccentric chuck.  
+    </p>
+    <p>
+      For an Offset CutPoint, you have the following parameters:
+    </p>
+    <ul>
+      <li>
+        <b>Repeat:</b> The number of cuts that are made around the rotation of the work piece (as with 
+        an eccentric chuck). Valid values for repeat can be any sub-multiple of 24 or 35 (the rotation 
+        is indexed with 24 or 35 holes).
+      </li>
+      <li>
+        <b>IndexOffset:</b> The number of holes to skip before starting the repeats.
+      </li>
+    </ul>
+    <p>
+      What you see in the Outline Editor is a pink line that is tangental to the surface, and a pink 
+      line that is perpendicular to the surface. When the work is positioned in the dome/eccentric chuck, the 
+      line perpendicular to the surface is brought to the center of rotation of the spindle.
+    </p>
+    <h3>PatternPoint:</h3>
+    <p>
+      A PatternPoint is used to cut a pattern around the point of rotation. It is to be used with a 
+      Horizontal Cutting Frame (HCF) and a custom pattern that is made from an outline of a shape (like 
+      a leaf or butterfly).   
+    </p>
+    <p>
+      For a PatternPoint, you have the following parameters:
+    </p>
+    <ul>
+      <li>
+        <b>Pattern:</b> This is usually a custom pattern.
+      </li>
+      <li>
+        <b>PatternRepeat:</b> The number of times the pattern is repeated (usually this is set to one). 
+      </li>
+      <li>
+        <b>Phase:</b> Phase shift for the pattern. 
+        Phase shift can be displayed in two different ways depending on how you have set 
+        your preferences (see the Help topic on Preferences). 
+        In "Engineering" mode, phase shift is a value between 0 and 360 degrees where 360 degrees 
+        represents a full pattern shift, 180 degrees means 1/2 pattern shift, 90 degrees 
+        means 1/4 pattern shift, etc. 
+        Note that this is NOT the actual spindle rotation. 
+        The other mode you can set in the Preferences is "Fraction" mode where 1.0 means a 
+        full pattern shift, 0.5 means 1/2 pattern shift, etc.
+      </li>
+      <li>
+        <b>Optimize:</b> A flag indicating that the depth of the cut be adjusted based on the curvature 
+        of the shape to reduce the distortion of the pattern due to curvature. 
+      </li>
+    </ul>
+    <p>
+      A custom pattern is made from the outline of some shape with radial symmetry. Measure the radial 
+      distance for various rotations from 0 to 360 degrees. Then scale the pattern to a horizontal scale 
+      ranging from 0 to 1 and a vertical scale of 0 to 1.   
+    </p>
+    <p>
+      When the pattern has a value of zero, no cut is made. When the pattern 
+      has a value of one, then the cutter will be at the specified cut depth. For other pattern 
+      values, the depth and position of the cutter is adjusted 
+      during spindle rotation so that the cut spans the distance from the center of rotation to the point 
+      indicated by the pattern. Thus the PatternPoint will reproduce outline of the shape that was 
+      used as a basis for the pattern. 
+    </p>
+    <p>
+      A custom pattern may also have dual lines. In that case, there are two pattern points for each position. 
+      The first point would be positive and represent the outline of the shape as described above. 
+      The second point can be negative and indicates that the extent of the cut is from some other point other 
+      than the center of rotation. This can be used, for example, for accentuating the stem on a leaf pattern.
+    </p>
+    <p>
+      What you see in the Outline Editor is a pink arc indicating the maximum cut depth, and green arcs 
+      on either side of the perpendicular pink line to show the extent of the cut.
+    </p>
+    <h3>OffsetGroup:</h3>
+    <p>
+      The OffsetGroup allows you to add one or more RosettePoints to the group. First drag and drop an 
+      OffsetGroup from the pallet. Then drag and drop one or more RosettePoints onto the curve, and then 
+      drag/drop the RosettePoints onto the center of the OffsetGroup. Now the RosettePoint is part of the 
+      group and can be positioned as desired relative to the group. 
+    </p>
+    <p>
+      What you see in the Outline Editor is similar to a regular RosettePoint, but the arcs are mirrored on 
+      either side of the pink lines indicating the origin of the group.
+    </p>
+    <h3>Changing the order of CutPoints:</h3>
+    <p>
+      The order of the CutPoints can be changed in the DataNavigator window. 
+      Select a CutPoint, then right-click (Mac CTRL-click) and choose "Move Up" or 
+      "Move Down" to move that CutPoint's position in the list. 
+      You can also use the keyboard shortcuts (which can be changed in the Preferences window). 
+    </p>
+  </body>
+</html>

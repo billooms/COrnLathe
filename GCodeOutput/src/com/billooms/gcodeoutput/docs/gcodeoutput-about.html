@@ -1,0 +1,264 @@
+<html>
+  <head>
+    <title>GCode Output</title>
+    <link rel="stylesheet" href="nbdocs://org.netbeans.modules.usersguide/org/netbeans/modules/usersguide/ide.css" type="text/css">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  </head>
+  <body>
+    <h2>Hardware Preferences</h2>
+    <p>
+      The Preferences are found under the Preferences menu item (Mac users) 
+      or under the "Tools --> Options" menu (PC and UNIX). 
+      These must be set to match your hardware configuration in order to 
+      have optimum results when generating instructions. 
+      The settings for your XZ stage might be different from your settings on 
+      the spindle (C-axis), so both must be set. 
+      Once set, these preferences are saved for later use each time you open 
+      the software.
+    </p>
+    <ul>
+      <li>
+        <b>Stepper Motor:</b> Stepper motors are generally either 200 steps 
+        per rotation (1.8 degree per step) or 400 steps per rotation (0.9 
+        degree per step). 
+      </li>
+      <li>
+        <b>MicroStepping:</b> Stepper motor drives often allow the ability 
+        to micro-step which gives greater resolution. 
+        If your stepper driver does not have this option, select "1 step". 
+        Otherwise, select the appropriate micro-stepping value. 
+      </li>
+      <li>
+        <b>Small Gear:</b> Typically you will want to have a pulley on the 
+        spindle stepper motor with fewer teeth than on the spindle. 
+        This gives you more torque on the spindle and greater resolution. 
+        Enter the number of teeth on the small pulley on the stepper motor.  
+      </li>
+      <li>
+        <b>Large Gear:</b> Enter the number of teeth on the large pulley on the spindle.  
+      </li>
+      <li>
+        <b>Turns per Inch:</b> Enter the number of turns per inch on the lead 
+        screw on the X and Z stages. 
+        Note that this might not be the same as the number of threads per 
+        inch in the event that your lead screw has multiple starts.   
+      </li>
+    </ul>
+    <h2>Location and name of g-code output file</h2>
+    <p>
+      The default location for the generated g-code file is in the same directory 
+      as the .xml file. 
+      The name is the same as the .xml file, but will have an extension of .ngc 
+      (which is the standard for LinuxCNC software). 
+    </p>
+    <p>
+      You have the option of selecting a single file that will always be used with 
+      the same name each time. 
+      For example, this might be on a different computer on the network which is 
+      running the LinuxCNC software. 
+      This makes it easy to simply re-load the file each time something is changed. 
+      Note that with this option, you will not be asked prior to over-writing the file. 
+    </p>
+    <p>
+      You can set the maximum number of g-code instructions that can be executed per second. 
+      In reality, LinuxCNC can only compute a trajectory at some maximum number of points per second 
+      which is a function of the speed of the CPU and other factors. 
+      This generally will come into play when cutting from rosettes at the maximum precision where 
+      a g-code instruction is generated for each micro-step of the spindle (C-axis).  
+      You can determine how fast your LinuxCNC machine can execute commands by setting this parameter to some high number 
+      (like 500) and then cutting a single rotation of a rosette with maximum resolution at a high rpm (like 10RPM). 
+      Note how many seconds it actually takes to cut the rotation. 
+      The number of g-code instructions per second that your system is capable of handling 
+      is the number of micro-steps per revolution of the 
+      spindle (C-axis) divided by the number of seconds to do the cut. 
+    </p>
+    <h2>LinuxCNC IP address</h2>
+    <p>
+      If you wish to probe points from the actual position of your XZ stage, check the "Connect to LinuxCNC" box. 
+      Then enter the IP address of your LinuxCNC computer. 
+      Note that some routers may assign a different IP address every time the system is turned on. 
+      You can change that in your router setup so that it always assigns a given IP address to each machine. 
+    </p>
+    <h2>GCode Output</h2>
+    <p>
+      There are 3 options for writing g-code. 
+      The first (and most commonly used) is cutting patterns from rosettes. 
+      You can also cut the contour of a shape, or cut threads.
+    </p>
+    <p>
+      <b>Important!</b> Since this software has no knowledge of the actual position of the stages, the user 
+      must assure that the stages are positioned so that the first g-code command 
+      executed (going to the first CutPoint) will not cause the cutter to interfere with 
+      the work.
+    </p>
+    <p>
+      To write the g-code file, press the "Write G-Code" button in the GCode Control Window. 
+      The file will have the same name as your .xml file, but will have the suffix ".ngc".
+      Alternately, you can always write to a specific file on a networked LinuxCNC computer (see 
+      Hardware Preferences above). 
+      Most of the g-code instructions use inverse time mode (g93) to assure that both the 
+      maximum rpm and the maximum velocities are not exceeded. 
+      When the spindle turns a full rotation, it is set to zero (without turning back) by the 
+      use of the g92 offset command. 
+      At the end of the file, a g92.1 command is given to clear any offsets that have been 
+      accumulated. 
+      The user needs to be aware of how these commands operate. 
+    </p>
+    <h3>Feed Rates</h3>
+    <p>
+      When generating g-code, the software needs to know the maximum feed rate 
+      on both the linear stages (X-axis and Z-axis) and on the spindle (C-axis). 
+      Values can be entered by moving the slider with the mouse, selecting the 
+      text in the display field and typing in a new value, or placing the 
+      cursor in the display field and rotating the mouse scroll wheel.
+    </p>
+    <ul>
+      <li>
+        <b>RPM:</b> Enter the desired maximum rpm on the spindle (C-axis). 
+      </li>
+      <li>
+        <b>Velocity:</b> Enter the desired maximum velocity on the X-axis 
+        and Z-axis (inches per minute).
+      </li>
+    </ul>
+    <p>
+      Note that this software is set up with a maximum spindle speed of 10 rpm, 
+      and a maximum linear stage speed of 15 inches per minute. 
+    </p>
+    <h3>Cutting Rosettes</h3>
+    <p>
+      When cutting from the rosettes, it is generally best to make multiple 
+      coarse cuts followed by a final fine cut. 
+      You can enter the depth of the coarse cuts and the depth of the final cut. 
+      Note that the final depth of the cut is specified on each CutPoint and 
+      the final depth will be broken down into the appropriate number of coarse 
+      and fine cuts. 
+      You also have the option to specify the number of stepper motor micro-steps 
+      for each generated g-code command. 
+      You might use a larger value for the coarse cuts and a smaller value for the 
+      final cut. 
+      You can choose to have all the cuts in the same direction, or to have the last 
+      cut in the opposite direction. 
+    </p>
+    <ul>
+      <li>
+        <b>Depth per Pass:</b> The depth of each coarse cut. 
+        Typical values are often in the range of 0.020 to 0.030 inch.
+      </li>
+      <li>
+        <b>Micro-Steps per instruction:</b> The number of stepper micro-steps per 
+        each generated instruction. 
+        The equivalent number of "Degrees per step" is displayed. 
+        A value that gives about 0.15 degrees per step might be good for coarse cuts. 
+      </li>
+      <li>
+        <b>Final Cut Depth:</b> This is the depth of the final fine cut. 
+        Note that this is not the total cut depth (which is specified for each CutPoint).  
+        A typical value is 0.005 inch.
+      </li>
+      <li>
+        <b>Micro-Steps per instruction:</b> The number of stepper micro-steps per 
+        each generated instruction. 
+        The equivalent number of "Degrees per step" is displayed. 
+        For best resolution, you would set this to "1".
+      </li>
+    </ul>
+    <p>
+      <b>Important!</b> When cutting on a convex surface, you MUST provide a safe path for the cutter 
+      to go from one CutPoint to the next! 
+      Otherwise, after making the a cut, the cutter might run into the surface of your shape! 
+      "GoToPoints" are entered in the Outline Editor in the "Edit CutPoint" mode by right clicking. 
+      These "GoToPoints" are displayed in red and are numbered. 
+      Since CutPoints are cut in the order they are entered, any "GoToPoints" you enter will provide 
+      a path when going from one CutPoint to the next.
+    </p>
+    <h3>Cutting Contours</h3>
+    <p>
+      This is useful when you want to rough out a shape and use the ornamental lathe to complete the final shape. 
+      It is also useful when making closely nested shapes. 
+      The user can specify how coarse of a step to take (which is independent of the display resolution 
+      used in the Outline Editor window). 
+      At each point on the curve, one complete turn is made at the specified rpm.
+    </p>
+    <ul>
+      <li>
+        <b>Step Size:</b> The approximate distance moved on the outline for each cut. 
+        Typical values are often in the range of 0.020 to 0.100 inch.
+      </li>
+      <li>
+        <b>Backoff:</b> How far to back away (from the final surface) when making the first cut. 
+        For example, if you have roughed out the shape to within about 0.1" of the final contour, 
+        you may want to backoff 0.100" on the first cut. 
+      </li>
+      <li>
+        <b>Direction of cut:</b> Either "First to Last" or "Last to First".
+        Note that this refers to the order that points are entered in the outline. 
+        You can view the order of the points in the DataNavigator window.
+      </li>
+      <li>
+        <b>Number of coarse cuts:</b> The number of coarse cut passes (which can be zero).
+      </li>
+      <li>
+        <b>Depth of coarse cuts:</b> The incremental depth of each coarse cut pass (which can be zero).
+      </li>
+      <li>
+        <b>Number of fine cuts:</b> The number of fine cut passes (which can be zero).
+      </li>
+      <li>
+        <b>Depth of fine cuts:</b> The incremental depth of each fine cut pass (which can be zero).
+      </li>
+    </ul>
+    <p>
+      Note that you need at least one coarse or fine cut (or nothing will be cut). 
+      You might only have one cut of zero depth with no back-off, which will cut the surface as drawn. 
+      The total number of passes (with the total cut depth relative to the drawn surface) is displayed.
+    </p>
+    <p>
+      <b>Important!</b> When cutting on a convex surface, you MUST provide a safe path for the cutter 
+      to go from the end back to the beginning when taking multiple passes! 
+      Otherwise, after making the first path, the cutter might run into the surface of your shape! 
+      Safe paths are entered in the Outline Editor in the "Edit Outline" mode by right clicking. 
+      These "safe path" points are displayed in red.
+    </p>
+    <h3>Cutting Threads</h3>
+    <p>
+      Threads may only be cut on a vertical surface (i.e. two points in the outline with the same X-coordinate). 
+      Threads are conveniently cut by the use of a thread cutter or 60 degree angle cutter in a drilling frame.
+    </p>
+    <ul>
+      <li>
+        <b>Threads per Inch:</b> The number of threads per inch. 
+        The pitch is displayed for convenience (but the pitch field cannot be manually changed). 
+      </li>
+      <li>
+        <b>Starts:</b> The number of starts for the threads. 
+        This is usually "1", but if you want faster threads (such as on the lid of a box), you can set this to a higher value. 
+        Note that the "turns per inch" will be the "Threads per Inch" divided by the number of starts. 
+      </li>
+      <li>
+        <b>%:</b> The percentage of engagement in the threads. 
+        A typical number would be 60%. 
+        See the figure below for more information and a description of the other dimensions displayed.
+      </li>
+      <li>
+        <b>Female ID:</b> Enter a number here for the inside dimension of the female recess, 
+        and the outside dimensions of the male tenon will be calculated and displayed.
+      </li>
+      <li>
+        <b>Male OD:</b> Enter a number here for the outside dimension of the male tenon, 
+        and the inside dimensions of the female recess will be calculated and displayed.
+      </li>
+    </ul>
+    <img alt="Threads" src="Threads.jpg" width="500" height="379">
+
+    <h3>LinuxCNC Connection</h3>
+    <p>
+      If you have set up your preferences to allow probing the actual position of the XZ stage, then 
+      this panel will show that the connection is active. 
+      When you press the "Probe" button, the actual position of the XZ stage is read and used as 
+      the coordinate for adding an outline point (if the EditorWindow is in "Edit Outline" mode) 
+      or used as the coordinate for adding a CutPoint (if the Editor Window is in the "Edit CutPoints" mode). 
+      The probed position is shown in the panel for convenience. 
+    </p>
+  </body>
+</html>

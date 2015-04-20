@@ -1,0 +1,105 @@
+<html>
+  <head>
+    <title>PatternEditor</title>
+    <link rel="stylesheet" href="nbdocs://org.netbeans.modules.usersguide/org/netbeans/modules/usersguide/ide.css" type="text/css">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  </head>
+  <body>
+    <h2>PatternEditor</h2>
+    <p>
+      The Pattern Editor allows you to quickly create your own rosette patterns. 
+      The plot shows a normalized version of a single repeat of the pattern. 
+      The horizontal scale goes from zero to one, and the vertical scale goes from 
+      zero to one. 
+    </p>
+    <p>
+      A point at the bottom represents zero deflection from the maximum radius of the rosette. 
+      A point at the top represents a maximum deflection of the rosette as determined by the 
+      rosette's peak-to-peak amplitude. 
+      You will find it helpful to look at the rosette with the Rosette Viewer as you are 
+      constructing a pattern.  
+      As changes are made, you will see a small icon below the pattern selection box. 
+    </p>
+    <p>
+      Important -- for the software to work properly, the plot must completely fill the 
+      total height and total width of the outlined box. 
+      In general, you will want the left side and right side to be the same height or 
+      you will have a sharp step in the rosette where one pattern repeat meets the 
+      adjacent pattern repeat.
+    </p>
+    <ul>
+      <li>
+        <b>New Pattern</b> -- This creates a new pattern with the name that you provide. 
+        You have the option of creating several different kinds of lines/curves as indicated below.
+      </li>
+      <li>
+        <b>Adding Points</b> -- Double click on the display window to add a point. 
+        To move a point, click near it and drag it to a new location. 
+        To delete a point, drag it off the display area. 
+        Points are in sorted order from left to right. 
+      </li>
+      <li>
+        <b>Manually editing points</b> -- you can manually edit the precise positions of the 
+        coordinates by using the DataNavigator Window together with the Properties Window. 
+        Click on "Patterns:" and expand the listing to see all the points. 
+        When you select a point, you will be able to manually edit the coordinates in the 
+        "Properties" window. 
+        See the Help file on the DataNavigator Window for more information.
+      </li>
+      <li>
+        <b>Normalize</b> -- This re-adjusts the curve you entered so that the curve 
+        completely fills the area. 
+        You should always use the Normalize function at the end of all edits. 
+      </li>
+      <li>
+        <b>Invert</b> -- Flip the curve top to bottom.  
+      </li>
+      <li>
+        <b>Delete</b> -- Delete this pattern.  
+      </li>
+      <li>
+        <b>Mirror L->R</b> -- Mirror the curve left to right. 
+        Points to the right of center are deleted, and all points to the left of 
+        center are mirrored and added to the right side.  
+      </li>
+      <li>
+        <b>Clear</b> -- Clear all points and start over again. 
+      </li>
+    </ul>
+    <p>
+      The built-in patterns cannot be edited or deleted.
+    </p>
+    <p>
+      You can also write a short program for your own custom patterns and have them 
+      permanently added to your copy of the software. 
+      This enables you do write a pattern module and share it with 
+      other users of this software. 
+    </p>
+    <h3>Various styles of lines/curves</h3>
+    <ul>
+      <li>
+        <b>Straight Lines</b> -- a straight line is drawn between each point.
+      </li>
+      <li>
+        <b>Curve Fit</b> -- all points are fit to a single curve. 
+        This works best when you have more points close together. 
+        If you have only a few points that are widely separated, you may get 
+        a bizarre result.
+      </li>
+      <li>
+        <b>Arc Segments</b> -- each group of 3 points is a curve-fit arc. 
+        Each segment shares a point with the previous segment to form a continuous line. 
+        For example, the 1st, 2nd, 3rd points form an arc segment, the 3rd point is shared with the 
+        next segment, the 3rd, 4th, 5th points are the next arc segment, etc. 
+        If there are an even number of points, the last arc segment is a straight line.
+      </li>
+      <li>
+        <b>Sine/Cosine Segments</b> -- Similar to the Arc Segments style above, but 
+        the segments are fit to a quarter of a sine/cosine curve. 
+        The even numbered points define whether the curve segment is concave or convex. 
+        Note that the even numbered points do not necessarily end up on the curve -- they 
+        only indicate the direction of curvature.
+      </li>
+    </ul>
+  </body>
+</html>

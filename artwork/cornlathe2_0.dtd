@@ -1,0 +1,198 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<!--
+    Defines the XML file structure for COrnLathe software.
+
+    PUBLIC ID: -//IDN billooms.com//DTD COrnLathe file format 1.0//EN
+    SYSTEM ID: http://www.billooms.com/dtds/cornlathe_0.dtd
+
+-->
+
+<!--
+    An example how to use this DTD from your XML document:
+
+    <?xml version="1.0"?>
+	<!DOCTYPE COrnLathe PUBLIC "-//IDN billooms.com//DTD COrnLathe file format 1.0//EN" "http://www.billooms.com/dtds/cornlathe_0.dtd">
+	<COrnLathe version="2.0">
+    ...
+	</COrnLathe>
+-->
+
+<!--
+	COrnLathe files are composed of sections defining the outline, the CutPoints, 
+	the cutter parameters, and optional control parameters.
+	A version number is required.
+-->
+<!ELEMENT COrnLathe (coarsefine?,feedrate?,cutcurve?,thread?,Cutter,dotCurve,cutPointList?)>
+<!ATTLIST COrnLathe
+    version CDATA #REQUIRED
+  >
+
+<!--- 
+	For g-code generation or real-time control. 
+	These parameters define coarse cuts and fine cuts.
+-->
+<!ELEMENT coarsefine EMPTY>
+<!ATTLIST coarsefine
+    passDepth CDATA #REQUIRED
+    passStep CDATA #REQUIRED
+    lastDepth CDATA #REQUIRED
+    lastStep CDATA #REQUIRED
+  >
+
+<!--- 
+	For g-code generation or real-time control. 
+	These parameters define feedrate on linear stages and rpm on rotary stages.
+-->
+<!ELEMENT feedrate EMPTY>
+<!ATTLIST feedrate
+    rpm CDATA #REQUIRED
+    velocity CDATA #REQUIRED
+  >
+
+<!--- 
+	For real-time control. 
+	These parameters are used for cutting the shape.
+-->
+<!ELEMENT cutcurve EMPTY>
+<!ATTLIST cutcurve
+    step CDATA #REQUIRED
+    backoff CDATA #REQUIRED
+    direction (LAST_TO_FIRST|FIRST_TO_LAST) "LAST_TO_FIRST"
+    count1 CDATA #REQUIRED
+    depth1 CDATA #REQUIRED
+    count2 CDATA #REQUIRED
+    depth2 CDATA #REQUIRED
+  >
+
+<!--- 
+	For real-time control. 
+	These parameters are used for cutting threads.
+-->
+<!ELEMENT thread EMPTY>
+<!ATTLIST thread
+    percent CDATA #REQUIRED
+    starts CDATA #REQUIRED
+    tpi CDATA #REQUIRED
+  >
+
+<!--- These parametes define the cutter. -->
+<!ELEMENT Cutter EMPTY>
+<!ATTLIST Cutter
+    cutRadius CDATA #REQUIRED
+    cutLocation (FRONT_INSIDE|BACK_INSIDE|FRONT_OUTSIDE|BACK_OUTSIDE) "FRONT_INSIDE"
+    frame (HCF|UCF|Drill|ECF) "HCF"
+    ucfAngle CDATA #REQUIRED
+    ucfRotate CDATA #REQUIRED
+    profile CDATA #REQUIRED
+    diameter CDATA #REQUIRED
+  >
+
+<!--- Points define a curve for the outline of the shape. -->
+<!ELEMENT dotCurve (point)*>
+<!ATTLIST dotCurve
+    nPts CDATA #REQUIRED
+    dotLocation (FRONT_INSIDE|BACK_INSIDE|FRONT_OUTSIDE|BACK_OUTSIDE) "FRONT_INSIDE"
+    digitizeCutter (true|false) "false"
+    t CDATA #REQUIRED
+    pointSpacing CDATA #REQUIRED
+  >
+
+<!--- Each point defining the curve. -->
+<!ELEMENT point EMPTY>
+<!ATTLIST point
+    x CDATA #REQUIRED
+    z CDATA #REQUIRED
+    snap (true|false) "true"
+  >
+
+<!--- CutPoints that are used in cutting a pattern. -->
+<!ELEMENT cutPointList (RosettePoint|IndexPoint|PiercePoint|SpiralIndex|SpiralRosette)*>
+<!ATTLIST cutPointList
+    nPts CDATA #REQUIRED
+  >
+
+<!--- Cutting with rosettes -->
+<!ELEMENT RosettePoint (point,(perp|pump|rock)+)>
+<!ATTLIST RosettePoint
+    n CDATA #REQUIRED
+    depth CDATA #REQUIRED
+    motion (ROCK|PUMP|PERP|BOTH) "ROCK"
+  >
+
+<!--- For motion='ROCK' or motion='BOTH' this defines the rocking rosette -->
+<!ELEMENT rock EMPTY>
+<!ATTLIST rock
+    style CDATA #REQUIRED
+    repeat CDATA #REQUIRED
+    amp CDATA #REQUIRED
+    phase CDATA #REQUIRED
+  >
+
+<!--- For motion='PUMP' or motion='BOTH' this defines the pumping rosette -->
+<!ELEMENT pump EMPTY>
+<!ATTLIST pump
+    style CDATA #REQUIRED
+    repeat CDATA #REQUIRED
+    amp CDATA #REQUIRED
+    phase CDATA #REQUIRED
+  >
+
+<!--- For motion='PERP' this defines the perpendicular rosette -->
+<!ELEMENT perp EMPTY>
+<!ATTLIST perp
+    style CDATA #REQUIRED
+    repeat CDATA #REQUIRED
+    amp CDATA #REQUIRED
+    phase CDATA #REQUIRED
+  >
+
+<!--- Indexed cuts -->
+<!ELEMENT IndexPoint (point,index)>
+<!ATTLIST IndexPoint
+    n CDATA #REQUIRED
+    depth CDATA #REQUIRED
+    direction (INDEX_X|INDEX_Z|INDEX_CURVE) "INDEX_X"
+  >
+
+<!--- Parameters for indexed cuts. -->
+<!ELEMENT index EMPTY>
+<!ATTLIST index
+    repeat CDATA #REQUIRED
+    phase CDATA #REQUIRED
+  >
+
+<!--- Cuts made with the spindle rotating fast -->
+<!ELEMENT PiercePoint (point,pierce)>
+<!ATTLIST PiercePoint
+    n CDATA #REQUIRED
+    depth CDATA #REQUIRED
+  >
+
+<!--- Pierced cut parameters -->
+<!ELEMENT pierce EMPTY>
+<!ATTLIST pierce
+    style (INDEX_X|INDEX_Z|INDEX_CURVE) "INDEX_X"
+  >
+
+<!--- Spirals Cuts made with indexing -->
+<!ELEMENT SpiralIndex (point,spiral,IndexPoint)*>
+<!ATTLIST SpiralIndex
+    n CDATA #REQUIRED
+    endDepth CDATA #REQUIRED
+  >
+
+<!--- Parameters for spirals -->
+<!ELEMENT spiral EMPTY>
+<!ATTLIST spiral
+    style CDATA #REQUIRED
+    twist CDATA #REQUIRED
+    amp CDATA #REQUIRED
+  >
+
+<!--- Spiral Cuts with a rosette -->
+<!ELEMENT SpiralRosette (point,spiral,RosettePoint)*>
+<!ATTLIST SpiralRosette
+    n CDATA #REQUIRED
+    endDepth CDATA #REQUIRED
+  >

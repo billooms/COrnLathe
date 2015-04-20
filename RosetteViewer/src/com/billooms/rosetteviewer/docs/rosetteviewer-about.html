@@ -1,0 +1,104 @@
+<html>
+  <head>
+    <title>RosetteViewer</title>
+    <link rel="stylesheet" href="nbdocs://org.netbeans.modules.usersguide/org/netbeans/modules/usersguide/ide.css" type="text/css">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  </head>
+  <body>
+    <h2>RosetteViewer</h2>
+    <p>
+      The RosetteViewer window is useful for visualizing the appearance of a rosette. 
+      Note that this is not used for setting the parameters of a particular rosette used 
+      in a CutPoint. 
+      It's just a way to look at a rosette and can print out the coordinates for 
+      actually making a rosette.
+    </p>
+    <h3>Rosette Parameters</h3>
+    <ul>
+      <li>
+        <b>Pattern</b> -- The pattern to be used for the rosette. 
+        You can select from a number of built-in patterns or build your own pattern with 
+        the Pattern Editor. 
+        You can also write your own brief software description of a pattern and have it 
+        permanently added to your version of the software (or share it with others). 
+        See the Help file for Patterns and the Pattern Editor for more details. 
+        A small plot of a single repeat of the pattern is shown below the selector box. 
+      </li>
+      <li>
+        <b>Repeat</b> -- The number of times the pattern is repeated around the rosette. 
+      </li>
+      <li>
+        <b>Invert</b> -- Invert the pattern on the rosette. 
+      </li>
+      <li>
+        <b>N2:</b> Some patterns use the optional <b>N2</b> parameter which is the number of small bumps within a repeat. 
+        For example -- an E rosette with 5 repeats and N2=6 will have a total of 30 bumps. 
+      </li>
+      <li>
+        <b>Amplitude2:</b> Some patterns use the optional <b>Amplitude2</b> parameter which is the amplitude of the small bumps as a 
+        fraction if the total amplitude. 
+        For example -- a Q rosette with a total amplitude of 0.3" and amplitude2=0.2" will have small bumps that are 
+        0.06" (0.3 * 0.2 = 0.06) high superimposed on the major shape.
+      </li>
+      <li>
+        <b>Peak-to-peak Amplitude</b> -- The maximum deflection from a rosette. 
+        This is the difference between the maximum radius and the minimum radius of the rosette. 
+        The amplitude can be set by sliding the slider, by selecting the text in the value field 
+        and typing in a new value, or by positioning the cursor in the value field and 
+        rotating the scroll wheel on your mouse. 
+      </li>
+      <li>
+        <b>Phase</b> -- The phase shift of the rosette. 
+        Phase shift can be displayed in two different ways depending on how you have set 
+        your preferences (see the Help topic on Preferences). 
+        In "Engineering" mode, phase shift is a value between 0 and 360 degrees where 360 degrees 
+        represents a full pattern shift, 180 degrees means 1/2 pattern shift, 90 degrees 
+        means 1/4 pattern shift, etc. 
+        Note that this is NOT the actual spindle rotation. 
+        The other mode you can set in the Preferences is "Fraction" mode where 1.0 means a 
+        full pattern shift, 0.5 means 1/2 pattern shift, etc.
+        The phase can be set by sliding the slider, by selecting the text in the value field 
+        and typing in a new value, or by positioning the cursor in the value field and 
+        rotating the scroll wheel on your mouse. 
+      </li>
+      <li>
+        <b>Mask:</b> Optional information for skipping some of the repeats. 
+        When left blank, all repeats are used. 
+        To mask certain repeat, enter a series of 0 and 1 digits. 
+        A 0 (zero) means to skip the repeat. 
+        A 1 (one) means to enable the repeat. 
+        If the sequence of digits is shorter than the repeat value, then the sequence will 
+        be used repeatedly. 
+        For example -- entering 0111 with Repeat=12 will skip the 1st repeat, the 
+        5th repeat, and the 9th repeat and use all other repeats. 
+      </li>
+      <li>
+        <b>MaskHiLo:</b> Flag indicating if masking causes rosette to be the highest or the lowest in the pattern. 
+      </li>
+
+      <li>
+        <b>MaskPhase:</b> Optional information for shifting the point in the pattern where 
+        the masking will start. 
+        As with Phase above, the number is either "Engineering" mode or "Fraction" mode 
+        depending on how you have set your preferences. 
+        In general, when you are cutting on the inside of a shape, you will probably want to 
+        start the masking at a point in the pattern where the pattern is at "1.0" in the pattern 
+        editor (which corresponds to a valley on the rosette). 
+        Likewise, when you are cutting on the outside of a shape, you will probably want to 
+        start the masking at a point in the pattern where the pattern is at "0.0" in the pattern 
+        editor (which corresponds to a peak on the rosette). 
+      </li>
+    </ul>
+    <h3>Write Rosette Data</h3>
+    <p>
+      This allows you to write out the coordinates of the rosette to a tab-delimited file 
+      that can be read by a spreadsheet program. 
+      This is useful for those who wish to make their own rosettes. 
+      You have the option of specifying the maximum radius of the rosette and specifying the 
+      rotational spacing between points. 
+      The file will list the radius at each rotation from 0 to 360 degrees. 
+      Note that this option works for patterns that you design with the Pattern Editor as 
+      well as for the built-in patterns. 
+    </p>
+  </body>
+</html>
