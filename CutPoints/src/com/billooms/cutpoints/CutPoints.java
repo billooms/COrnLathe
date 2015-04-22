@@ -692,10 +692,10 @@ public class CutPoints extends CLclass {
       if (c instanceof SpiralCut) {
         CutPoint beginPt = ((SpiralCut) c).getBeginPoint();
         beginPt.drag(new Point2D.Double(beginPt.getX(), beginPt.getZ() - delta));
-      }
-      for (int i = 0; i < ((SpiralCut) c).getNumGoTos(); i++) {
-        GoToPoint goToPt = ((SpiralCut) c).getGoToPoint(i);
-        goToPt.drag(new Point2D.Double(goToPt.getX(), goToPt.getZ() - delta));
+        for (int i = 0; i < ((SpiralCut) c).getNumGoTos(); i++) {
+          GoToPoint goToPt = ((SpiralCut) c).getGoToPoint(i);
+          goToPt.drag(new Point2D.Double(goToPt.getX(), goToPt.getZ() - delta));
+        }
       }
       if (c instanceof OffsetGroup) {
         for (int i = 0; i < ((OffsetGroup) c).getNumCutPoints(); i++) {
