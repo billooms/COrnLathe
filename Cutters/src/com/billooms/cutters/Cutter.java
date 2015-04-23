@@ -285,6 +285,20 @@ public class Cutter extends CLclass {
   public Frame getFrame() {
     return frame;
   }
+  
+  /**
+   * Determine if the cutter is HCF (or UCF at angle 0) with IDEAL cutter. 
+   * This indicates a faster algorithm for rendering can be used.
+   * 
+   * @return true if cutter is HCF (or UCF at angle 0) with IDEAL cutter
+   */
+  public boolean isIdealHCF() {
+    if (profile.getName().equals("IDEAL") && 
+        (frame.equals(Frame.HCF) || (frame.equals(Frame.UCF) && (ucfRotate == 0.0)))) {
+      return true;
+    }
+    return false;
+  }
 
   /**
    * Set the type of cutting frame. This fires a PROP_FRAME property change with

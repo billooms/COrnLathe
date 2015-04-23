@@ -415,6 +415,7 @@ public class Surface implements PropertyChangeListener {
     int a = ((int) Math.round(cDeg / (360.0 / (double) sectors))) % sectors;	// index for surface[][] -- must be in range 0 to sectors
     switch (cutter.getFrame()) {
       case HCF:
+      case UCF:     // this should only happen if udfRotate==0.0
         for (Point3D[] pt1 : pts) {
           final double dx = pt1[a].getX() - cutX;		// distance from surface point to center of cutter
           final double dz = pt1[a].getZ() - cutZ;

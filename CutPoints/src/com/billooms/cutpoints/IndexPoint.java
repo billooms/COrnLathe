@@ -442,7 +442,7 @@ public class IndexPoint extends CutPoint implements ActiveEditorDrop {
       if (mask.isEmpty() || (fullMask.charAt(i) != '0')) {
         spindleC = 360.0 * (double) i / (double) getRepeat() - getPhase() / (double) getRepeat();	// minus to match rosette phase
         surface.rotateZ(spindleC - lastC);		// incremental rotate the surface
-        if (cutter.getFrame().equals(Frame.HCF) && cutter.getProfile().getName().equals("IDEAL")) {
+        if (cutter.isIdealHCF()) {
           surface.cutSurface(cutter, cutX, cutZ, spindleC); // fast cut rendering only for IDEAL HCF
         } else {
           surface.cutSurface(cutter, cutX, cutZ);

@@ -490,7 +490,7 @@ public class RosettePoint extends CutPoint implements ActiveEditorDrop {
     for (count = 0, spindleC = 0.0; count < nSectors; count++, spindleC += dAngle) {
       cutXZ = rosetteMove(spindleC, x0, z0);
       surface.rotateZ(spindleC - lastC);		// incremental rotate the surface
-      if (cutter.getFrame().equals(Frame.HCF) && cutter.getProfile().getName().equals("IDEAL")) {
+      if (cutter.isIdealHCF()) {
         surface.cutSurface(cutter, cutXZ.x, cutXZ.y, spindleC);
       } else {
         surface.cutSurface(cutter, cutXZ.x, cutXZ.y);
