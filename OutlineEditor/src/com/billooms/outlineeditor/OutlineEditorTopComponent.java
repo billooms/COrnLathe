@@ -413,16 +413,20 @@ public final class OutlineEditorTopComponent extends TopComponent implements Pro
   }// </editor-fold>//GEN-END:initComponents
 
   private void thickFieldchangeThickness(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_thickFieldchangeThickness
-    double t = Math.max(Outline.MIN_THICKNESS, ((Number) thickField.getValue()).doubleValue());
-    if (outline != null) {
-      outline.setThickness(t);
+    if (thickField.isFocusOwner()) {
+      double t = Math.max(Outline.MIN_THICKNESS, ((Number) thickField.getValue()).doubleValue());
+      if (outline != null) {
+        outline.setThickness(t);
+      }
     }
   }//GEN-LAST:event_thickFieldchangeThickness
 
   private void resolutionFieldchangeResoluttion(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_resolutionFieldchangeResoluttion
-    double r = Math.max(Outline.MIN_RESOLUTION, ((Number) resolutionField.getValue()).doubleValue());
-    if (outline != null) {
-      outline.setResolution(r);
+    if (resolutionField.isFocusOwner()) {
+      double r = Math.max(Outline.MIN_RESOLUTION, ((Number) resolutionField.getValue()).doubleValue());
+      if (outline != null) {
+        outline.setResolution(r);
+      }
     }
   }//GEN-LAST:event_resolutionFieldchangeResoluttion
 

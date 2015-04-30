@@ -25,6 +25,7 @@ import java.beans.PropertyChangeEvent;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import javafx.geometry.Point3D;
+import javax.swing.ProgressMonitor;
 import org.netbeans.spi.palette.PaletteItemRegistration;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -369,7 +370,7 @@ public class SpiralLine extends SpiralCut {
   }
 
   @Override
-  public void cutSurface(Surface surface) {
+  public synchronized void cutSurface(Surface surface, ProgressMonitor monitor) {
     Point3D[] rzc = getCutterTwist();
     ArrayList<Point3D> xyz = toXYZ(rzc);
 
@@ -398,7 +399,12 @@ public class SpiralLine extends SpiralCut {
       } else {
         modPt.setDepth(startDepth + cumLength / totLength * deltaDepth);
       }
-      modPt.cutSurface(surface);
+      monitor.setProgress(num+1);
+      monitor.setNote("CutPoint " + getNum() + ": " + i + "/" + rzc.length + "\n");
+      modPt.cutSurface(surface, monitor);
+      if (monitor.isCanceled()) {
+        break;
+      }
     }
   }
 

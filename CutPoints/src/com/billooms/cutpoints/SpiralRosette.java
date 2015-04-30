@@ -24,6 +24,7 @@ import java.beans.PropertyChangeEvent;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import javafx.geometry.Point3D;
+import javax.swing.ProgressMonitor;
 import org.netbeans.spi.palette.PaletteItemRegistration;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -374,13 +375,13 @@ public class SpiralRosette extends SpiralCut {
   }
 
   @Override
-  public void cutSurface(Surface surface) {
+  public synchronized void cutSurface(Surface surface, ProgressMonitor monitor) {
     Point3D[] rzc = getCutterTwist();
     ArrayList<Point3D> xyz = toXYZ(rzc);
 
     double totLength = getTotalDistance(xyz);	// actual length on the spiral
     if (totLength <= 0.0) {         // so we don't divide by zero further down
-      beginPt.cutSurface(surface);	// no movement, so just cut this one place
+      beginPt.cutSurface(surface, monitor);	// no movement, so just cut this one place
       return;
     }
 
@@ -427,7 +428,12 @@ public class SpiralRosette extends SpiralCut {
         modPt.getRosette2().setPhase(ros2StartPhase + rzc[i].getZ() * repeat);
       }
       modPt.move(rzc[i].getX(), rzc[i].getY());
-      modPt.cutSurface(surface);
+      monitor.setProgress(num+1);
+      monitor.setNote("CutPoint " + getNum() + ": " + i + "/" + rzc.length + "\n");
+      modPt.cutSurface(surface, monitor);
+      if (monitor.isCanceled()) {
+        break;
+      }
     }
   }
 

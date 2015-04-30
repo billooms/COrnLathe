@@ -1,15 +1,22 @@
 package com.billooms.cutpoints.surface;
 
+import com.billooms.cutpoints.CutPoint;
 import com.billooms.cutpoints.CutPoints;
 import com.billooms.cutters.Cutter;
 import com.billooms.outline.Outline;
 import com.billooms.profiles.Profile;
 import com.billooms.cutpoints.surface.RotMatrix.Axis;
+import java.awt.Toolkit;
 import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import javafx.geometry.Point3D;
+import javax.swing.ProgressMonitor;
+import javax.swing.SwingWorker;
+import org.openide.util.Exceptions;
+import org.openide.windows.TopComponent;
+import org.openide.windows.WindowManager;
 
 /**
  * A surface is a two-dimensional array of 3D points (in lathe coordinates) and
@@ -62,9 +69,40 @@ public class Surface implements PropertyChangeListener {
   private final CutPoints cutPtMgr;
   /** Render CutPoint (true) or not (false). */
   private boolean render;
+  /** Background task for building the Surface. */
+  private BuildTask buildTask = null;
+  /** Progress monitor for background task. */
+  private ProgressMonitor progressMonitor = null;
 
   /** The Surface can fire propertyChanges. */
   private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
+  
+  /**
+   * Creates a new background task for building the Surface.
+   */
+  class BuildTask extends SwingWorker<Void, Void> {
+    @Override
+    protected Void doInBackground() throws Exception {
+      try {
+        for(CutPoint cp : cutPtMgr.getAll()) {
+          setProgress(cp.getNum() + 1);   // progress is CutPoint number +1 (don't start with 0)
+          if (cp.isVisible()) {
+            cp.cutSurface(Surface.this, progressMonitor);
+          }
+          if (progressMonitor.isCanceled()) {   // Check to see if the ProgressMonitor has been cancelled
+            Toolkit.getDefaultToolkit().beep();
+            cancel(true);   // cancel the BuildTask
+          }
+          if (isCancelled() || isDone()) {    // break out of the loop if task is cancelled externally
+            break;
+          }
+        }
+      } catch (Exception e) {
+        Exceptions.printStackTrace(e);
+      }
+      return null;
+    }
+  }
 
   /**
    * Construct a new Surface from the given outline points.
@@ -162,16 +200,18 @@ public class Surface implements PropertyChangeListener {
   /**
    * Rebuild the Surface from the given outline points.
    */
-  public final void rebuild() {
+  public synchronized final void rebuild() {
     pts = makeCleanSurface();
     if (render) {
-      cutPtMgr.getAll().stream().forEach((cp) -> {
-        if (cp.isVisible()) {
-          cp.cutSurface(this);
-        }
-      });
+      TopComponent window = WindowManager.getDefault().findTopComponent("View3DTopComponent");
+      // progressMonitor closes with progress >= max, so use size()+1
+      progressMonitor = new ProgressMonitor(window, "Rendering the surface", "", 0, cutPtMgr.size()+1);
+      buildTask = new BuildTask();
+      buildTask.addPropertyChangeListener(this);
+      buildTask.execute();
+    } else {      // not rendering
+      pcs.firePropertyChange(PROP_REBUILD, null, outline);  // let listeners know we're done
     }
-    pcs.firePropertyChange(PROP_REBUILD, null, outline);
   }
 
   /**
@@ -179,7 +219,7 @@ public class Surface implements PropertyChangeListener {
    *
    * @return array of Point3D[][]
    */
-  public Point3D[][] makeCleanSurface() {
+  public synchronized Point3D[][] makeCleanSurface() {
     Point2D.Double[] curvePts;
     if (inOut) {
       curvePts = outline.getInsideCurve().getPoints();
@@ -224,9 +264,31 @@ public class Surface implements PropertyChangeListener {
   public void propertyChange(PropertyChangeEvent evt) {
 //    System.out.println("Surface.propertyChange: " + evt.getSource().getClass().getSimpleName()+ " " + evt.getPropertyName() + " " + evt.getOldValue() + " " + evt.getNewValue());
 
-    // this listens to the Outline and to the CutPoint manager
-    if (!evt.getPropertyName().contains("Drag")) {  // don't keep updating when dragging a point
-      rebuild();      // rebuild will fire a propertyChangeEvent
+    switch (evt.getPropertyName()) {
+      case "progress":      // "progress" is from BuildTask -- update the ProgressMonitor
+        int progress = (Integer) evt.getNewValue();
+        progressMonitor.setProgress(progress);
+        progressMonitor.setNote("Rendering CutPoint " + (progress-1) + "\n");
+        break;
+      case "state":         // "state" is from BuildTask -- Are we done yet?
+        if (evt.getNewValue().equals(SwingWorker.StateValue.DONE)) {
+          progressMonitor.close();
+          buildTask.removePropertyChangeListener(this);
+          pcs.firePropertyChange(PROP_REBUILD, null, outline);  // let listeners know we're done
+        } break;
+      default:    // this listens to the Outline and to the CutPoint manager
+        if (!evt.getPropertyName().contains("Drag")) {  // don't keep updating when dragging a point
+          if ((buildTask != null) && (buildTask.getState() != SwingWorker.StateValue.DONE)) {
+            // There is already a buildTask running!!
+            // so shut it down and turn off rendering
+            progressMonitor.close();
+            buildTask.removePropertyChangeListener(this);   // don't listen when state goes to DONE
+            buildTask.cancel(true);     // cancel any current buildTask
+            Toolkit.getDefaultToolkit().beep();
+            render = false;             // TODO: Render button in View3DTopComponent is not reset!
+          }
+          rebuild();      // rebuild will fire a propertyChangeEvent
+      } break;
     }
   }
 

@@ -8,7 +8,6 @@ import com.billooms.cutpoints.surface.RotMatrix.Axis;
 import com.billooms.cutpoints.surface.Surface;
 import com.billooms.cutters.Cutter;
 import com.billooms.cutters.Cutters;
-import com.billooms.cutters.Frame;
 import static com.billooms.drawables.Drawable.SOLID_LINE;
 import com.billooms.drawables.geometry.CircleGeom;
 import com.billooms.drawables.simple.Arc;
@@ -20,6 +19,7 @@ import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
 import java.io.PrintWriter;
 import javafx.geometry.Point3D;
+import javax.swing.ProgressMonitor;
 import javax.swing.text.JTextComponent;
 import org.netbeans.spi.palette.PaletteItemRegistration;
 import org.openide.text.ActiveEditorDrop;
@@ -424,9 +424,10 @@ public class IndexPoint extends CutPoint implements ActiveEditorDrop {
    * Cut the given surface with this CutPoint.
    *
    * @param surface Surface
+   * @param monitor progress monitor which can be canceled
    */
   @Override
-  public void cutSurface(Surface surface) {
+  public synchronized void cutSurface(Surface surface, ProgressMonitor monitor) {
     Vector2d cutVectorS = getMoveVector(cutDepth);	// cut direction scaled by depth
     double cutX = getX() + cutVectorS.x;
     double cutZ = getZ() + cutVectorS.y;

@@ -17,6 +17,7 @@ import java.awt.geom.Point2D;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.ProgressMonitor;
 import org.netbeans.spi.palette.PaletteItemRegistration;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -307,7 +308,7 @@ public class OffsetGroup extends OffsetCut {
   }
 
   @Override
-  public void cutSurface(Surface surface) {
+  public synchronized void cutSurface(Surface surface, ProgressMonitor monitor) {
     if (cpList.isEmpty() || (repeat <= 0)) {
       return;
     }
@@ -315,6 +316,7 @@ public class OffsetGroup extends OffsetCut {
     if (zRotation != 0.0) {
       surface.rotateZ(zRotation);			// initial phase rotation
     }
+    outerloop:
     for (int i = 0; i < repeat; i++) {
       if (i > 0) {
         surface.rotateZ(360.0 / repeat);	// rotate to the next one
@@ -324,10 +326,15 @@ public class OffsetGroup extends OffsetCut {
       surface.rotateY(-getTangentAngle());
 
       // this is where the main work is done
+      monitor.setProgress(num+1);
+      monitor.setNote("CutPoint " + getNum() + ": " + i + "/" + repeat + "\n");
       for (CutPoint cPt : cpList) {
         if (cPt instanceof OffRosettePoint) {
           Vector2d offsetPt = offsetForCutPoint(cPt);
           ((OffRosettePoint) cPt).cutSurface(surface, offsetPt.x, offsetPt.y);			// and cut with it
+        }
+        if (monitor.isCanceled()) {
+          break outerloop;
         }
       }
 

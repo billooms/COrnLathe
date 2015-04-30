@@ -25,6 +25,7 @@ import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import javax.swing.ProgressMonitor;
 import org.openide.util.Lookup;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -482,8 +483,9 @@ public abstract class CutPoint extends CLclass {
    * Cut the surface with the CutPoint.
    *
    * @param surface surface
+   * @param monitor progress monitor which can be canceled
    */
-  public abstract void cutSurface(Surface surface);
+  public abstract void cutSurface(Surface surface, ProgressMonitor monitor);
 
   /**
    * Make instructions for this CutPoint

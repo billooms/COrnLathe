@@ -30,6 +30,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import javafx.geometry.Point3D;
+import javax.swing.ProgressMonitor;
 import org.netbeans.spi.palette.PaletteItemRegistration;
 import org.openide.*;
 import org.w3c.dom.Element;
@@ -486,7 +487,7 @@ public class PatternPoint extends OffsetCut {
   }
 
   @Override
-  public void cutSurface(Surface surface) {
+  public synchronized void cutSurface(Surface surface, ProgressMonitor monitor) {
     double zRotation = indexOffsetDegrees();
     if (zRotation != 0.0) {
       surface.rotateZ(zRotation);			// initial repeatPhase rotation

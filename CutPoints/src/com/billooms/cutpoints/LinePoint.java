@@ -7,7 +7,6 @@ import com.billooms.cutpoints.surface.RotMatrix;
 import com.billooms.cutpoints.surface.Surface;
 import com.billooms.cutters.Cutter;
 import com.billooms.cutters.Cutters;
-import com.billooms.cutters.Frame;
 import static com.billooms.drawables.Drawable.SOLID_LINE;
 import com.billooms.drawables.simple.Arc;
 import com.billooms.drawables.simple.Line;
@@ -21,6 +20,7 @@ import java.beans.PropertyChangeEvent;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import javafx.geometry.Point3D;
+import javax.swing.ProgressMonitor;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
@@ -373,7 +373,7 @@ public class LinePoint extends CutPoint {
   }
 
   @Override
-  public void cutSurface(Surface surface) {
+  public synchronized void cutSurface(Surface surface, ProgressMonitor monitor) {
     Vector2d cutVectorS = getMoveVector(cutDepth);	// cut direction scaled by depth
     double cutX = getX() + cutVectorS.x;
     double cutZ = getZ() + cutVectorS.y;

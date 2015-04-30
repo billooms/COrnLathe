@@ -11,6 +11,7 @@ import java.awt.Color;
 import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
 import java.io.PrintWriter;
+import javax.swing.ProgressMonitor;
 import javax.swing.text.JTextComponent;
 import org.netbeans.spi.palette.PaletteItemRegistration;
 import org.openide.text.*;
@@ -123,7 +124,7 @@ public class GoToPoint extends CutPoint implements ActiveEditorDrop {
   }
 
   @Override
-  public void cutSurface(Surface surface) {
+  public synchronized void cutSurface(Surface surface, ProgressMonitor monitor) {
     // do nothing for a GoToPoint
   }
 
