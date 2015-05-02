@@ -54,7 +54,7 @@ public class RosetteNode extends AbstractNode implements PropertyChangeListener 
     this.setDisplayName(ros.toString());
     this.setIconBaseWithExtension("com/billooms/rosette/Rosette16.png");
 
-    ros.addPropertyChangeListener((PropertyChangeListener) this);
+    ros.addPropertyChangeListener(this);
   }
 
   /**
@@ -146,21 +146,21 @@ public class RosetteNode extends AbstractNode implements PropertyChangeListener 
   public void propertyChange(PropertyChangeEvent evt) {
     this.setDisplayName(ros.toString());		// update the display name
     if (ros.getPattern().needsN2()) {
-      if (set.get("n2") == null) {
+      if (set.get("N2") == null) {
         set.put(n2Prop);
       }
     } else {
       if (set != null) {
-        set.remove("n2");
+        set.remove("N2");
       }
     }
     if (ros.getPattern().needsAmp2()) {
-      if (set.get("amplitude2") == null) {
+      if (set.get("Amplitude2") == null) {
         set.put(amp2Prop);
       }
     } else {
       if (set != null) {
-        set.remove("amplitude2");
+        set.remove("Amplitude2");
       }
     }
   }
