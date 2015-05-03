@@ -102,7 +102,7 @@ public class CutterNode extends AbstractNode implements PropertyChangeListener {
       set.put(rodProp);
 
       Property<Double> angProp = new PropertySupport.Reflection<>(cutter, double.class, "UCFAngle");
-      angProp.setName("UCF Angle");
+      angProp.setName("UCF/Drill Angle");
       angProp.setShortDescription("Rotation of cutting frame around the y-axis. Zero is along the z-axis, + angle is rotate toward front.");
       set.put(angProp);
 
