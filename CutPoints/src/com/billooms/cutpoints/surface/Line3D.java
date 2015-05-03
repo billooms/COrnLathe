@@ -42,6 +42,15 @@ public class Line3D {
   public Line3D(List<Point3D> pts) {
     this.pts.addAll(pts);
   }
+  
+  /** 
+   * Construct a new Line3D which is a copy of the given line. 
+   * 
+   * @param line given line to copy
+   */
+  public Line3D(Line3D line) {
+    this(line.getPoints());
+  }
 
   /**
    * Construct a straight line between the two given points.
@@ -52,6 +61,21 @@ public class Line3D {
   public Line3D(Point3D p1, Point3D p2) {
     this.pts.add(p1);
     this.pts.add(p2);
+  }
+  
+  /**
+   * Construct a new Line3D which is a circle around the given point in the XY plane.
+   * 
+   * @param pt Center of the circle
+   * @param radius radius
+   * @param n number of points
+   */
+  public Line3D(Point3D pt, double radius, int n) {
+    double angRad = 0.0;
+    for (int i = 0; i <= n; i++) {
+      this.pts.add(new Point3D(pt.getX() + radius * Math.cos(angRad), pt.getY() + radius * Math.sin(angRad), pt.getZ()));
+      angRad += Math.PI * 2.0 / n;
+    }
   }
 
   /**

@@ -72,6 +72,8 @@ public class IndexPoint extends CutPoint implements ActiveEditorDrop {
   protected final static Color INDEX_COLOR2 = Color.CYAN;
   /** move cutter above cutCurve while moving for safety. */
   protected final static double INDEX_SAFETY = 0.020;
+  /** Number of points per circle for ECF circles. */
+  private final static int CIRCLE_PTS = 32;
 
   /** Directions for indexing. */
   public enum Direction {
@@ -368,7 +370,14 @@ public class IndexPoint extends CutPoint implements ActiveEditorDrop {
   @Override
   protected void make3DLines() {
     list3D.clear();
-    // TODO: This is only defined for HCF so far
+    // TODO: This is only defined for HCF and ECF so far
+    String fullMask = mask;
+    if (!mask.isEmpty()) {
+      while (fullMask.length() < getRepeat()) {
+        fullMask += mask;	// fill out to full length
+      }
+    }
+    double ang = phase / repeat;
     switch (cutter.getFrame()) {
       case HCF:
         Vector2d moveVectorS = getMoveVector(cutDepth);
@@ -377,13 +386,6 @@ public class IndexPoint extends CutPoint implements ActiveEditorDrop {
         if (pts == null) {
           return;
         }
-        String fullMask = mask;
-        if (!mask.isEmpty()) {
-          while (fullMask.length() < getRepeat()) {
-            fullMask += mask;	// fill out to full length
-          }
-        }
-        double ang = phase / repeat;
         for (int i = 0; i < repeat; i++) {
           if (mask.isEmpty() || (fullMask.charAt(i) != '0')) {
             Line3D line = new Line3D(new Point3D(pts[0].x, 0.0, pts[0].y), new Point3D(pts[1].x, 0.0, pts[1].y));
@@ -393,9 +395,23 @@ public class IndexPoint extends CutPoint implements ActiveEditorDrop {
           ang -= 360.0 / (double) repeat;
         }
         break;
+      case ECF:
+        // make a circle, tilt is by UCFAngle, then translate it to starting point
+        Line3D circle = new Line3D(new Point3D(0.0, 0.0, 0.0), cutter.getRadius(), CIRCLE_PTS);
+        circle.rotate(Axis.Y, cutter.getUCFAngle());
+        circle.translate(getX(), 0.0, getZ());
+        // then make a copy of it rotated to the proper position
+        for (int i = 0; i < repeat; i++) {
+          if (mask.isEmpty() || (fullMask.charAt(i) != '0')) {
+            Line3D newCircle = new Line3D(circle);
+            newCircle.rotate(Axis.Z, ang);
+            list3D.add(newCircle);
+          }
+          ang -= 360.0 / (double) repeat;
+        }
+        break;
       case UCF:
       case Drill:
-      case ECF:
       default:
         break;
     }
