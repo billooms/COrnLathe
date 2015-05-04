@@ -159,6 +159,7 @@ public final class View3DTopComponent extends TopComponent implements PropertyCh
     if (surface != null) {
       surface.removePropertyChangeListener(view3DPanel); // view3DPanel should quit listening to the old surface
       view3DPanel.renderButton.setSelected(false);
+      surface.setRender(false);     // Don't render when View3DTopComponent is not visible
     }
   }
 
