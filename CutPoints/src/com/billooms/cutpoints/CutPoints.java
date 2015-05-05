@@ -403,8 +403,10 @@ public class CutPoints extends CLclass {
    */
   public List<Line3D> getAll3DLines() {
     ArrayList<Line3D> lines = new ArrayList<>();
-    for (CutPoint cp : getAll()) {        // TODO: Filter this for the selected cutter!
-      lines.addAll(cp.get3DLines());
+    for (CutPoint cp : getAll()) {        // TODO: Filter this for the selected cutter?
+      if (cp.isVisible()) {     // only get lines from visible CutPoints
+        lines.addAll(cp.get3DLines());
+      }
     }
     return lines;
   }
