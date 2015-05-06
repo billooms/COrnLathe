@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<!DOCTYPE COrnLathe PUBLIC "-//IDN billooms.com//DTD COrnLathe file format 3.0//EN" "http://www.billooms.com/dtds/cornlathe3.dtd">
+<COrnLathe version='3.0'>
+  <Controls active='NORMAL'>
+    <FeedRate rpm='3.00' velocity='4.00'/>
+    <CoarseFine  passDepth='0.0250' passStep='5' lastDepth='0.0050' lastStep='1' rotation='NEG_LAST'/>
+  </Controls>
+  <Cutters>
+    <Cutter name='HCF1' displayName='HCF with R=0.512' frame='HCF' location='FRONT_OUTSIDE' profile='IDEAL' tipWidth='0.1875' radius='0.500'/>
+  </Cutters>
+  <Outline dotLocation='FRONT_OUTSIDE' thickness='0.100' resolution='0.010' color='rgb(186, 99, 18)'>
+    <Pt x='1.0000' y='0.0000'/>
+    <Pt x='1.0000' y='2.0000'/>
+  </Outline>
+  <CutPoints>
+    <RosettePoint n='0' cutter='HCF1' depth='0.0600' motion='ROCK'>
+      <Pt x='1.5000' z='0.0000'/>
+      <Rosette pattern='NSIDE' repeat='24' amp='0.050' phase='0.0'/>
+    </RosettePoint>
+    <RosettePoint n='1' snap='false' cutter='HCF1' depth='0.0600' motion='ROCK'>
+      <Pt x='1.5000' z='0.3000'/>
+      <Rosette pattern='NSIDE' repeat='24' amp='0.050' phase='180.0'/>
+    </RosettePoint>
+    <RosettePoint n='2' snap='false' cutter='HCF1' depth='0.0600' motion='ROCK'>
+      <Pt x='1.5000' z='0.6000'/>
+      <Rosette pattern='NSIDE' repeat='24' amp='0.050' phase='0.0'/>
+    </RosettePoint>
+    <RosettePoint n='3' snap='false' cutter='HCF1' depth='0.0600' motion='ROCK'>
+      <Pt x='1.5000' z='0.9000'/>
+      <Rosette pattern='NSIDE' repeat='24' amp='0.050' phase='180.0'/>
+    </RosettePoint>
+    <RosettePoint n='4' snap='false' cutter='HCF1' depth='0.0600' motion='ROCK'>
+      <Pt x='1.5000' z='1.2000'/>
+      <Rosette pattern='NSIDE' repeat='24' amp='0.050' phase='0.0'/>
+    </RosettePoint>
+    <RosettePoint n='5' snap='false' cutter='HCF1' depth='0.0600' motion='ROCK'>
+      <Pt x='1.5000' z='1.5000'/>
+      <Rosette pattern='NSIDE' repeat='24' amp='0.050' phase='180.0'/>
+    </RosettePoint>
+    <RosettePoint n='6' snap='false' cutter='HCF1' depth='0.0600' motion='ROCK'>
+      <Pt x='1.5000' z='1.8000'/>
+      <Rosette pattern='NSIDE' repeat='24' amp='0.050' phase='0.0'/>
+    </RosettePoint>
+  </CutPoints>
+</COrnLathe>

@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<!DOCTYPE COrnLathe PUBLIC "-//IDN billooms.com//DTD COrnLathe file format 3.0//EN" "http://www.billooms.com/dtds/cornlathe3.dtd">
+<COrnLathe version='3.0'>
+  <Controls active='NORMAL'>
+    <FeedRate rpm='3.00' velocity='4.00'/>
+    <CoarseFine  passDepth='0.0250' passStep='5' lastDepth='0.0050' lastStep='1' rotation='NEG_LAST'/>
+  </Controls>
+  <Cutters>
+    <Cutter name='UCF1' displayName='UCF with R=0.512' frame='UCF' location='FRONT_OUTSIDE' profile='FLAT' tipWidth='0.1875' radius='0.500' ucfAngle='90.0' ucfRotate='90.0'/>
+  </Cutters>
+  <Outline dotLocation='FRONT_OUTSIDE' thickness='0.100' resolution='0.010' color='rgb(186, 99, 18)'>
+    <Pt x='1.0000' y='0.0000'/>
+    <Pt x='1.0000' y='2.0000'/>
+  </Outline>
+  <CutPoints>
+    <IndexPoint n='0' snap='false' cutter='UCF1' depth='0.0460' direction='INDEX_X' repeat='18' phase='0.0'>
+      <Pt x='1.5000' z='0.0930'/>
+    </IndexPoint>
+    <IndexPoint n='1' snap='false' cutter='UCF1' depth='0.0460' direction='INDEX_X' repeat='18' phase='180.0'>
+      <Pt x='1.5000' z='0.2805'/>
+    </IndexPoint>
+    <IndexPoint n='2' snap='false' cutter='UCF1' depth='0.0460' direction='INDEX_X' repeat='18' phase='0.0'>
+      <Pt x='1.5000' z='0.4680'/>
+    </IndexPoint>
+    <IndexPoint n='3' snap='false' cutter='UCF1' depth='0.0460' direction='INDEX_X' repeat='18' phase='180.0'>
+      <Pt x='1.5000' z='0.6555'/>
+    </IndexPoint>
+    <IndexPoint n='4' snap='false' cutter='UCF1' depth='0.0460' direction='INDEX_X' repeat='18' phase='0.0'>
+      <Pt x='1.5000' z='0.8430'/>
+    </IndexPoint>
+    <IndexPoint n='5' snap='false' cutter='UCF1' depth='0.0460' direction='INDEX_X' repeat='18' phase='180.0'>
+      <Pt x='1.5000' z='1.0305'/>
+    </IndexPoint>
+    <IndexPoint n='6' snap='false' cutter='UCF1' depth='0.0460' direction='INDEX_X' repeat='18' phase='0.0'>
+      <Pt x='1.5000' z='1.2180'/>
+    </IndexPoint>
+    <IndexPoint n='7' snap='false' cutter='UCF1' depth='0.0460' direction='INDEX_X' repeat='18' phase='180.0'>
+      <Pt x='1.5000' z='1.4055'/>
+    </IndexPoint>
+    <IndexPoint n='8' snap='false' cutter='UCF1' depth='0.0460' direction='INDEX_X' repeat='18' phase='0.0'>
+      <Pt x='1.5000' z='1.5930'/>
+    </IndexPoint>
+    <IndexPoint n='9' snap='false' cutter='UCF1' depth='0.0460' direction='INDEX_X' repeat='18' phase='180.0'>
+      <Pt x='1.5000' z='1.7805'/>
+    </IndexPoint>
+    <IndexPoint n='10' snap='false' cutter='UCF1' depth='0.0460' direction='INDEX_X' repeat='18' phase='0.0'>
+      <Pt x='1.5000' z='1.9680'/>
+    </IndexPoint>
+  </CutPoints>
+</COrnLathe>
