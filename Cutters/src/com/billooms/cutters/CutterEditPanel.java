@@ -31,9 +31,9 @@ import javax.swing.JPanel;
  */
 public class CutterEditPanel extends JPanel implements PropertyChangeListener {
 
-  /** All CustomProfile property change names start with this prefix */
+  /** All CutterEditPanel property change names start with this prefix. */
   public final static String PROP_PREFIX = "CutterEditPanel" + "_";
-  /** Property name used when changing the name or display name */
+  /** Property name used when changing the cutter. */
   public final static String PROP_CUTTER = PROP_PREFIX + "Cutter";
 
   private Cutters cutMgr = null;    // Everything is initiated when a cutMgr is given (may be null)
