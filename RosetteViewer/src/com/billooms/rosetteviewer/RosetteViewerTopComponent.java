@@ -2,7 +2,6 @@ package com.billooms.rosetteviewer;
 
 import com.billooms.drawables.Grid;
 import com.billooms.patterns.Patterns;
-import com.billooms.rosette.Rosette;
 import com.billooms.rosette.RosetteEditPanel;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -171,8 +170,9 @@ public final class RosetteViewerTopComponent extends TopComponent implements Pro
     private final double INITIAL_DPI = 100.0;	  // for the first time the window comes up
     private final double WINDOW_PERCENT = 0.95;	  // use 95% of the window for the rosette
     private final Point INITIAL_ZPIX = new Point(150, 200);   // artibrary
-    private double dpi = INITIAL_DPI;		  // Dots per inch for zooming in/out
-    private Point zeroPix = INITIAL_ZPIX;	  // Location of 0.0, 0.0 in pixels
+    private double dpi = INITIAL_DPI;           // Dots per inch for zooming in/out
+    private Point zeroPix = INITIAL_ZPIX;       // Location of 0.0, 0.0 in pixels
+    private final double ROSETTE_RADIUS = 3.5;  // The radius of the Rosette for drawing purposes
 
     /** Creates new DisplayPanel */
     public DisplayPanel() {
@@ -184,8 +184,8 @@ public final class RosetteViewerTopComponent extends TopComponent implements Pro
     protected void paintComponent(Graphics g) {
       super.paintComponent(g);
 
-      dpi = (int) Math.min(WINDOW_PERCENT * this.getWidth() / (2 * Rosette.DEFAULT_RADIUS),
-          WINDOW_PERCENT * this.getHeight() / (2 * Rosette.DEFAULT_RADIUS));
+      dpi = (int) Math.min(WINDOW_PERCENT * this.getWidth() / (2 * ROSETTE_RADIUS),
+          WINDOW_PERCENT * this.getHeight() / (2 * ROSETTE_RADIUS));
       zeroPix = new Point(getWidth() / 2, getHeight() / 2);	// zero is always in the center
 
       Graphics2D g2d = (Graphics2D) g;
@@ -197,7 +197,7 @@ public final class RosetteViewerTopComponent extends TopComponent implements Pro
           (double) getWidth() / dpi, (double) getHeight() / dpi).paint(g2d);
 
       if (editPanel.getRosette() != null) {
-        editPanel.getRosette().paint(g2d);		// paint the rosette
+        editPanel.getRosette().paint(g2d, ROSETTE_RADIUS);		// paint the rosette
       }
     }
 

@@ -80,8 +80,8 @@ public class Rosette extends CLclass {
   public final static int DEFAULT_N2 = 3;
   /** Default for optional second amplitude parameter */
   public final static double DEFAULT_AMP2 = 0.1;
-  /** The radius of the Rosette for drawing purposes (currently set to 3.5) */
-  public final static double DEFAULT_RADIUS = 3.5;
+//  /** The radius of the Rosette for drawing purposes (currently set to 3.5) */
+//  public final static double DEFAULT_RADIUS = 3.5;
 
   /** Two different ways to mask */
   public static enum Mask {
@@ -123,7 +123,6 @@ public class Rosette extends CLclass {
   private final static Color OUTLINE_COLOR = Color.BLACK;
   private final static Color RADIUS_COLOR = Color.BLUE;
   private final static int NUM_POINTS = 720;	    // draw a point every 1/2 degree
-  private final double nomRadius = DEFAULT_RADIUS;  // nominal (reference) radius of the rosette
   private final Point2D.Double center = new Point2D.Double(0.0, 0.0);   // center of the rosette is always 0.0, 0.0
   private final ArrayList<Drawable> drawList = new ArrayList<>();   // a list of things to draw for a visual representaiton of the rosette
 
@@ -150,7 +149,6 @@ public class Rosette extends CLclass {
         ((CustomPattern) pattern).addPropertyChangeListener(this);
       }
     }
-    makeDrawables();
   }
 
   /**
@@ -176,7 +174,6 @@ public class Rosette extends CLclass {
     this.invert = rosette.getInvert();
     this.amp2 = rosette.getAmp2();
     this.n2 = rosette.getN2();
-    makeDrawables();
   }
 
   /**
@@ -197,7 +194,6 @@ public class Rosette extends CLclass {
     maskPhase = CLUtilities.getDouble(element, "maskPhase", DEFAULT_MASK_PHASE);
     n2 = CLUtilities.getInteger(element, "n2", DEFAULT_N2);
     amp2 = CLUtilities.getDouble(element, "amp2", DEFAULT_AMP2);
-    makeDrawables();
   }
 
   @Override
@@ -211,8 +207,6 @@ public class Rosette extends CLclass {
         setPattern(patternMgr.getDefaultPattern());	// deleted the rosettes pattern --> use default.
       }
     }
-    // make the drawables
-    makeDrawables();
     // pass the info through
     pcs.firePropertyChange(evt.getPropertyName(), evt.getOldValue(), evt.getNewValue());
   }
@@ -274,7 +268,6 @@ public class Rosette extends CLclass {
       this.pToP = 0.0;
       this.phase = 0.0;
     }
-    makeDrawables();
     if (pattern instanceof CustomPattern) {   // listen to customs for changes
       ((CustomPattern) pattern).addPropertyChangeListener(this);
     }
@@ -300,7 +293,6 @@ public class Rosette extends CLclass {
   public synchronized void setRepeat(int n) {
     int old = repeat;
     this.repeat = Math.max(n, pattern.getMinRepeat());
-    makeDrawables();
     this.pcs.firePropertyChange(PROP_REPEAT, old, repeat);
   }
 
@@ -326,7 +318,6 @@ public class Rosette extends CLclass {
     if (pattern.getName().equals("NONE")) {
       this.pToP = 0.0;
     }
-    makeDrawables();
     this.pcs.firePropertyChange(PROP_PTOP, old, pToP);
   }
 
@@ -365,7 +356,6 @@ public class Rosette extends CLclass {
     if (pattern.getName().equals("NONE")) {
       this.phase = 0.0;
     }
-    makeDrawables();
     this.pcs.firePropertyChange(PROP_PHASE, old, phase);
   }
 
@@ -402,7 +392,6 @@ public class Rosette extends CLclass {
   public void setInvert(boolean inv) {
     boolean old = invert;
     this.invert = inv;
-    makeDrawables();
     this.pcs.firePropertyChange(PROP_INVERT, old, invert);
   }
 
@@ -446,7 +435,6 @@ public class Rosette extends CLclass {
         mask = mask.replace(c, '1');
       }
     }
-    makeDrawables();
     pcs.firePropertyChange(PROP_MASK, old, mask);
   }
 
@@ -469,7 +457,6 @@ public class Rosette extends CLclass {
   public void setMaskHiLo(Mask hiLo) {
     Mask old = this.maskHiLo;
     this.maskHiLo = hiLo;
-    makeDrawables();
     pcs.firePropertyChange(PROP_HILO, old.toString(), maskHiLo.toString());
   }
 
@@ -507,7 +494,6 @@ public class Rosette extends CLclass {
     if (pattern.getName().equals("NONE")) {
       this.maskPhase = 0.0;
     }
-    makeDrawables();
     this.pcs.firePropertyChange(PROP_MASKPHASE, old, maskPhase);
   }
 
@@ -544,7 +530,6 @@ public class Rosette extends CLclass {
   public void setN2(int n) {
     int old = n2;
     this.n2 = n;
-    makeDrawables();
     this.pcs.firePropertyChange(PROP_N2, old, n2);
   }
 
@@ -567,7 +552,6 @@ public class Rosette extends CLclass {
   public synchronized void setAmp2(double a) {
     double old = this.amp2;
     this.amp2 = a;
-    makeDrawables();
     this.pcs.firePropertyChange(PROP_AMP2, old, amp2);
   }
 
@@ -591,15 +575,40 @@ public class Rosette extends CLclass {
    * Paint the object.
    *
    * @param g2d Graphics2D
+   * @param nomRadius Nominal radius of the drawn rosette
    */
-  public void paint(Graphics2D g2d) {
+  public void paint(Graphics2D g2d, double nomRadius) {
     g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
     g2d.setStroke(SOLID_LINE);
 
+    makeDrawables(nomRadius);    // make drawables when needed for painting
     drawList.stream().forEach((item) -> {
       // paint everything in the drawlist
       item.paint(g2d);
     });
+  }
+
+  /**
+   * Make the rosette appearance based on stored values.
+   * 
+   * @param nomRadius Nominal radius of the drawn rosette
+   */
+  private void makeDrawables(double nomRadius) {
+    drawList.clear();			// clear out the old drawlist
+    drawList.add(new Plus(center, RADIUS_COLOR));  // always draw a center mark
+    drawList.add(new Circle(new Point2D.Double(0.0, 0.0), nomRadius, RADIUS_COLOR, DOT_LINE));  // circle at nominal radius
+
+    Point2D.Double[] pts = new Point2D.Double[NUM_POINTS + 1];     // add 1 for wrap-around
+    double rad, r;
+    for (int i = 0; i <= NUM_POINTS; i++) {
+      // Add PI so that the pattern starts on the left side.
+      // Minus sign so that pattern goes clockwise such that 
+      // a positive spindle rotation brings the feature to the left side.
+      rad = -Math.toRadians((double) i) + Math.PI;
+      r = nomRadius - getAmplitudeAt((double) i);
+      pts[i] = new Point2D.Double(r * Math.cos(rad), r * Math.sin(rad));
+    }
+    drawList.add(new Curve(pts, OUTLINE_COLOR, SOLID_LINE));
   }
 
   /**
@@ -679,27 +688,6 @@ public class Rosette extends CLclass {
       fullMask += mask;			// fill out to full length
     }
     return (fullMask.charAt(m) == '0');
-  }
-
-  /**
-   * Make the rosette appearance based on stored values
-   */
-  private void makeDrawables() {
-    drawList.clear();			// clear out the old drawlist
-    drawList.add(new Plus(center, RADIUS_COLOR));  // always draw a center mark
-    drawList.add(new Circle(new Point2D.Double(0.0, 0.0), nomRadius, RADIUS_COLOR, DOT_LINE));  // circle at nominal radius
-
-    Point2D.Double[] pts = new Point2D.Double[NUM_POINTS + 1];     // add 1 for wrap-around
-    double rad, r;
-    for (int i = 0; i <= NUM_POINTS; i++) {
-      // Add PI so that the pattern starts on the left side.
-      // Minus sign so that pattern goes clockwise such that 
-      // a positive spindle rotation brings the feature to the left side.
-      rad = -Math.toRadians((double) i) + Math.PI;
-      r = nomRadius - getAmplitudeAt((double) i);
-      pts[i] = new Point2D.Double(r * Math.cos(rad), r * Math.sin(rad));
-    }
-    drawList.add(new Curve(pts, OUTLINE_COLOR, SOLID_LINE));
   }
 
   @Override

@@ -1,10 +1,13 @@
 package com.billooms.rosette;
 
 import com.billooms.cornlatheprefs.COrnLathePrefs;
+import com.billooms.drawables.Grid;
 import com.billooms.patterns.Pattern;
 import com.billooms.patterns.Patterns;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Point;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -104,6 +107,9 @@ public class RosetteEditPanel extends JPanel implements PropertyChangeListener {
     if (patternMgr != null) {
       patternMgr.removePropertyChangeListener(this);
     }
+    if (rosette != null) {
+      rosette.removePropertyChangeListener((PropertyChangeListener) viewPanel);
+    }
     
     this.patternMgr = newPatternMgr;
     updatePatternCombo();
@@ -112,6 +118,7 @@ public class RosetteEditPanel extends JPanel implements PropertyChangeListener {
       setRosette(null);
     } else {
       setRosette(new Rosette(patternMgr));
+      rosette.addPropertyChangeListener((PropertyChangeListener) viewPanel);
       if (patternMgr.getAllCustom().size() > 0) {
         rosette.setPattern(patternMgr.getAllCustom().get(0));    // set to first custom pattern
       } else {
@@ -305,6 +312,52 @@ public class RosetteEditPanel extends JPanel implements PropertyChangeListener {
       }
     }
   }
+  
+  /** Nested inner class for a panel showing a small plot of the rosette. */
+  private class ViewPanel extends JPanel implements PropertyChangeListener {
+    
+    private final double INITIAL_DPI = 100.0;	  // for the first time the window comes up
+    private final double WINDOW_PERCENT = 0.95;	  // use 95% of the window for the rosette
+    private final Point INITIAL_ZPIX = new Point(150, 200);   // artibrary
+    private double dpi = INITIAL_DPI;           // Dots per inch for zooming in/out
+    private Point zeroPix = INITIAL_ZPIX;       // Location of 0.0, 0.0 in pixels
+    private final double ROSETTE_RADIUS = 1.0;  // The radius of the Rosette for drawing purposes
+    
+    /** Creates new DisplayPanel */
+    public ViewPanel() {
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+      super.paintComponent(g);
+
+      dpi = (int) Math.min(WINDOW_PERCENT * this.getWidth() / (2 * ROSETTE_RADIUS),
+          WINDOW_PERCENT * this.getHeight() / (2 * ROSETTE_RADIUS));
+      zeroPix = new Point(getWidth() / 2, getHeight() / 2);	// zero is always in the center
+
+      Graphics2D g2d = (Graphics2D) g;
+      g2d.translate(zeroPix.x, zeroPix.y);
+      g2d.scale(dpi, -dpi);	// positive y is up
+
+      // Paint the grid
+      new Grid(-(double) zeroPix.x / dpi, -(double) (getHeight() - zeroPix.y) / dpi,
+          (double) getWidth() / dpi, (double) getHeight() / dpi).paint(g2d);
+
+      if (rosette != null) {
+        rosette.paint(g2d, ROSETTE_RADIUS);		// paint the rosette
+      }
+    }
+
+    /**
+     * Listen for changes and repaint
+     *
+     * @param evt event
+     */
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+      repaint();		// when things change, just repaint
+    }
+  }
 
   /** This method is called from within the constructor to initialize the form.
    * WARNING: Do NOT modify this code. The content of this method is always
@@ -317,18 +370,19 @@ public class RosetteEditPanel extends JPanel implements PropertyChangeListener {
     stylePanel = new javax.swing.JPanel();
     patternCombo = new javax.swing.JComboBox();
     repeatSpinner = new javax.swing.JSpinner();
+    invertCheck = new javax.swing.JCheckBox();
     iconPanel = new IconPanel();
     n2Spinner = new javax.swing.JSpinner();
     jLabel1 = new javax.swing.JLabel();
     amp2Field = new javax.swing.JFormattedTextField();
     jLabel2 = new javax.swing.JLabel();
-    invertCheck = new javax.swing.JCheckBox();
+    viewPanel = new ViewPanel();
     maskPanel = new javax.swing.JPanel();
-    maskField = new javax.swing.JTextField();
     jLabel4 = new javax.swing.JLabel();
+    maskField = new javax.swing.JTextField();
+    hiLoCombo = new javax.swing.JComboBox();
     jLabel5 = new javax.swing.JLabel();
     maskPhaseField = new javax.swing.JFormattedTextField();
-    hiLoCombo = new javax.swing.JComboBox();
     ampPanel = new javax.swing.JPanel();
     ampSlider = new javax.swing.JSlider();
     ampField = new javax.swing.JFormattedTextField();
@@ -355,17 +409,26 @@ public class RosetteEditPanel extends JPanel implements PropertyChangeListener {
       }
     });
 
+    org.openide.awt.Mnemonics.setLocalizedText(invertCheck, org.openide.util.NbBundle.getMessage(RosetteEditPanel.class, "RosetteEditPanel.invertCheck.text")); // NOI18N
+    invertCheck.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
+    invertCheck.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        changeInvert(evt);
+      }
+    });
+
     iconPanel.setBackground(new java.awt.Color(255, 255, 255));
+    iconPanel.setPreferredSize(new java.awt.Dimension(100, 50));
 
     javax.swing.GroupLayout iconPanelLayout = new javax.swing.GroupLayout(iconPanel);
     iconPanel.setLayout(iconPanelLayout);
     iconPanelLayout.setHorizontalGroup(
       iconPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-      .addGap(0, 60, Short.MAX_VALUE)
+      .addGap(0, 100, Short.MAX_VALUE)
     );
     iconPanelLayout.setVerticalGroup(
       iconPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-      .addGap(0, 25, Short.MAX_VALUE)
+      .addGap(0, 50, Short.MAX_VALUE)
     );
 
     n2Spinner.setModel(new javax.swing.SpinnerNumberModel(Integer.valueOf(3), Integer.valueOf(1), null, Integer.valueOf(1)));
@@ -392,14 +455,6 @@ public class RosetteEditPanel extends JPanel implements PropertyChangeListener {
 
     org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(RosetteEditPanel.class, "RosetteEditPanel.jLabel2.text")); // NOI18N
 
-    org.openide.awt.Mnemonics.setLocalizedText(invertCheck, org.openide.util.NbBundle.getMessage(RosetteEditPanel.class, "RosetteEditPanel.invertCheck.text")); // NOI18N
-    invertCheck.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
-    invertCheck.addActionListener(new java.awt.event.ActionListener() {
-      public void actionPerformed(java.awt.event.ActionEvent evt) {
-        changeInvert(evt);
-      }
-    });
-
     javax.swing.GroupLayout stylePanelLayout = new javax.swing.GroupLayout(stylePanel);
     stylePanel.setLayout(stylePanelLayout);
     stylePanelLayout.setHorizontalGroup(
@@ -408,39 +463,57 @@ public class RosetteEditPanel extends JPanel implements PropertyChangeListener {
         .addComponent(patternCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
         .addComponent(repeatSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE)
-        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
         .addComponent(invertCheck))
-      .addGroup(stylePanelLayout.createSequentialGroup()
+      .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, stylePanelLayout.createSequentialGroup()
         .addComponent(iconPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        .addComponent(jLabel1)
-        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-        .addComponent(n2Spinner, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE)
-        .addGap(6, 6, 6)
-        .addComponent(jLabel2)
-        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-        .addComponent(amp2Field, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+        .addGroup(stylePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+          .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, stylePanelLayout.createSequentialGroup()
+            .addComponent(jLabel1)
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+            .addComponent(n2Spinner, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE))
+          .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, stylePanelLayout.createSequentialGroup()
+            .addComponent(jLabel2)
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+            .addComponent(amp2Field, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
     );
     stylePanelLayout.setVerticalGroup(
       stylePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
       .addGroup(stylePanelLayout.createSequentialGroup()
-        .addGroup(stylePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-          .addGroup(stylePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(repeatSpinner, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-            .addComponent(patternCombo, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+        .addGroup(stylePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+          .addComponent(patternCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+          .addComponent(repeatSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
           .addComponent(invertCheck))
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-        .addGroup(stylePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-          .addComponent(iconPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-          .addGroup(stylePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
-            .addComponent(jLabel1)
-            .addComponent(n2Spinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-          .addGroup(stylePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-            .addComponent(amp2Field, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-            .addComponent(jLabel2))))
+        .addGroup(stylePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+          .addGroup(stylePanelLayout.createSequentialGroup()
+            .addGroup(stylePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+              .addComponent(n2Spinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+              .addComponent(jLabel1))
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+            .addGroup(stylePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+              .addComponent(amp2Field, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+              .addComponent(jLabel2)))
+          .addComponent(iconPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+    );
+
+    viewPanel.setBackground(new java.awt.Color(255, 255, 255));
+
+    javax.swing.GroupLayout viewPanelLayout = new javax.swing.GroupLayout(viewPanel);
+    viewPanel.setLayout(viewPanelLayout);
+    viewPanelLayout.setHorizontalGroup(
+      viewPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+      .addGap(0, 0, Short.MAX_VALUE)
+    );
+    viewPanelLayout.setVerticalGroup(
+      viewPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+      .addGap(0, 0, Short.MAX_VALUE)
     );
 
     maskPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(RosetteEditPanel.class, "RosetteEditPanel.maskPanel.border.title"))); // NOI18N
+
+    org.openide.awt.Mnemonics.setLocalizedText(jLabel4, org.openide.util.NbBundle.getMessage(RosetteEditPanel.class, "RosetteEditPanel.jLabel4.text")); // NOI18N
 
     maskField.setColumns(5);
     maskField.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
@@ -451,7 +524,12 @@ public class RosetteEditPanel extends JPanel implements PropertyChangeListener {
       }
     });
 
-    org.openide.awt.Mnemonics.setLocalizedText(jLabel4, org.openide.util.NbBundle.getMessage(RosetteEditPanel.class, "RosetteEditPanel.jLabel4.text")); // NOI18N
+    hiLoCombo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "HIGH", "LOW" }));
+    hiLoCombo.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        changeHiLo(evt);
+      }
+    });
 
     org.openide.awt.Mnemonics.setLocalizedText(jLabel5, org.openide.util.NbBundle.getMessage(RosetteEditPanel.class, "RosetteEditPanel.jLabel5.text")); // NOI18N
 
@@ -467,42 +545,29 @@ public class RosetteEditPanel extends JPanel implements PropertyChangeListener {
       }
     });
 
-    hiLoCombo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "HIGH", "LOW" }));
-    hiLoCombo.addActionListener(new java.awt.event.ActionListener() {
-      public void actionPerformed(java.awt.event.ActionEvent evt) {
-        changeHiLo(evt);
-      }
-    });
-
     javax.swing.GroupLayout maskPanelLayout = new javax.swing.GroupLayout(maskPanel);
     maskPanel.setLayout(maskPanelLayout);
     maskPanelLayout.setHorizontalGroup(
       maskPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
       .addGroup(maskPanelLayout.createSequentialGroup()
-        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        .addGroup(maskPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-          .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, maskPanelLayout.createSequentialGroup()
-            .addGroup(maskPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-              .addComponent(jLabel4, javax.swing.GroupLayout.Alignment.TRAILING)
-              .addComponent(jLabel5, javax.swing.GroupLayout.Alignment.TRAILING))
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addGroup(maskPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-              .addComponent(maskField, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-              .addComponent(maskPhaseField, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-          .addComponent(hiLoCombo, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-    );
-    maskPanelLayout.setVerticalGroup(
-      maskPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-      .addGroup(maskPanelLayout.createSequentialGroup()
-        .addGroup(maskPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
-          .addComponent(maskField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-          .addComponent(jLabel4))
+        .addComponent(jLabel4)
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+        .addComponent(maskField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
         .addComponent(hiLoCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-        .addGroup(maskPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-          .addComponent(maskPhaseField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-          .addComponent(jLabel5)))
+        .addComponent(jLabel5)
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+        .addComponent(maskPhaseField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+    );
+    maskPanelLayout.setVerticalGroup(
+      maskPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+      .addGroup(maskPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+        .addComponent(jLabel4)
+        .addComponent(maskField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+        .addComponent(hiLoCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+        .addComponent(jLabel5)
+        .addComponent(maskPhaseField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
     );
 
     ampPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(RosetteEditPanel.class, "RosetteEditPanel.ampPanel.border.title"))); // NOI18N
@@ -601,31 +666,35 @@ public class RosetteEditPanel extends JPanel implements PropertyChangeListener {
     layout.setHorizontalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
       .addGroup(layout.createSequentialGroup()
-        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-          .addComponent(stylePanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+          .addGroup(layout.createSequentialGroup()
+            .addComponent(stylePanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+            .addComponent(viewPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+          .addComponent(maskPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
           .addComponent(writeButton))
-        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-        .addComponent(maskPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-          .addComponent(phasePanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-          .addComponent(ampPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+          .addComponent(ampPanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+          .addComponent(phasePanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
     );
     layout.setVerticalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
       .addGroup(layout.createSequentialGroup()
-        .addComponent(stylePanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        .addComponent(writeButton)
-        .addContainerGap())
-      .addGroup(layout.createSequentialGroup()
-        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+          .addComponent(stylePanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
           .addGroup(layout.createSequentialGroup()
-            .addComponent(ampPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(phasePanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-          .addComponent(maskPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-        .addGap(0, 0, Short.MAX_VALUE))
+            .addContainerGap()
+            .addComponent(viewPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+        .addComponent(maskPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        .addComponent(writeButton))
+      .addGroup(layout.createSequentialGroup()
+        .addComponent(ampPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+        .addComponent(phasePanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
     );
   }// </editor-fold>//GEN-END:initComponents
 
@@ -772,6 +841,7 @@ public class RosetteEditPanel extends JPanel implements PropertyChangeListener {
   private javax.swing.JSlider phaseSlider;
   private javax.swing.JSpinner repeatSpinner;
   private javax.swing.JPanel stylePanel;
+  private javax.swing.JPanel viewPanel;
   private javax.swing.JButton writeButton;
   // End of variables declaration//GEN-END:variables
 }
