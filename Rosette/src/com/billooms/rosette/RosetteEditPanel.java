@@ -11,16 +11,7 @@ import java.awt.Point;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.PrintWriter;
-import java.text.DecimalFormat;
 import javax.swing.JPanel;
-import javax.swing.filechooser.FileNameExtensionFilter;
-import org.openide.*;
-import org.openide.awt.StatusDisplayer;
-import org.openide.filesystems.FileChooserBuilder;
 import org.openide.util.Lookup;
 
 /**
@@ -49,9 +40,6 @@ public class RosetteEditPanel extends JPanel implements PropertyChangeListener {
   public final static String PROP_PREFIX = "RosetteEditPanel" + "_";
   /** Property name used when changing the rosette. */
   public final static String PROP_ROSETTE = PROP_PREFIX + "Rosette";
-
-  private final static String EXTENSION = "txt";
-  private final static DecimalFormat F4 = new DecimalFormat("0.0000");
   
   private final static COrnLathePrefs prefs = Lookup.getDefault().lookup(COrnLathePrefs.class);
   
@@ -71,10 +59,10 @@ public class RosetteEditPanel extends JPanel implements PropertyChangeListener {
       hiLoCombo.addItem(hl.toString());
     }
     ampSlider.setLabelTable(new SliderLabels(0, 100, 25, 0.0, 0.25));	  // labels for slider
-    if (prefs.isFracPhase()) {
-      phaseSlider.setLabelTable(new SliderLabels(0, 180, 45, 0.0, 0.25)); // fractional labels for slider
-    } else {
+    if ((prefs == null) || !prefs.isFracPhase()) {    // (test for null so that drag & drop works)
       phaseSlider.setLabelTable(new SliderLabels(0, 180, 45, 0, 90));	  // engineering labels for slider
+    } else {
+      phaseSlider.setLabelTable(new SliderLabels(0, 180, 45, 0.0, 0.25)); // fractional labels for slider
     }
     
     updateForm();
@@ -195,66 +183,6 @@ public class RosetteEditPanel extends JPanel implements PropertyChangeListener {
     }
   }
 
-  private void writeRosetteData(double delta, double radius) {
-    if ((delta <= 0.0) || (radius <= 0.0)) {
-      return;
-    }
-
-    File textFile;
-    File home = new File(System.getProperty("user.home"));	//The default dir to use if no value is stored
-    textFile = new FileChooserBuilder("openfile")
-        .setTitle("Save g-code File As...")
-        .setDefaultWorkingDirectory(home)
-        .setApproveText("save")
-        .setFileFilter(new FileNameExtensionFilter(EXTENSION + " files", EXTENSION))
-        .showSaveDialog();
-    if (textFile == null) {
-      return;
-    }
-    if (!(textFile.toString()).endsWith("." + EXTENSION)) {   // make sure there's a .txt extention
-      textFile = new File(textFile.toString() + "." + EXTENSION);
-    }
-    if (textFile.exists()) {	// Ask the user whether to replace the file.
-      NotifyDescriptor d = new NotifyDescriptor.Confirmation(
-          "The file " + textFile.getName() + " already exists.\nDo you want to replace it?",
-          "Overwrite File Check",
-          NotifyDescriptor.YES_NO_OPTION,
-          NotifyDescriptor.WARNING_MESSAGE);
-      d.setValue(NotifyDescriptor.CANCEL_OPTION);
-      Object result = DialogDisplayer.getDefault().notify(d);
-      if (result != DialogDescriptor.YES_OPTION) {
-        return;
-      }
-    }
-    StatusDisplayer.getDefault().setStatusText("Saving Rosette File As: " + textFile.getName());
-
-    PrintWriter out;
-    try {
-      FileOutputStream stream = new FileOutputStream(textFile);
-      out = new PrintWriter(stream);
-    } catch (FileNotFoundException e) {
-      NotifyDescriptor d = new NotifyDescriptor.Message("Error while trying to open the text file:\n" + e,
-          NotifyDescriptor.ERROR_MESSAGE);
-      DialogDisplayer.getDefault().notify(d);
-      return;
-    }
-    try {
-      double degrees = 0.0;
-      out.println("degrees\tradius");
-      do {
-        out.println(F4.format(degrees) + "\t" + F4.format(radius - rosette.getAmplitudeAt(degrees)));
-        degrees += delta;
-      } while (degrees < 360.0);
-
-    } catch (Exception e) {
-      NotifyDescriptor d = new NotifyDescriptor.Message("Error while trying to write the text file:\n" + e,
-          NotifyDescriptor.ERROR_MESSAGE);
-      DialogDisplayer.getDefault().notify(d);
-    } finally {
-      out.close();
-    }
-  }
-
   @Override
   public void propertyChange(PropertyChangeEvent evt) {
 //    System.out.println("RosetteEditPanel.propertyChange: " + evt.getPropertyName() + " " + evt.getOldValue() + " " + evt.getNewValue());
@@ -323,7 +251,7 @@ public class RosetteEditPanel extends JPanel implements PropertyChangeListener {
     private Point zeroPix = INITIAL_ZPIX;       // Location of 0.0, 0.0 in pixels
     private final double ROSETTE_RADIUS = 1.0;  // The radius of the Rosette for drawing purposes
     
-    /** Creates new DisplayPanel */
+    /** Creates new ViewPanel */
     public ViewPanel() {
     }
 
@@ -389,7 +317,6 @@ public class RosetteEditPanel extends JPanel implements PropertyChangeListener {
     phasePanel = new javax.swing.JPanel();
     phaseSlider = new javax.swing.JSlider();
     phaseField = new javax.swing.JFormattedTextField();
-    writeButton = new javax.swing.JButton();
 
     stylePanel.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(RosetteEditPanel.class, "RosetteEditPanel.stylePanel.border.title"))); // NOI18N
 
@@ -485,13 +412,13 @@ public class RosetteEditPanel extends JPanel implements PropertyChangeListener {
           .addComponent(patternCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
           .addComponent(repeatSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
           .addComponent(invertCheck))
-        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+        .addGap(0, 0, 0)
         .addGroup(stylePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
           .addGroup(stylePanelLayout.createSequentialGroup()
             .addGroup(stylePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
               .addComponent(n2Spinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
               .addComponent(jLabel1))
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+            .addGap(0, 0, 0)
             .addGroup(stylePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
               .addComponent(amp2Field, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
               .addComponent(jLabel2)))
@@ -654,13 +581,6 @@ public class RosetteEditPanel extends JPanel implements PropertyChangeListener {
       .addComponent(phaseSlider, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
     );
 
-    org.openide.awt.Mnemonics.setLocalizedText(writeButton, org.openide.util.NbBundle.getMessage(RosetteEditPanel.class, "RosetteEditPanel.writeButton.text")); // NOI18N
-    writeButton.addActionListener(new java.awt.event.ActionListener() {
-      public void actionPerformed(java.awt.event.ActionEvent evt) {
-        writeData(evt);
-      }
-    });
-
     javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
     this.setLayout(layout);
     layout.setHorizontalGroup(
@@ -669,14 +589,13 @@ public class RosetteEditPanel extends JPanel implements PropertyChangeListener {
         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
           .addGroup(layout.createSequentialGroup()
             .addComponent(stylePanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+            .addGap(0, 0, 0)
             .addComponent(viewPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-          .addComponent(maskPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-          .addComponent(writeButton))
-        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+          .addComponent(maskPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+        .addGap(0, 0, 0)
         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-          .addComponent(ampPanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-          .addComponent(phasePanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+          .addComponent(ampPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+          .addComponent(phasePanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
     );
     layout.setVerticalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -686,15 +605,11 @@ public class RosetteEditPanel extends JPanel implements PropertyChangeListener {
           .addGroup(layout.createSequentialGroup()
             .addContainerGap()
             .addComponent(viewPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-        .addComponent(maskPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        .addComponent(writeButton))
+        .addComponent(maskPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
       .addGroup(layout.createSequentialGroup()
         .addComponent(ampPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-        .addComponent(phasePanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        .addGap(0, 0, 0)
+        .addComponent(phasePanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
     );
   }// </editor-fold>//GEN-END:initComponents
 
@@ -797,27 +712,6 @@ public class RosetteEditPanel extends JPanel implements PropertyChangeListener {
     }
   }//GEN-LAST:event_changePhase
 
-  private void writeData(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_writeData
-    if (rosette != null) {
-      WriteDataPanel panel = new WriteDataPanel();
-      DialogDescriptor dd = new DialogDescriptor(
-        panel,
-        "Write Rosette Data",
-        true,
-        DialogDescriptor.OK_CANCEL_OPTION,
-        DialogDescriptor.OK_OPTION,
-        null);
-      Object result = DialogDisplayer.getDefault().notify(dd);
-      if (result != DialogDescriptor.OK_OPTION) {
-        return;
-      }
-      double delta = ((Number) panel.degreeField.getValue()).doubleValue();
-      double radius = ((Number) panel.radiusField.getValue()).doubleValue();
-
-      writeRosetteData(delta, radius);
-    }
-  }//GEN-LAST:event_writeData
-
 
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JFormattedTextField amp2Field;
@@ -842,6 +736,5 @@ public class RosetteEditPanel extends JPanel implements PropertyChangeListener {
   private javax.swing.JSpinner repeatSpinner;
   private javax.swing.JPanel stylePanel;
   private javax.swing.JPanel viewPanel;
-  private javax.swing.JButton writeButton;
   // End of variables declaration//GEN-END:variables
 }
