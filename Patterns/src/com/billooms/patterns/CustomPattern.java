@@ -480,6 +480,24 @@ public class CustomPattern extends BasicPattern {
       p.setY(1.0 - p.getY());
     });
   }
+  
+  /**
+   * Flip the pattern left to right.
+   */
+  public void flip() {
+    if (line.getSize() < 0) {	// nothing is done if no points.
+      return;
+    }
+    ArrayList<Pt> oldList = line.getAllPoints();
+    ArrayList<Pt> newList = new ArrayList<>(oldList.size());
+    // new points have to be in sorted order by increasing x coordinate
+    for (int i = oldList.size()-1; i >= 0; i--) {
+      Pt pt = oldList.get(i);
+      SquarePt p = new SquarePt(new Point2D.Double(1.0 - pt.getX(), pt.getY()), IMAGE_COLOR);
+      newList.add(p);
+    }
+    line.setAllPoints(newList);
+  }
 
   /**
    * Write the data to an xml file.

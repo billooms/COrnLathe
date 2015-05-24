@@ -196,6 +196,7 @@ public final class PatternEditorTopComponent extends TopComponent implements Pro
     clearButton = new javax.swing.JButton();
     mirrorButton = new javax.swing.JButton();
     invertButton = new javax.swing.JButton();
+    flipButton = new javax.swing.JButton();
 
     setLayout(new java.awt.BorderLayout());
 
@@ -293,6 +294,13 @@ public final class PatternEditorTopComponent extends TopComponent implements Pro
       }
     });
 
+    org.openide.awt.Mnemonics.setLocalizedText(flipButton, org.openide.util.NbBundle.getMessage(PatternEditorTopComponent.class, "PatternEditorTopComponent.flipButton.text")); // NOI18N
+    flipButton.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        flipButtonflip(evt);
+      }
+    });
+
     javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
     jPanel1.setLayout(jPanel1Layout);
     jPanel1Layout.setHorizontalGroup(
@@ -310,16 +318,18 @@ public final class PatternEditorTopComponent extends TopComponent implements Pro
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(normalButton))
           .addGroup(jPanel1Layout.createSequentialGroup()
-            .addGap(0, 135, Short.MAX_VALUE)
+            .addGap(0, 32, Short.MAX_VALUE)
             .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-              .addGroup(jPanel1Layout.createSequentialGroup()
-                .addComponent(invertButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(deleteButton))
               .addGroup(jPanel1Layout.createSequentialGroup()
                 .addComponent(mirrorButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(clearButton))))))
+                .addComponent(clearButton))
+              .addGroup(jPanel1Layout.createSequentialGroup()
+                .addComponent(flipButton)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(invertButton)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(deleteButton))))))
     );
     jPanel1Layout.setVerticalGroup(
       jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -336,7 +346,8 @@ public final class PatternEditorTopComponent extends TopComponent implements Pro
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
           .addComponent(deleteButton)
-          .addComponent(invertButton))
+          .addComponent(invertButton)
+          .addComponent(flipButton))
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
           .addComponent(clearButton)
@@ -417,10 +428,17 @@ public final class PatternEditorTopComponent extends TopComponent implements Pro
     }
   }//GEN-LAST:event_invertButtoninvert
 
+  private void flipButtonflip(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_flipButtonflip
+    if (!selected.isBuiltIn()) {
+      ((CustomPattern) selected).flip();
+    }
+  }//GEN-LAST:event_flipButtonflip
+
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JButton clearButton;
   private javax.swing.JLabel coordsLabel;
   private javax.swing.JButton deleteButton;
+  private javax.swing.JButton flipButton;
   private javax.swing.JPanel iconPanel;
   private javax.swing.JButton invertButton;
   private javax.swing.JPanel jPanel1;
