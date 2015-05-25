@@ -337,6 +337,7 @@ public class RosetteEditPanel extends JPanel implements PropertyChangeListener {
     });
 
     org.openide.awt.Mnemonics.setLocalizedText(invertCheck, org.openide.util.NbBundle.getMessage(RosetteEditPanel.class, "RosetteEditPanel.invertCheck.text")); // NOI18N
+    invertCheck.setToolTipText(org.openide.util.NbBundle.getMessage(RosetteEditPanel.class, "RosetteEditPanel.invertCheck.toolTipText")); // NOI18N
     invertCheck.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
     invertCheck.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -345,6 +346,7 @@ public class RosetteEditPanel extends JPanel implements PropertyChangeListener {
     });
 
     iconPanel.setBackground(new java.awt.Color(255, 255, 255));
+    iconPanel.setToolTipText(org.openide.util.NbBundle.getMessage(RosetteEditPanel.class, "RosetteEditPanel.iconPanel.toolTipText")); // NOI18N
     iconPanel.setPreferredSize(new java.awt.Dimension(100, 50));
 
     javax.swing.GroupLayout iconPanelLayout = new javax.swing.GroupLayout(iconPanel);
@@ -426,6 +428,7 @@ public class RosetteEditPanel extends JPanel implements PropertyChangeListener {
     );
 
     viewPanel.setBackground(new java.awt.Color(255, 255, 255));
+    viewPanel.setToolTipText(org.openide.util.NbBundle.getMessage(RosetteEditPanel.class, "RosetteEditPanel.viewPanel.toolTipText")); // NOI18N
 
     javax.swing.GroupLayout viewPanelLayout = new javax.swing.GroupLayout(viewPanel);
     viewPanel.setLayout(viewPanelLayout);
@@ -445,6 +448,7 @@ public class RosetteEditPanel extends JPanel implements PropertyChangeListener {
     maskField.setColumns(5);
     maskField.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
     maskField.setText(org.openide.util.NbBundle.getMessage(RosetteEditPanel.class, "RosetteEditPanel.maskField.text")); // NOI18N
+    maskField.setToolTipText(org.openide.util.NbBundle.getMessage(RosetteEditPanel.class, "RosetteEditPanel.maskField.toolTipText")); // NOI18N
     maskField.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
         changeMask(evt);
@@ -452,6 +456,7 @@ public class RosetteEditPanel extends JPanel implements PropertyChangeListener {
     });
 
     hiLoCombo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "HIGH", "LOW" }));
+    hiLoCombo.setToolTipText(org.openide.util.NbBundle.getMessage(RosetteEditPanel.class, "RosetteEditPanel.hiLoCombo.toolTipText")); // NOI18N
     hiLoCombo.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
         changeHiLo(evt);
