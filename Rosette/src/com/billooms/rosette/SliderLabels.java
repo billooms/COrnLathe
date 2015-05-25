@@ -1,4 +1,4 @@
-package com.billooms.rosetteviewer;
+package com.billooms.rosette;
 
 import java.util.Hashtable;
 import javax.swing.JLabel;

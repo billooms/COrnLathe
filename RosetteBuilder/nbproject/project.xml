@@ -3,20 +3,11 @@
     <type>org.netbeans.modules.apisupport.project</type>
     <configuration>
         <data xmlns="http://www.netbeans.org/ns/nb-module-project/3">
-            <code-name-base>com.billooms.rosette</code-name-base>
+            <code-name-base>com.billooms.rosettebuilder</code-name-base>
             <suite-component/>
             <module-dependencies>
                 <dependency>
                     <code-name-base>com.billooms.clclass</code-name-base>
-                    <build-prerequisite/>
-                    <compile-dependency/>
-                    <run-dependency>
-                        <release-version>1</release-version>
-                        <specification-version>1.0</specification-version>
-                    </run-dependency>
-                </dependency>
-                <dependency>
-                    <code-name-base>com.billooms.cornlatheprefs</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
@@ -43,6 +34,24 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
+                    <code-name-base>com.billooms.rosette</code-name-base>
+                    <build-prerequisite/>
+                    <compile-dependency/>
+                    <run-dependency>
+                        <release-version>1</release-version>
+                        <specification-version>1.0</specification-version>
+                    </run-dependency>
+                </dependency>
+                <dependency>
+                    <code-name-base>org.netbeans.modules.settings</code-name-base>
+                    <build-prerequisite/>
+                    <compile-dependency/>
+                    <run-dependency>
+                        <release-version>1</release-version>
+                        <specification-version>1.45.1</specification-version>
+                    </run-dependency>
+                </dependency>
+                <dependency>
                     <code-name-base>org.openide.awt</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
@@ -51,19 +60,11 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>org.openide.dialogs</code-name-base>
+                    <code-name-base>org.openide.explorer</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
-                        <specification-version>7.38.1</specification-version>
-                    </run-dependency>
-                </dependency>
-                <dependency>
-                    <code-name-base>org.openide.filesystems</code-name-base>
-                    <build-prerequisite/>
-                    <compile-dependency/>
-                    <run-dependency>
-                        <specification-version>8.12.1</specification-version>
+                        <specification-version>6.57.1</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
@@ -71,7 +72,7 @@
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
-                        <specification-version>7.38.1</specification-version>
+                        <specification-version>7.39.1</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
@@ -79,7 +80,7 @@
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
-                        <specification-version>8.37.1</specification-version>
+                        <specification-version>8.39.1</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
@@ -87,13 +88,19 @@
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
-                        <specification-version>8.24.1</specification-version>
+                        <specification-version>8.25.1</specification-version>
+                    </run-dependency>
+                </dependency>
+                <dependency>
+                    <code-name-base>org.openide.windows</code-name-base>
+                    <build-prerequisite/>
+                    <compile-dependency/>
+                    <run-dependency>
+                        <specification-version>6.71.1</specification-version>
                     </run-dependency>
                 </dependency>
             </module-dependencies>
-            <public-packages>
-                <package>com.billooms.rosette</package>
-            </public-packages>
+            <public-packages/>
         </data>
     </configuration>
 </project>
