@@ -179,6 +179,7 @@ public class RosetteEditPanel extends JPanel implements PropertyChangeListener {
       maskField.setText(rosette.getMask());
       invertCheck.setSelected(rosette.getInvert());
       hiLoCombo.setSelectedItem(rosette.getMaskHiLo());
+      symAmpText.setText(rosette.getSymmetryAmp().toString());
       iconPanel.repaint();
     }
   }
@@ -311,6 +312,8 @@ public class RosetteEditPanel extends JPanel implements PropertyChangeListener {
     hiLoCombo = new javax.swing.JComboBox();
     jLabel5 = new javax.swing.JLabel();
     maskPhaseField = new javax.swing.JFormattedTextField();
+    jLabel3 = new javax.swing.JLabel();
+    symAmpText = new javax.swing.JTextField();
     ampPanel = new javax.swing.JPanel();
     ampSlider = new javax.swing.JSlider();
     ampField = new javax.swing.JFormattedTextField();
@@ -477,6 +480,15 @@ public class RosetteEditPanel extends JPanel implements PropertyChangeListener {
       }
     });
 
+    org.openide.awt.Mnemonics.setLocalizedText(jLabel3, org.openide.util.NbBundle.getMessage(RosetteEditPanel.class, "RosetteEditPanel.jLabel3.text")); // NOI18N
+
+    symAmpText.setToolTipText(org.openide.util.NbBundle.getMessage(RosetteEditPanel.class, "RosetteEditPanel.symAmpText.toolTipText")); // NOI18N
+    symAmpText.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        changeSymAmp(evt);
+      }
+    });
+
     javax.swing.GroupLayout maskPanelLayout = new javax.swing.GroupLayout(maskPanel);
     maskPanel.setLayout(maskPanelLayout);
     maskPanelLayout.setHorizontalGroup(
@@ -491,15 +503,24 @@ public class RosetteEditPanel extends JPanel implements PropertyChangeListener {
         .addComponent(jLabel5)
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
         .addComponent(maskPhaseField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+      .addGroup(maskPanelLayout.createSequentialGroup()
+        .addComponent(jLabel3)
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+        .addComponent(symAmpText, javax.swing.GroupLayout.PREFERRED_SIZE, 124, javax.swing.GroupLayout.PREFERRED_SIZE))
     );
     maskPanelLayout.setVerticalGroup(
       maskPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-      .addGroup(maskPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-        .addComponent(jLabel4)
-        .addComponent(maskField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-        .addComponent(hiLoCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-        .addComponent(jLabel5)
-        .addComponent(maskPhaseField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+      .addGroup(maskPanelLayout.createSequentialGroup()
+        .addGroup(maskPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+          .addComponent(jLabel4)
+          .addComponent(maskField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+          .addComponent(hiLoCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+          .addComponent(jLabel5)
+          .addComponent(maskPhaseField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+        .addGap(0, 0, 0)
+        .addGroup(maskPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+          .addComponent(jLabel3)
+          .addComponent(symAmpText, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
     );
 
     ampPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(RosetteEditPanel.class, "RosetteEditPanel.ampPanel.border.title"))); // NOI18N
@@ -717,6 +738,13 @@ public class RosetteEditPanel extends JPanel implements PropertyChangeListener {
     }
   }//GEN-LAST:event_changePhase
 
+  private void changeSymAmp(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_changeSymAmp
+    if (rosette != null & symAmpText.isFocusOwner()) {
+      rosette.setSymmetryAmp(symAmpText.getText());
+      updateForm();   // in case of format problem
+    }
+  }//GEN-LAST:event_changeSymAmp
+
 
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JFormattedTextField amp2Field;
@@ -728,6 +756,7 @@ public class RosetteEditPanel extends JPanel implements PropertyChangeListener {
   private javax.swing.JCheckBox invertCheck;
   private javax.swing.JLabel jLabel1;
   private javax.swing.JLabel jLabel2;
+  private javax.swing.JLabel jLabel3;
   private javax.swing.JLabel jLabel4;
   private javax.swing.JLabel jLabel5;
   private javax.swing.JTextField maskField;
@@ -740,6 +769,7 @@ public class RosetteEditPanel extends JPanel implements PropertyChangeListener {
   private javax.swing.JSlider phaseSlider;
   private javax.swing.JSpinner repeatSpinner;
   private javax.swing.JPanel stylePanel;
+  private javax.swing.JTextField symAmpText;
   private javax.swing.JPanel viewPanel;
   // End of variables declaration//GEN-END:variables
 }

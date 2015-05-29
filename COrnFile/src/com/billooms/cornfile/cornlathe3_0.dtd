@@ -264,6 +264,7 @@
     maskPhase CDATA "0.0"
     n2 CDATA "0.0"
     amp2 CDATA "0.0"
+    symmetryAmp CDATA ""
   >
 
 <!--- These attributes define a pattern bar -->

@@ -63,6 +63,8 @@ public class Rosette extends CLclass {
   public final static String PROP_N2 = PROP_PREFIX + "N2";
   /** Property name used for changing the optional 2nd amplitude */
   public final static String PROP_AMP2 = PROP_PREFIX + "Amp2";
+  /** Property name used for changing the symmetry amplitudes. */
+  public final static String PROP_SYMAMP = PROP_PREFIX + "SymmetryAmp";
 
   /** Default Style Name (currently set to "SINE") */
   public final static String DEFAULT_PATTERN = "SINE";
@@ -82,6 +84,7 @@ public class Rosette extends CLclass {
   public final static double DEFAULT_AMP2 = 0.1;
 //  /** The radius of the Rosette for drawing purposes (currently set to 3.5) */
 //  public final static double DEFAULT_RADIUS = 3.5;
+  public final static String DEFAULT_SYMAMP = "";
 
   /** Two different ways to mask */
   public static enum Mask {
@@ -113,6 +116,10 @@ public class Rosette extends CLclass {
   private int n2 = DEFAULT_N2;
   /** Optional 2nd amplitude parameter. */
   private double amp2 = DEFAULT_AMP2;
+  /** Optional amplitude symmetry parameters. */
+  private DoubleArray symmetryAmp = new DoubleArray(DEFAULT_SYMAMP);
+  /** Optional phase symmetry parameters. */
+  private DoubleArray symmetryPhase = new DoubleArray();
 
   private static COrnLathePrefs prefs = Lookup.getDefault().lookup(COrnLathePrefs.class);
   private Patterns patternMgr = null;
@@ -194,6 +201,7 @@ public class Rosette extends CLclass {
     maskPhase = CLUtilities.getDouble(element, "maskPhase", DEFAULT_MASK_PHASE);
     n2 = CLUtilities.getInteger(element, "n2", DEFAULT_N2);
     amp2 = CLUtilities.getDouble(element, "amp2", DEFAULT_AMP2);
+    symmetryAmp.setData(CLUtilities.getString(element, "symmetryAmp", DEFAULT_SYMAMP));
   }
 
   @Override
@@ -554,6 +562,41 @@ public class Rosette extends CLclass {
     this.amp2 = a;
     this.pcs.firePropertyChange(PROP_AMP2, old, amp2);
   }
+  
+  /**
+   * Get the optional symmetry amplitudes.
+   * 
+   * @return DoubleArray of optional symmetry amplitudes
+   */
+  public DoubleArray getSymmetryAmp() {
+    return symmetryAmp;
+  }
+  
+  /**
+   * Set the optional symmetry amplitudes.
+   *
+   * This fires a PROP_SYMAMP property change with the old and new values.
+   * 
+   * @param newAmps array of optional symmetry amplitudes (or null for no variations)
+   */
+  public void setSymmetryAmp(DoubleArray newAmps) {
+    DoubleArray old = this.symmetryAmp;
+    this.symmetryAmp = newAmps;
+    this.pcs.firePropertyChange(PROP_SYMAMP, old, newAmps);
+  }
+  
+  /**
+   * Set the optional symmetry amplitudes.
+   *
+   * This fires a PROP_SYMAMP property change with the old and new values.
+   * 
+   * @param newStr string with new values comma delimited
+   */
+  public void setSymmetryAmp(String newStr) {
+    String old = this.symmetryAmp.toString();
+    this.symmetryAmp.setData(newStr);
+    this.pcs.firePropertyChange(PROP_SYMAMP, old, symmetryAmp.toString());
+  }
 
   /**
    * Make sure angle is in range 0.0 <= a < 360.0
@@ -633,18 +676,39 @@ public class Rosette extends CLclass {
     double anglePerRepeat = 360.0 / repeat;	// degrees per every repeat of pattern
     int m = (int) (angle / anglePerRepeat);	// which repeat is the pattern in (0 to repeat)
     double patternAngle = angle - m * anglePerRepeat;	// degrees into the pattern
-    double dr;
-    if (pattern.needsOptions()) {
-      dr = pToP * pattern.getValue(patternAngle / anglePerRepeat, repeat, n2, amp2);
-    } else if (pattern.needsRepeat()) {
-      dr = pToP * pattern.getValue(patternAngle / anglePerRepeat, repeat);
-    } else {
-      dr = pToP * pattern.getValue(patternAngle / anglePerRepeat);
+    double dr = pToP * getPatternValue(patternAngle / anglePerRepeat);
+    if ((symmetryAmp != null) && (symmetryAmp.size() > 0)) {
+      dr = symmetryAmp.getData()[m % symmetryAmp.size()] * dr;    // multiply by the symmetry amplitude
+      if (getPatternValue(0.0) >= 0.99) {    // just in case it's not exacly 1.0
+        // for patterns that start at 1.0, offset so that repeats match up
+        dr = dr + pToP * (1.0 - symmetryAmp.getData()[m % symmetryAmp.size()]);
+      }
     }
     if (invert) {
       return pToP - dr;
     }
     return dr;
+  }
+  
+  /**
+   * Get a normalized value (in the range of 0 to 1) for the given normalized
+   * input (also in the range of 0 to 1).
+   * 
+   * Use this rather than directly calling pattern.getValue so that we call the 
+   * correct method depending on if the pattern requires the repeat or other optional 
+   * parameters. 
+   *
+   * @param n input value (in the range of 0.0 to 1.0)
+   * @return normalized pattern value (in the range 0.0 to 1.0)
+   */
+  private double getPatternValue(double n) {
+    if (pattern.needsOptions()) {
+      return pattern.getValue(n, repeat, n2, amp2);
+    } else if (pattern.needsRepeat()) {
+      return pattern.getValue(n, repeat);
+    } else {
+      return pattern.getValue(n);
+    }
   }
 
   /**
@@ -706,6 +770,9 @@ public class Rosette extends CLclass {
     }
     if (pattern.needsAmp2()) {
       opt = opt + " amp2='" + F4.format(amp2) + "'";
+    }
+    if ((symmetryAmp != null) && (symmetryAmp.size() > 0)) {
+      opt = opt + " symmetryAmp='" + symmetryAmp.toString() + "'";
     }
     out.println(indent + "<Rosette"
         + " pattern='" + pattern.getName() + "'"
