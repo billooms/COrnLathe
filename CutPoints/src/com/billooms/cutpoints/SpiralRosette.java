@@ -355,14 +355,24 @@ public class SpiralRosette extends SpiralCut {
         fullMask += mask;	// fill out to full length
       }
     }
-    double ang = phase / repeat;
-    for (int i = 0; i < repeat; i++) {
-      if (mask.isEmpty() || (fullMask.charAt(i) != '0')) {
+    if (((RosettePoint) beginPt).getRosette().usesSymmetryWid()) {
+      // TODO: the lines don't quite match the cut surface because phase shift is not warped
+      double[] angles = ((RosettePoint) beginPt).getRosette().getAngleBreaks();
+      for (int i = 0; i < repeat; i++) {
         Line3D line = new Line3D(getPointsForLine());
-        line.rotate(RotMatrix.Axis.Z, ang);
+        line.rotate(RotMatrix.Axis.Z, -angles[i]);
         list3D.add(line);
       }
-      ang -= 360.0 / (double) repeat;
+    } else {
+      double ang = phase / repeat;
+      for (int i = 0; i < repeat; i++) {
+        if (mask.isEmpty() || (fullMask.charAt(i) != '0')) {
+          Line3D line = new Line3D(getPointsForLine());
+          line.rotate(RotMatrix.Axis.Z, ang);
+          list3D.add(line);
+        }
+        ang -= 360.0 / (double) repeat;
+      }
     }
   }
 

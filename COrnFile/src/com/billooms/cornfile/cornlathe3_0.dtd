@@ -265,6 +265,7 @@
     n2 CDATA "0.0"
     amp2 CDATA "0.0"
     symmetryAmp CDATA ""
+    symmetryWid CDATA ""
   >
 
 <!--- These attributes define a pattern bar -->

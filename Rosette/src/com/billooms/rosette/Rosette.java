@@ -65,6 +65,8 @@ public class Rosette extends CLclass {
   public final static String PROP_AMP2 = PROP_PREFIX + "Amp2";
   /** Property name used for changing the symmetry amplitudes. */
   public final static String PROP_SYMAMP = PROP_PREFIX + "SymmetryAmp";
+  /** Property name used for changing the symmetry widths. */
+  public final static String PROP_SYMWID = PROP_PREFIX + "SymmetryWid";
 
   /** Default Style Name (currently set to "SINE") */
   public final static String DEFAULT_PATTERN = "SINE";
@@ -82,17 +84,16 @@ public class Rosette extends CLclass {
   public final static int DEFAULT_N2 = 3;
   /** Default for optional second amplitude parameter */
   public final static double DEFAULT_AMP2 = 0.1;
-//  /** The radius of the Rosette for drawing purposes (currently set to 3.5) */
-//  public final static double DEFAULT_RADIUS = 3.5;
+  /** Default value for optional symmetry amplitudes. */
   public final static String DEFAULT_SYMAMP = "";
+  /** Default value for optional symmetry widths. */
+  public final static String DEFAULT_SYMWID = "";
 
   /** Two different ways to mask */
   public static enum Mask {
-
     /** Mask the rosette to the highest point */
     HIGH,
-    /** Mask the rosette to the
-     * lowest point */
+    /** Mask the rosette to the lowest point */
     LOW
   }
 
@@ -118,8 +119,8 @@ public class Rosette extends CLclass {
   private double amp2 = DEFAULT_AMP2;
   /** Optional amplitude symmetry parameters. */
   private DoubleArray symmetryAmp = new DoubleArray(DEFAULT_SYMAMP);
-  /** Optional phase symmetry parameters. */
-  private DoubleArray symmetryPhase = new DoubleArray();
+  /** Optional width symmetry parameters. */
+  private DoubleArray symmetryWid = new DoubleArray(DEFAULT_SYMWID);
 
   private static COrnLathePrefs prefs = Lookup.getDefault().lookup(COrnLathePrefs.class);
   private Patterns patternMgr = null;
@@ -181,6 +182,8 @@ public class Rosette extends CLclass {
     this.invert = rosette.getInvert();
     this.amp2 = rosette.getAmp2();
     this.n2 = rosette.getN2();
+    this.symmetryAmp = rosette.getSymmetryAmp();
+    this.symmetryWid = rosette.getSymmetryWid();
   }
 
   /**
@@ -202,6 +205,7 @@ public class Rosette extends CLclass {
     n2 = CLUtilities.getInteger(element, "n2", DEFAULT_N2);
     amp2 = CLUtilities.getDouble(element, "amp2", DEFAULT_AMP2);
     symmetryAmp.setData(CLUtilities.getString(element, "symmetryAmp", DEFAULT_SYMAMP));
+    symmetryWid.setData(CLUtilities.getString(element, "symmetryWid", DEFAULT_SYMWID));
   }
 
   @Override
@@ -301,6 +305,7 @@ public class Rosette extends CLclass {
   public synchronized void setRepeat(int n) {
     int old = repeat;
     this.repeat = Math.max(n, pattern.getMinRepeat());
+    checkSymWid();    // in case repeat gets smaller than symmetryWid
     this.pcs.firePropertyChange(PROP_REPEAT, old, repeat);
   }
 
@@ -564,25 +569,30 @@ public class Rosette extends CLclass {
   }
   
   /**
+   * Determine if this rosette uses symmetryAmp.
+   * 
+   * @return true = yes it does
+   */
+  public boolean usesSymmetryAmp() {
+    return (symmetryAmp != null) && (symmetryAmp.size() > 0);
+  }
+  
+  /**
    * Get the optional symmetry amplitudes.
    * 
-   * @return DoubleArray of optional symmetry amplitudes
+   * @return Optional symmetry amplitudes
    */
   public DoubleArray getSymmetryAmp() {
     return symmetryAmp;
   }
   
   /**
-   * Set the optional symmetry amplitudes.
-   *
-   * This fires a PROP_SYMAMP property change with the old and new values.
+   * Get the optional symmetry amplitudes as a String.
    * 
-   * @param newAmps array of optional symmetry amplitudes (or null for no variations)
+   * @return Optional symmetry amplitudes as a String
    */
-  public void setSymmetryAmp(DoubleArray newAmps) {
-    DoubleArray old = this.symmetryAmp;
-    this.symmetryAmp = newAmps;
-    this.pcs.firePropertyChange(PROP_SYMAMP, old, newAmps);
+  public String getSymAmpStr() {
+    return symmetryAmp.toString();
   }
   
   /**
@@ -592,10 +602,69 @@ public class Rosette extends CLclass {
    * 
    * @param newStr string with new values comma delimited
    */
-  public void setSymmetryAmp(String newStr) {
+  public void setSymAmpStr(String newStr) {
     String old = this.symmetryAmp.toString();
     this.symmetryAmp.setData(newStr);
     this.pcs.firePropertyChange(PROP_SYMAMP, old, symmetryAmp.toString());
+  }
+  
+  /**
+   * Determine if this rosette uses symmetryWid.
+   * 
+   * @return true = yes it does
+   */
+  public boolean usesSymmetryWid() {
+    return (symmetryWid != null) && (symmetryWid.size() > 0);
+  }
+  
+  /**
+   * Get the optional symmetry widths.
+   * 
+   * @return Optional symmetry widths
+   */
+  public DoubleArray getSymmetryWid() {
+    return symmetryWid;
+  }
+  
+  /**
+   * Get the optional symmetry widths as a String.
+   * 
+   * @return Optional symmetry widths as a String
+   */
+  public String getSymWidStr() {
+    return symmetryWid.toString();
+  }
+  
+  /**
+   * Set the optional symmetry widths.
+   *
+   * This fires a PROP_SYMWID property change with the old and new values.
+   * 
+   * @param newStr string with new values comma delimited
+   */
+  public void setSymWidStr(String newStr) {
+    String old = this.symmetryWid.toString();
+    this.symmetryWid.setData(newStr);
+    checkSymWid();
+    this.pcs.firePropertyChange(PROP_SYMWID, old, symmetryWid.toString());
+  }
+  
+  private void checkSymWid() {
+    if (!usesSymmetryWid()) {
+      return;
+    }
+    if (symmetryWid.size() > repeat) {    // trim off any extra values
+      double[] newVals = new double[repeat];
+      System.arraycopy(symmetryWid.getData(), 0, newVals, 0, repeat);
+      symmetryWid.setData(newVals);
+    }
+    if (symmetryWid.size() == repeat) {
+      double n = 0.0;
+      for (int i = 0; i < symmetryWid.size() - 1; i++) {
+        n += symmetryWid.getData()[i];      // add up all but the last value
+      }
+      symmetryWid.getData()[symmetryWid.size() - 1] = repeat - n;   // make sure last value is correct
+    }
   }
 
   /**
@@ -660,6 +729,23 @@ public class Rosette extends CLclass {
    * nominal radius.
    *
    * @param ang Angle in degrees around the rosette
+   * @param inv invert the returned value (as if rubbing on the backside of the
+   * rosette).
+   * @return amplitude which will be a positive number from 0.0 to pToP
+   */
+  public double getAmplitudeAt(double ang, boolean inv) {
+    if (inv) {
+      return pToP - getAmplitudeAt(ang);
+    }
+    return getAmplitudeAt(ang);
+  }
+
+  /**
+   * Get the amplitude (offset from nominal radius) of the rosette at a given
+   * angle in degrees. A returned value of zero means zero deflection from its
+   * nominal radius.
+   *
+   * @param ang Angle in degrees around the rosette
    * @return amplitude which will be a positive number from 0.0 to pToP
    */
   public double getAmplitudeAt(double ang) {
@@ -671,23 +757,84 @@ public class Rosette extends CLclass {
           return pToP;
       }
     }
-    double angle = angleCheck(ang);		// must be in range of 0 to 360
-    angle = angle + phase / repeat;		// angle relative to the start of first pattern
-    double anglePerRepeat = 360.0 / repeat;	// degrees per every repeat of pattern
-    int m = (int) (angle / anglePerRepeat);	// which repeat is the pattern in (0 to repeat)
-    double patternAngle = angle - m * anglePerRepeat;	// degrees into the pattern
-    double dr = pToP * getPatternValue(patternAngle / anglePerRepeat);
-    if ((symmetryAmp != null) && (symmetryAmp.size() > 0)) {
-      dr = symmetryAmp.getData()[m % symmetryAmp.size()] * dr;    // multiply by the symmetry amplitude
+    int m = 0;        // which repeat is the pattern in (0 to repeat)
+    double deltaR;  // rosette deflection from nominal radius
+    double patternFraction;   // fraction into the pattern
+    double angle = angleCheck(ang);   // must be in range of 0 to 360
+    double anglePerRepeat = 360.0 / repeat;                   // degrees per every repeat of pattern
+    if (!usesSymmetryWid()) {   // symmetrical widths
+      double phaseAdjustedAngle = angle + phase / repeat;		// angle relative to the start of first pattern
+      m = (int) (phaseAdjustedAngle / anglePerRepeat);          // which repeat is the pattern in (0 to repeat)
+      double patternAngle = phaseAdjustedAngle - m * anglePerRepeat;	// degrees into the pattern
+      patternFraction = patternAngle / anglePerRepeat;   // fraction into the pattern
+    } else {    // not symmetrical widths
+      // TODO: is there a way to calculate just once?
+      // factors are the amount each repeat is stretched (>1.0) or shrunk (<1.0)
+      double[] factors = getFactors();
+      // angleBreaks are the angles where each repeat starts/ends
+      double[] angleBreaks = getAngleBreaks(factors);
+      for (int i = angleBreaks.length - 1; i >= 0; i--) {   // find which repeat the angle is in
+        if (angle >= angleBreaks[i]) {
+          m = i;
+          break;
+        }
+      }
+      double patternAngle = angle - angleBreaks[m];                   // degrees into the pattern
+      patternFraction = patternAngle / anglePerRepeat / factors[m];   // fraction into the pattern
+    }
+    deltaR = pToP * getPatternValue(patternFraction);
+    if (usesSymmetryAmp()) {    // are there amplitude variations?
+      deltaR = symmetryAmp.getData()[m % symmetryAmp.size()] * deltaR;    // multiply by the symmetry amplitude
       if (getPatternValue(0.0) >= 0.99) {    // just in case it's not exacly 1.0
         // for patterns that start at 1.0, offset so that repeats match up
-        dr = dr + pToP * (1.0 - symmetryAmp.getData()[m % symmetryAmp.size()]);
+        deltaR = deltaR + pToP * (1.0 - symmetryAmp.getData()[m % symmetryAmp.size()]);
       }
     }
     if (invert) {
-      return pToP - dr;
+      return pToP - deltaR;
     }
-    return dr;
+    return deltaR;
+  }
+  
+  /**
+   * Factors are the amount each repeat is stretched (> 1) or shrunk (< 1).
+   * 
+   * @return array of factors
+   */
+  private double[] getFactors() {
+    double[] factors = new double[repeat + 1];  // the extra is for wrap-around
+    double sum = 0.0;
+    for (int i = 0; i < repeat - 1; i++) {
+      factors[i] = symmetryWid.getData()[i % symmetryWid.size()];   // keep repeating symmetryWid to fill out the factors
+      sum += factors[i];
+    }
+    factors[repeat - 1] = repeat - sum; // last one has to add up to repeat
+    factors[repeat] = factors[0];     // repeat for wrap around
+    return factors;
+  }
+  
+  /**
+   * AngleBreaks are the angles where each repeat starts/ends.
+   * 
+   * @param factors stretch factors
+   * @return array of angles
+   */
+  private double[] getAngleBreaks(double[] factors) {
+    double[] angleBreaks = new double[repeat + 1];  // the extra is for wrap-around
+    angleBreaks[0] = -phase / repeat * factors[0];   // [0] is negative phase shift adjusted by first factor
+    for (int i = 1; i < angleBreaks.length; i++) {
+      angleBreaks[i] = angleBreaks[i - 1] + 360.0 / repeat * factors[i - 1];
+    }
+    return angleBreaks;
+  }
+  
+  /**
+   * AngleBreaks are the angles where each repeat starts/ends.
+   * 
+   * @return array of angles
+   */
+  public double[] getAngleBreaks() {
+    return getAngleBreaks(getFactors());
   }
   
   /**
@@ -712,29 +859,12 @@ public class Rosette extends CLclass {
   }
 
   /**
-   * Get the amplitude (offset from nominal radius) of the rosette at a given
-   * angle in degrees. A returned value of zero means zero deflection from its
-   * nominal radius.
-   *
-   * @param ang Angle in degrees around the rosette
-   * @param inv invert the returned value (as if rubbing on the backside of the
-   * rosette).
-   * @return amplitude which will be a positive number from 0.0 to pToP
-   */
-  public double getAmplitudeAt(double ang, boolean inv) {
-    if (inv) {
-      return pToP - getAmplitudeAt(ang);
-    }
-    return getAmplitudeAt(ang);
-  }
-
-  /**
    * Determine if the rosette is masked at the given angle.
    *
    * @param ang Angle in degrees around the rosette
    * @return true=masked, false=not masked
    */
-  private boolean isMasked(double ang) {
+  private boolean isMasked(double ang) {      // TODO: Masking doesn't work right with symmetryWid
     if (mask.isEmpty()) {		// nothing is masked
       return false;
     }
@@ -771,8 +901,11 @@ public class Rosette extends CLclass {
     if (pattern.needsAmp2()) {
       opt = opt + " amp2='" + F4.format(amp2) + "'";
     }
-    if ((symmetryAmp != null) && (symmetryAmp.size() > 0)) {
+    if (usesSymmetryAmp()) {
       opt = opt + " symmetryAmp='" + symmetryAmp.toString() + "'";
+    }
+    if (usesSymmetryWid()) {
+      opt = opt + " symmetryWid='" + symmetryWid.toString() + "'";
     }
     out.println(indent + "<Rosette"
         + " pattern='" + pattern.getName() + "'"

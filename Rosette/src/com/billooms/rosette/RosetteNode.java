@@ -135,11 +135,15 @@ public class RosetteNode extends AbstractNode implements PropertyChangeListener 
         set.put(amp2Prop);
       }
 
-      PropertySupport.Reflection<DoubleArray> symAmp = new PropertySupport.Reflection<>(ros, DoubleArray.class, "SymmetryAmp");
+      PropertySupport.Reflection<String> symAmp = new PropertySupport.Reflection<>(ros, String.class, "SymAmpStr");
       symAmp.setName("SymmetryAmplitudes");
       symAmp.setShortDescription("Optional Symmetry amplitudes separated by commas");
-      symAmp.setPropertyEditorClass(DoubleArrayPropertyEditor.class);
       set.put(symAmp);
+
+      PropertySupport.Reflection<String> symWid = new PropertySupport.Reflection<>(ros, String.class, "SymWidStr");
+      symWid.setName("SymmetryWidths");
+      symWid.setShortDescription("Optional Symmetry widths separated by commas");
+      set.put(symWid);
 
     } catch (NoSuchMethodException ex) {
       ErrorManager.getDefault();

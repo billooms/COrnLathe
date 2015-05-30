@@ -179,7 +179,8 @@ public class RosetteEditPanel extends JPanel implements PropertyChangeListener {
       maskField.setText(rosette.getMask());
       invertCheck.setSelected(rosette.getInvert());
       hiLoCombo.setSelectedItem(rosette.getMaskHiLo());
-      symAmpText.setText(rosette.getSymmetryAmp().toString());
+      symAmpText.setText(rosette.getSymAmpStr());
+      symWidText.setText(rosette.getSymWidStr());
       iconPanel.repaint();
     }
   }
@@ -314,6 +315,8 @@ public class RosetteEditPanel extends JPanel implements PropertyChangeListener {
     maskPhaseField = new javax.swing.JFormattedTextField();
     jLabel3 = new javax.swing.JLabel();
     symAmpText = new javax.swing.JTextField();
+    jLabel6 = new javax.swing.JLabel();
+    symWidText = new javax.swing.JTextField();
     ampPanel = new javax.swing.JPanel();
     ampSlider = new javax.swing.JSlider();
     ampField = new javax.swing.JFormattedTextField();
@@ -489,6 +492,15 @@ public class RosetteEditPanel extends JPanel implements PropertyChangeListener {
       }
     });
 
+    org.openide.awt.Mnemonics.setLocalizedText(jLabel6, org.openide.util.NbBundle.getMessage(RosetteEditPanel.class, "RosetteEditPanel.jLabel6.text")); // NOI18N
+
+    symWidText.setToolTipText(org.openide.util.NbBundle.getMessage(RosetteEditPanel.class, "RosetteEditPanel.symWidText.toolTipText")); // NOI18N
+    symWidText.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        changeSymWid(evt);
+      }
+    });
+
     javax.swing.GroupLayout maskPanelLayout = new javax.swing.GroupLayout(maskPanel);
     maskPanel.setLayout(maskPanelLayout);
     maskPanelLayout.setHorizontalGroup(
@@ -506,7 +518,11 @@ public class RosetteEditPanel extends JPanel implements PropertyChangeListener {
       .addGroup(maskPanelLayout.createSequentialGroup()
         .addComponent(jLabel3)
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-        .addComponent(symAmpText, javax.swing.GroupLayout.PREFERRED_SIZE, 124, javax.swing.GroupLayout.PREFERRED_SIZE))
+        .addComponent(symAmpText, javax.swing.GroupLayout.PREFERRED_SIZE, 124, javax.swing.GroupLayout.PREFERRED_SIZE)
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+        .addComponent(jLabel6)
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+        .addComponent(symWidText))
     );
     maskPanelLayout.setVerticalGroup(
       maskPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -520,7 +536,9 @@ public class RosetteEditPanel extends JPanel implements PropertyChangeListener {
         .addGap(0, 0, 0)
         .addGroup(maskPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
           .addComponent(jLabel3)
-          .addComponent(symAmpText, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+          .addComponent(symAmpText, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+          .addComponent(jLabel6)
+          .addComponent(symWidText, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
     );
 
     ampPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(RosetteEditPanel.class, "RosetteEditPanel.ampPanel.border.title"))); // NOI18N
@@ -740,10 +758,17 @@ public class RosetteEditPanel extends JPanel implements PropertyChangeListener {
 
   private void changeSymAmp(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_changeSymAmp
     if (rosette != null & symAmpText.isFocusOwner()) {
-      rosette.setSymmetryAmp(symAmpText.getText());
+      rosette.setSymAmpStr(symAmpText.getText());
       updateForm();   // in case of format problem
     }
   }//GEN-LAST:event_changeSymAmp
+
+  private void changeSymWid(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_changeSymWid
+    if (rosette != null & symWidText.isFocusOwner()) {
+      rosette.setSymWidStr(symWidText.getText());
+      updateForm();   // in case of format problem
+    }
+  }//GEN-LAST:event_changeSymWid
 
 
   // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -759,6 +784,7 @@ public class RosetteEditPanel extends JPanel implements PropertyChangeListener {
   private javax.swing.JLabel jLabel3;
   private javax.swing.JLabel jLabel4;
   private javax.swing.JLabel jLabel5;
+  private javax.swing.JLabel jLabel6;
   private javax.swing.JTextField maskField;
   private javax.swing.JPanel maskPanel;
   private javax.swing.JFormattedTextField maskPhaseField;
@@ -770,6 +796,7 @@ public class RosetteEditPanel extends JPanel implements PropertyChangeListener {
   private javax.swing.JSpinner repeatSpinner;
   private javax.swing.JPanel stylePanel;
   private javax.swing.JTextField symAmpText;
+  private javax.swing.JTextField symWidText;
   private javax.swing.JPanel viewPanel;
   // End of variables declaration//GEN-END:variables
 }
