@@ -58,7 +58,7 @@ public class DoubleArray {
    * @param da given DoubleAray (may be null)
    */
   public DoubleArray(DoubleArray da) {
-    if (da == null) {
+    if ((da == null) || (da.getData() == null)) {
       this.data = null;
     } else {
       this.data = new double[da.size()];

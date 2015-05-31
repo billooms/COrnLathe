@@ -152,7 +152,7 @@ public class Rosette extends CLclass {
       this.phase = 0.0;
     } else {
       this.pToP = amplitude;
-      this.phase = angleCheck(phase);
+      this.phase = phase;
       if (pattern instanceof CustomPattern) {
         ((CustomPattern) pattern).addPropertyChangeListener(this);
       }
@@ -182,8 +182,8 @@ public class Rosette extends CLclass {
     this.invert = rosette.getInvert();
     this.amp2 = rosette.getAmp2();
     this.n2 = rosette.getN2();
-    this.symmetryAmp = rosette.getSymmetryAmp();
-    this.symmetryWid = rosette.getSymmetryWid();
+    this.symmetryAmp = new DoubleArray(rosette.getSymmetryAmp());
+    this.symmetryWid = new DoubleArray(rosette.getSymmetryWid());
   }
 
   /**
@@ -357,15 +357,15 @@ public class Rosette extends CLclass {
   /**
    * Set the phase of the rosette.
    *
-   * Phase is adjusted to be in the range of 0 to 360. This fires a PROP_PHASE
-   * property change with the old and new phases.
+   * Phase can be negative. 
+   * This fires a PROP_PHASE property change with the old and new phases.
    *
    * @param ph phase in degrees: 180 means 1/2 of the repeat, 90 means 1/4 of
    * the repeat, etc.
    */
   public synchronized void setPhase(double ph) {
     double old = this.phase;
-    this.phase = angleCheck(ph);
+    this.phase = ph;
     if (pattern.getName().equals("NONE")) {
       this.phase = 0.0;
     }
@@ -375,9 +375,8 @@ public class Rosette extends CLclass {
   /**
    * Set the phase of the rosette.
    *
-   * Values of less than 0.0 will be set to 0.0 and values greater than 1.0 will
-   * be set to 1.0. This fires a PROP_PHASE property change with the old and new
-   * phases.
+   * Phase can be negative. 
+   * This fires a PROP_PHASE property change with the old and new phases.
    *
    * @param ph phase: 0.5 means 1/2 of the repeat, 0.25 means 1/4 of the repeat,
    * etc.
@@ -758,12 +757,11 @@ public class Rosette extends CLclass {
       }
     }
     int m = 0;        // which repeat is the pattern in (0 to repeat)
-    double deltaR;  // rosette deflection from nominal radius
+    double deltaR;    // rosette deflection from nominal radius
     double patternFraction;   // fraction into the pattern
-    double angle = angleCheck(ang);   // must be in range of 0 to 360
-    double anglePerRepeat = 360.0 / repeat;                   // degrees per every repeat of pattern
+    double anglePerRepeat = 360.0 / repeat;             // degrees per every repeat of pattern
+    double phaseAdjustedAngle = angleCheck(ang + phase / repeat);	// angle relative to the start of first pattern (based on symmetrical rosette)
     if (!usesSymmetryWid()) {   // symmetrical widths
-      double phaseAdjustedAngle = angle + phase / repeat;		// angle relative to the start of first pattern
       m = (int) (phaseAdjustedAngle / anglePerRepeat);          // which repeat is the pattern in (0 to repeat)
       double patternAngle = phaseAdjustedAngle - m * anglePerRepeat;	// degrees into the pattern
       patternFraction = patternAngle / anglePerRepeat;   // fraction into the pattern
@@ -774,12 +772,12 @@ public class Rosette extends CLclass {
       // angleBreaks are the angles where each repeat starts/ends
       double[] angleBreaks = getAngleBreaks(factors);
       for (int i = angleBreaks.length - 1; i >= 0; i--) {   // find which repeat the angle is in
-        if (angle >= angleBreaks[i]) {
+        if (phaseAdjustedAngle >= angleBreaks[i]) {
           m = i;
           break;
         }
       }
-      double patternAngle = angle - angleBreaks[m];                   // degrees into the pattern
+      double patternAngle = phaseAdjustedAngle - angleBreaks[m];                   // degrees into the pattern
       patternFraction = patternAngle / anglePerRepeat / factors[m];   // fraction into the pattern
     }
     deltaR = pToP * getPatternValue(patternFraction);
@@ -821,7 +819,7 @@ public class Rosette extends CLclass {
    */
   private double[] getAngleBreaks(double[] factors) {
     double[] angleBreaks = new double[repeat + 1];  // the extra is for wrap-around
-    angleBreaks[0] = -phase / repeat * factors[0];   // [0] is negative phase shift adjusted by first factor
+    angleBreaks[0] = 0.0;
     for (int i = 1; i < angleBreaks.length; i++) {
       angleBreaks[i] = angleBreaks[i - 1] + 360.0 / repeat * factors[i - 1];
     }
