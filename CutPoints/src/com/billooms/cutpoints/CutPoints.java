@@ -860,14 +860,23 @@ public class CutPoints extends CLclass {
             break;
           }
         }
-      // Cut depth (and rosette amplitude) should always scale with radius
-//        newPt.setDepth(startDepth + target / cumTotal * deltaDepth);
-        newPt.setDepth(startDepth + (x-rStart) / deltaR * deltaDepth);
-//        newPt.getRosette().setPToP(rosStartAmp + target / cumTotal * deltaRosAmp);
-        newPt.getRosette().setPToP(rosStartAmp + (x-rStart) / deltaR * deltaRosAmp);
+        if ((deltaR != 0.0) && (deltaDepth != 0.0) && (deltaRosAmp != 0.0)) {
+          // Cut depth (and rosette amplitude) should always scale with radius when deltaR != 0
+          newPt.setDepth(startDepth + (x - rStart) / deltaR * deltaDepth);
+          newPt.getRosette().setPToP(rosStartAmp + (x - rStart) / deltaR * deltaRosAmp);
+          if (beginRosPt.getMotion() == Motion.BOTH) {
+            newPt.getRosette2().setPToP(ros2StartAmp + (x - rStart) / deltaR * deltaRos2Amp);
+          }
+        } else {
+          // when deltaR == 0, scale with distance
+          newPt.setDepth(startDepth + target / cumTotal * deltaDepth);
+          newPt.getRosette().setPToP(rosStartAmp + target / cumTotal * deltaRosAmp);
+          if (beginRosPt.getMotion() == Motion.BOTH) {
+            newPt.getRosette2().setPToP(ros2StartAmp + target / cumTotal * deltaRos2Amp);
+          }
+        }
         newPt.getRosette().setPhase(rosStartPhase + c * repeat);
         if (beginRosPt.getMotion() == Motion.BOTH) {
-          newPt.getRosette2().setPToP(ros2StartAmp + (x-rStart) / deltaR * deltaRos2Amp);
           newPt.getRosette2().setPhase(ros2StartPhase + c * repeat2);
         }
         newPt.move(x, z);
