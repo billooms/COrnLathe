@@ -510,7 +510,7 @@ public class CustomPattern extends BasicPattern {
     if (isDual()) {
       opt += " dual='" + dual + "'";
     }
-    if (line.getSize() != 0) {
+//    if (line.getSize() != 0) {
       out.println(indent + "<CustomPattern"
           + " name='" + getName() + "'"
           + " displayName='" + getDisplayName() + "'"
@@ -523,7 +523,7 @@ public class CustomPattern extends BasicPattern {
       });
       indentLess();
       out.println(indent + "</CustomPattern>");
-    }
+//    }
   }
 
   /**

@@ -142,9 +142,10 @@ public class PatternPoint extends OffsetCut {
    */
   public PatternPoint(Point2D.Double pos, Cutter cut, Outline outline, Patterns patMgr) {
     super(pos, cut, outline);
-    if (patMgr.getAllCustom().size() > 0) {
-      this.pattern = patMgr.getAllCustom().get(0);    // use the first CustomPattern
+    if (patMgr.getAllCustom().isEmpty()) {    // can't leave patter as null!
+      patMgr.add(new CustomPattern("undefined", CustomPattern.CustomStyle.STRAIGHT));
     }
+    this.pattern = patMgr.getAllCustom().get(0);    // use the first CustomPattern
     makeDrawables();
     if (pattern != null) {
       pattern.addPropertyChangeListener(this);
