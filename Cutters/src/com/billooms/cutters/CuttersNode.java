@@ -21,6 +21,7 @@ import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 import org.openide.util.actions.SystemAction;
 import org.openide.util.lookup.Lookups;
+import org.openide.xml.EntityCatalog;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -137,6 +138,7 @@ public class CuttersNode extends AbstractNode implements PropertyChangeListener 
       DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
       try {
         DocumentBuilder db = dbf.newDocumentBuilder();
+        db.setEntityResolver(EntityCatalog.getDefault());
         Document doc = db.parse(new File(prefs.getLibPath()));  // parse the xml file
         Element topElement = doc.getDocumentElement();
         NodeList cutterList = topElement.getElementsByTagName("Cutters");
