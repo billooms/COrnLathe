@@ -678,6 +678,43 @@ public class CutPoints extends CLclass {
   }
 
   /**
+   * Scales the coordinates of all CutPoints.
+   *
+   * This fires a PROP_MULTI property change. Note that points are moved using
+   * drag() which fires a PROP_DRAG property change. The reason for using drag()
+   * is so that you can choose to ignore the multiple events and not re-render
+   * all the time.
+   * 
+   * @param factor scale factor (Must be in the range 0.1 to 10.0).
+   */
+  public void scale(double factor) {
+    if (list.isEmpty()) {
+      return;
+    }
+    if ((factor < 0.1) && (factor > 10.0) && (factor == 1.0)) {
+      return;
+    }
+    for (CutPoint c : list) {			// move the cutPoints
+      c.scale(factor);
+      if (c instanceof SpiralCut) {
+        CutPoint beginPt = ((SpiralCut) c).getBeginPoint();
+        beginPt.drag(new Point2D.Double(beginPt.getX() * factor, beginPt.getZ() * factor));
+        for (int i = 0; i < ((SpiralCut) c).getNumGoTos(); i++) {
+          GoToPoint goToPt = ((SpiralCut) c).getGoToPoint(i);
+          goToPt.drag(new Point2D.Double(goToPt.getX() * factor, goToPt.getZ() * factor));
+        }
+      }
+      if (c instanceof OffsetGroup) {
+        for (int i = 0; i < ((OffsetGroup) c).getNumCutPoints(); i++) {
+          CutPoint cPt = ((OffsetGroup) c).getCutPoint(i);
+          cPt.drag(new Point2D.Double(cPt.getX() * factor, cPt.getZ() * factor));
+        }
+      }
+    }
+    pcs.firePropertyChange(PROP_MULTI, null, null);
+  }
+
+  /**
    * Offset all CutPoints vertically by a given amount. This fires a PROP_MULTI
    * property change. Note that points are moved using drag() which fires a
    * PROP_DRAG property change. The reason for using drag() is so that you can

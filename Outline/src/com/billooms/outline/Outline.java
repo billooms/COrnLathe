@@ -775,6 +775,23 @@ public class Outline extends CLclass {
     pcs.firePropertyChange(PROP_MULTI, null, null);   // because invert uses drag propertyChanges
   }
 
+  /**
+   * Scale the curve by the given factor.
+   * 
+   * @param factor scale factor (Must be in the range 0.1 to 10.0).
+   */
+  public synchronized void scale(double factor) {   // limit the range
+    if ((factor < 0.1) && (factor > 10.0) && (factor == 1.0)) {
+      return;
+    }
+    dotCurve.scale(factor);
+    if (safePath != null) {
+      safePath.getCurve().scale(factor);
+    }
+    updateCurves();
+    pcs.firePropertyChange(PROP_MULTI, null, null);   // because invert uses drag propertyChanges
+  }
+
   @Override
   public void propertyChange(PropertyChangeEvent evt) {
 //    System.out.println("Outline.propertyChange: " + evt.getPropertyName() + " " + evt.getOldValue() + " " + evt.getNewValue());

@@ -320,6 +320,16 @@ public abstract class CutPoint extends CLclass {
   }
 
   /**
+   * Scale the coordinates of the CutPoint.
+   * 
+   * @param factor scale factor
+   */
+  public synchronized void scale(double factor) {
+    pt.scale(factor);
+//    makeDrawables();    // pt.invert will fire a DRAG propertyChange
+  }
+
+  /**
    * Offset the CutPoint vertically by subtracting the given value from
    * z-coordinate.
    *

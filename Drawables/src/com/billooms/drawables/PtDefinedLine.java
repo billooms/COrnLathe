@@ -370,6 +370,18 @@ public abstract class PtDefinedLine implements Drawable, PropertyChangeListener 
   }
 
   /**
+   * Scale the x and y coordinates by the given factor.
+   *
+   * Note: Each point will fire a propertyChange.
+   *
+   * @param factor scale factor;
+   */
+  public synchronized void scale(double factor) {
+    ptList.stream().forEach(pt -> pt.scale(factor));
+    update();
+  }
+
+  /**
    * Offset in the y-direction by subtracting the given value from y-coordinate.
    *
    * Note: Each point will fire a propertyChange.

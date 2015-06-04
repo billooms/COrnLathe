@@ -426,6 +426,21 @@ public abstract class Pt extends CLclass implements Drawable {
   }
 
   /**
+   * Scale all coordinates by the given factor.
+   *
+   * Because this is usually done on multiple points at one time, it fires a
+   * PROP_DRAG property change.
+   *
+   * @param factor scale factor;
+   */
+  public synchronized void scale(double factor) {
+    x = x * factor;
+    y = y * factor;
+    z = z * factor;
+    pcs.firePropertyChange(PROP_DRAG, null, null);
+  }
+
+  /**
    * Offset in the x-direction by subtracting the given value from x-coordinate.
    *
    * Because this is usually done on multiple points at one time, it fires a
