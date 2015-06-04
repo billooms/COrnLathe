@@ -42,6 +42,24 @@ public class COrnLathePrefs {
   }
 
   /**
+   * Is the cutter library checkbox seleted?
+   * 
+   * @return true=use library
+   */
+  public boolean useLibrary() {
+    return NbPreferences.forModule(COrnLathePanel.class).getBoolean("useLib", false);
+  }
+
+  /**
+   * Get the path name for the cutter library file
+   *
+   * @return full path name for the cutter library file
+   */
+  public String getLibPath() {
+    return NbPreferences.forModule(COrnLathePanel.class).get("libpath", "");
+  }
+
+  /**
    * Update all values from the last saved preferences.
    */
   private void update() {

@@ -76,6 +76,15 @@ public class Cutters extends CLclass {
   public ArrayList<Cutter> getAllCutters() {
     return cutters;
   }
+  
+  /**
+   * Get the number of cutters.
+   * 
+   * @return number of cutters
+   */
+  public int size() {
+    return cutters.size();
+  }
 
   /**
    * Get a list of names of all cutters.
@@ -151,6 +160,10 @@ public class Cutters extends CLclass {
    * @param newCutter new cutter
    */
   public synchronized void add(Cutter newCutter) {
+    if (getCutter(newCutter.getName()) != null) {       // check if the name is already used
+      newCutter.setName(newCutter.getName() + "COPY");
+      newCutter.setDisplayName(newCutter.getDisplayName() + " copy");
+    }
     cutters.add(newCutter);
     newCutter.addPropertyChangeListener(this);
     pcs.firePropertyChange(PROP_ADD, null, newCutter.getName());

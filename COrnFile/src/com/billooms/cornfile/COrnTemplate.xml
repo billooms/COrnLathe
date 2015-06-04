@@ -6,7 +6,7 @@
     <CoarseFine passDepth='0.0250' passStep='5' lastDepth='0.0050' lastStep='1' rotation='NEG_LAST'/>
   </Controls>
   <Cutters>
-    <Cutter name='HCF1' displayName='HCF with R=0.512' 
+    <Cutter name='HCF' displayName='HCF with R=0.512' 
             radius='0.512' location='FRONT_INSIDE' frame='HCF' ucfAngle='0.0' ucfRotate='0.0' 
             profile='IDEAL' tipWidth='0.1875'/>
   </Cutters>

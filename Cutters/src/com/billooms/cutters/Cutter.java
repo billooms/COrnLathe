@@ -105,8 +105,10 @@ public class Cutter extends CLclass {
    * @param copy cutter to copy
    */
   public Cutter(Cutter copy) {
-    this.displayName = copy.displayName + "copy";
-    this.name = copy.name + "COPY";
+//    this.displayName = copy.displayName + "copy";   // do this in cutters.add() instead
+//    this.name = copy.name + "COPY";
+    this.displayName = copy.displayName;
+    this.name = copy.name;
     this.radius = copy.radius;
     this.location = copy.location;
     this.frame = copy.frame;
