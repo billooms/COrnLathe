@@ -70,6 +70,7 @@ public class SpiralIndex extends SpiralCut {
     super(element, cutMgr, outline);
     NodeList ipNodes = element.getElementsByTagName("IndexPoint");
     beginPt = new IndexPoint((Element) ipNodes.item(0), cutMgr, outline);
+    beginPt.setCutter(this.cutter);   // make sure beginPt uses same cutter
     beginPt.addPropertyChangeListener(this);
     makeDrawables();
   }
@@ -199,8 +200,7 @@ public class SpiralIndex extends SpiralCut {
   @Override
   public void writeXML(PrintWriter out) {
     out.println(indent + "<SpiralIndex"
-        + " n='" + num + "'"
-        //        + xmlCutPointInfo()     // don't write snap, cutter or depth -- get that from beginPoint
+        + xmlCutPointInfo2()     // don't write depth
         + " endDepth='" + F4.format(endCutDepth) + "'"
         + ">");
     indentMore();

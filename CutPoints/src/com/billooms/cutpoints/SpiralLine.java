@@ -78,6 +78,7 @@ public class SpiralLine extends SpiralCut {
     this.scaleDepth = CLUtilities.getBoolean(element, "scaleDepth", false);
     NodeList ipNodes = element.getElementsByTagName("LinePoint");
     beginPt = new LinePoint((Element) ipNodes.item(0), cutMgr, outline, patMgr);
+    beginPt.setCutter(this.cutter);   // make sure beginPt uses same cutter
     beginPt.addPropertyChangeListener(this);
     makeDrawables();
   }
@@ -229,8 +230,7 @@ public class SpiralLine extends SpiralCut {
   @Override
   public void writeXML(PrintWriter out) {
     out.println(indent + "<SpiralLine"
-        + " n='" + num + "'"
-        //        + xmlCutPointInfo()     // don't write snap, cutter or depth -- get that from beginPoint
+        + xmlCutPointInfo2()     // don't write depth
         + " scaleDepth='" + scaleDepth + "'"
         + " endDepth='" + F4.format(endCutDepth) + "'"
         + ">");

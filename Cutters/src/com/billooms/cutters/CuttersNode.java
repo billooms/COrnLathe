@@ -133,7 +133,7 @@ public class CuttersNode extends AbstractNode implements PropertyChangeListener 
      */
     @Override
     public void actionPerformed(ActionEvent e) {
-      System.out.println("path: " + prefs.getLibPath());
+//      System.out.println("path: " + prefs.getLibPath());
 
       DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
       try {

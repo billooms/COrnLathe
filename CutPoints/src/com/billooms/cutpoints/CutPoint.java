@@ -484,6 +484,22 @@ public abstract class CutPoint extends CLclass {
     return str;
   }
 
+  /**
+   * String with xml information that is common to all CutPoints, except 
+   * no cutDepth.
+   *
+   * @return string
+   */
+  protected String xmlCutPointInfo2() {
+    String str = "";
+    str += " n='" + num + "'";
+    if (!snap) {
+      str += " snap='false'";
+    }
+    str += " cutter='" + cutter.getName() + "'";
+    return str;
+  }
+
   @Override
   public void writeXML(PrintWriter out) {
     pt.writeXML(out);

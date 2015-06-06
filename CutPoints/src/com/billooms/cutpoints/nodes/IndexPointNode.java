@@ -46,6 +46,18 @@ public class IndexPointNode extends CutPointNode {
     this.setDisplayName(cpt.toString());
     this.setIconBaseWithExtension("com/billooms/cutpoints/icons/Index16.png");
   }
+  /**
+   * Construct a new IndexPointNode for the given IndexPoint and CutPoint
+   * manager.
+   *
+   * @param cpt IndexPoint
+   * @param cptMgr CutPoint manager
+   * @param show true=show cutter, false=don't show it
+   */
+  public IndexPointNode(IndexPoint cpt, CutPoints cptMgr, boolean show) {
+    this(cpt, cptMgr);
+    this.showCutter = show;
+  }
 
   @Override
   protected Sheet createSheet() {

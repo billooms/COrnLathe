@@ -44,6 +44,17 @@ public class LinePointNode extends CutPointNode {
     this.setDisplayName(cpt.toString());
     this.setIconBaseWithExtension("com/billooms/cutpoints/icons/SpiralLine16.png");
   }
+  /**
+   * Construct a new LinePointNode for the given LinePoint and CutPoint manager.
+   *
+   * @param cpt LinePoint
+   * @param cptMgr CutPoint manager
+   * @param show true=show cutter, false=don't show it
+   */
+  public LinePointNode(LinePoint cpt, CutPoints cptMgr, boolean show) {
+    this(cpt, cptMgr);
+    this.showCutter = show;
+  }
 
   @Override
   protected Sheet createSheet() {

@@ -778,6 +778,10 @@ public class CutPoints extends CLclass {
         CutPoint cp = (CutPoint) evt.getSource();
         cp.snapToCurve();
       }
+      if (propName.equals(CutPoint.PROP_CUTTER)) {
+        CutPoint cp = (CutPoint) evt.getSource();
+        cp.snapToCurve();     // have to snap it to a new curve when changing cutter
+      }
     }
 
     // Listen for any outline changes and re-snap all CutPoints

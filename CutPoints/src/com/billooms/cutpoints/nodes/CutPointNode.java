@@ -48,6 +48,8 @@ public class CutPointNode extends AbstractNode implements PropertyChangeListener
   protected Sheet sheet;
   /** Retain a copy so that extensions can modify. */
   protected Sheet.Set set;
+  /** Flag indicating it's OK to edit the cutter. */
+  protected boolean showCutter = true;
 
   /**
    * Create a new CutPointNode for the given CutPoint
@@ -66,7 +68,7 @@ public class CutPointNode extends AbstractNode implements PropertyChangeListener
 
     cpt.addPropertyChangeListener((PropertyChangeListener) this);
   }
-
+  
   /**
    * Initialize a property sheet
    *
@@ -101,12 +103,14 @@ public class CutPointNode extends AbstractNode implements PropertyChangeListener
       visibleProp.setShortDescription("Show or hide the CutPoint");
       set.put(visibleProp);
 
-      PropertySupport.Reflection<Cutter> cutterProp = new PropertySupport.Reflection<>(cpt, Cutter.class, "Cutter");
-      cutterProp.setName("Cutter");
-      cutterProp.setShortDescription("Cutter for the CutPoint");
-      cutterProp.setPropertyEditorClass(CutterEditorInplace.class);
-      set.put(cutterProp);
-
+      if (showCutter) {     // children of SpiralCutNodes should not show cutter for editing
+        PropertySupport.Reflection<Cutter> cutterProp = new PropertySupport.Reflection<>(cpt, Cutter.class, "Cutter");
+        cutterProp.setName("Cutter");
+        cutterProp.setShortDescription("Cutter for the CutPoint");
+        cutterProp.setPropertyEditorClass(CutterEditorInplace.class);
+        set.put(cutterProp);
+      }
+      
       Property<Double> depthProp = new PropertySupport.Reflection<>(cpt, double.class, "depth");
       depthProp.setName("Cut Depth");
       depthProp.setShortDescription("Depth of the cut");

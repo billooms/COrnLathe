@@ -176,6 +176,23 @@ public abstract class SpiralCut extends CutPoint {
   }
 
   /**
+   * Set the cutter for this CutPoint. This fires a PROP_CUTTER propertyChange.
+   *
+   * @param newCutter new cutter
+   */
+  @Override
+  public synchronized void setCutter(Cutter newCutter) {
+    super.setCutter(newCutter);
+    if (beginPt != null) {
+      beginPt.setCutter(newCutter);	// does beginPt.makeDrawables() and fires PROP_NUM property change
+    }
+    goList.stream().forEach((gPt) -> {
+      gPt.setCutter(newCutter);	// each fires PROP_NUM property change
+    });
+    makeDrawables();
+  }
+
+  /**
    * Get the beginning cutPoint.
    *
    * @return beginning cutPoint
@@ -237,7 +254,7 @@ public abstract class SpiralCut extends CutPoint {
     }
     gPt.setNum(this.num);	// make it the same number
     goList.add(gPt);
-    gPt.addPropertyChangeListener(this);
+    gPt.addPropertyChangeListener(this);    // listen to changes in GoToPoints
     makeDrawables();
     pcs.firePropertyChange(PROP_ADD, null, gPt);
   }

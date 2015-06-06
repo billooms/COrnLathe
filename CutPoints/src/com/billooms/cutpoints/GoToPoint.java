@@ -115,7 +115,8 @@ public class GoToPoint extends CutPoint implements ActiveEditorDrop {
   @Override
   public void writeXML(PrintWriter out) {
     out.println(indent + "<GoToPoint"
-        + " n='" + num + "'" // no depth or cutter
+        + " n='" + num + "'"        // no depth or snap
+        + " cutter='" + cutter.getName() + "'"
         + ">");
     indentMore();
     super.writeXML(out);    // for point

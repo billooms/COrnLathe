@@ -2,6 +2,8 @@ package com.billooms.cutpoints.nodes;
 
 import com.billooms.cutpoints.CutPoints;
 import com.billooms.cutpoints.SpiralCut;
+import com.billooms.cutters.Cutter;
+import com.billooms.cutters.CutterEditorInplace;
 import org.openide.ErrorManager;
 import org.openide.nodes.Children;
 import org.openide.nodes.PropertySupport;
@@ -51,15 +53,12 @@ public class SpiralCutNode extends CutPointNode {
     super.createSheet();
     set.setDisplayName("SpiralCut Properties");
     try {
+      set.remove("Cut Depth");  // don't use cut depth, use endDepth instead
+      
       Property<Double> endDepthProp = new PropertySupport.Reflection<>(spiralCut, double.class, "EndDepth");
       endDepthProp.setName("End Cut Depth");
       endDepthProp.setShortDescription("Depth of the cut at the end of the spiral");
       set.put(endDepthProp);
-
-      // Don't display snap, cutter, depth -- get those from beginPoint
-      set.remove("Snap");
-      set.remove("Cutter");
-      set.remove("Cut Depth");
 
     } catch (NoSuchMethodException ex) {
       ErrorManager.getDefault();

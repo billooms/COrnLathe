@@ -148,6 +148,7 @@ public class Outline extends CLclass {
     if (safePath != null) {
       safePath.addPropertyChangeListener(this);	// listen to the SafePath object, not to the individual points
     }
+    cutterMgr.addPropertyChangeListener(this);  // listen to cutter manager in case new cutters are added to update curves
   }
 
   /**
@@ -796,7 +797,7 @@ public class Outline extends CLclass {
   public void propertyChange(PropertyChangeEvent evt) {
 //    System.out.println("Outline.propertyChange: " + evt.getPropertyName() + " " + evt.getOldValue() + " " + evt.getNewValue());
 
-    // Listens to dotCurve, safePath, cutter, and CutterEditPanel
+    // Listens to dotCurve, safePath, cutter, cutterMgr, and CutterEditPanel
     if (evt.getPropertyName().equals(CutterEditPanel.PROP_CUTTER)) {
       setCutter((Cutter) evt.getNewValue());	    // grab any newly selected cutter
     }

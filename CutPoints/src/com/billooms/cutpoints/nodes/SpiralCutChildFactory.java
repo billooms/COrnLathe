@@ -68,17 +68,18 @@ public class SpiralCutChildFactory extends ChildFactory.Detachable<CLclass> impl
     if (key instanceof Spiral) {
       return new SpiralNode((Spiral) key);
     }
+    // don't allow editing of cutter for children
     if (key instanceof IndexPoint) {
-      return new IndexPointNode((IndexPoint) key, cptMgr);
+      return new IndexPointNode((IndexPoint) key, cptMgr, false);
     }
     if (key instanceof RosettePoint) {
-      return new RosettePointNode((RosettePoint) key, cptMgr);
+      return new RosettePointNode((RosettePoint) key, cptMgr, false);
     }
     if (key instanceof LinePoint) {
-      return new LinePointNode((LinePoint) key, cptMgr);
+      return new LinePointNode((LinePoint) key, cptMgr, false);
     }
     if (key instanceof GoToPoint) {
-      return new GoToPointNode((GoToPoint) key, cptMgr);
+      return new GoToPointNode((GoToPoint) key, cptMgr, false);
     }
     return null;
   }

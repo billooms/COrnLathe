@@ -38,6 +38,17 @@ public class GoToPointNode extends CutPointNode {
     this.setDisplayName(cpt.toString());
     this.setIconBaseWithExtension("com/billooms/cutpoints/icons/GoTo16.png");
   }
+  /**
+   * Construct a new GoToPointNode for the given GoToPoint and CutPoint manager.
+   *
+   * @param cpt GoToPoint
+   * @param cptMgr CutPoint manager
+   * @param show true=show cutter, false=don't show it
+   */
+  public GoToPointNode(GoToPoint cpt, CutPoints cptMgr, boolean show) {
+    this(cpt, cptMgr);
+    this.showCutter = show;
+  }
 
   @Override
   protected Sheet createSheet() {

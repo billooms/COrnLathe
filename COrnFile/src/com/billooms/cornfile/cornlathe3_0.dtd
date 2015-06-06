@@ -159,6 +159,7 @@
 <!ELEMENT GoToPoint (Pt)>
 <!ATTLIST GoToPoint
     n CDATA #REQUIRED
+    cutter CDATA #IMPLIED
   >
 
 <!--- Indexed CutPoint -->
@@ -210,6 +211,8 @@
 <!ELEMENT SpiralIndex (Pt, IndexPoint, Spiral, GoToPoint*)>
 <!ATTLIST SpiralIndex
     n CDATA #REQUIRED
+    snap CDATA "true"
+    cutter CDATA #REQUIRED
     endDepth CDATA #REQUIRED
   >
 
@@ -217,6 +220,8 @@
 <!ELEMENT SpiralRosette (Pt, RosettePoint, Spiral, GoToPoint*)>
 <!ATTLIST SpiralRosette
     n CDATA #REQUIRED
+    snap CDATA "true"
+    cutter CDATA #REQUIRED
     endDepth CDATA #REQUIRED
   >
 
@@ -224,6 +229,8 @@
 <!ELEMENT SpiralLine (Pt, LinePoint, Spiral, GoToPoint*)>
 <!ATTLIST SpiralLine
     n CDATA #REQUIRED
+    snap CDATA "true"
+    cutter CDATA #REQUIRED
     scaleDepth CDATA #REQUIRED
     endDepth CDATA #REQUIRED
   >

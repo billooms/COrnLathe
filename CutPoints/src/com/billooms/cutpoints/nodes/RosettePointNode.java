@@ -42,6 +42,19 @@ public class RosettePointNode extends CutPointNode {
     this.setDisplayName(cpt.toString());
     this.setIconBaseWithExtension("com/billooms/cutpoints/icons/Rosette16.png");
   }
+  
+  /**
+   * Construct a new RosettePointNode for the given RosettePoint and CutPoint
+   * manager.
+   *
+   * @param cpt RosettePoint
+   * @param cptMgr CutPoint manager
+   * @param show true=show cutter, false=don't show it
+   */
+  public RosettePointNode(RosettePoint cpt, CutPoints cptMgr, boolean show) {
+    this(cpt, cptMgr);
+    this.showCutter = show;
+  }
 
   @Override
   protected Sheet createSheet() {
