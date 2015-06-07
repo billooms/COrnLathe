@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<!DOCTYPE COrnLathe PUBLIC "-//IDN billooms.com//DTD COrnLathe file format 3.0//EN" "http://www.billooms.com/dtds/cornlathe3_0.dtd">
+<!DOCTYPE COrnLathe PUBLIC "-//IDN billooms.com//DTD COrnLathe file format 3.1//EN" "http://www.billooms.com/dtds/cornlathe3_1.dtd">
 <COrnLathe version="3.0">
   <Controls active='NORMAL'>
     <FeedRate rpm='3.00' velocity='4.0'/>

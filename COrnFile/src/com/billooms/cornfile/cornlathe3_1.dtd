@@ -3,8 +3,8 @@
 <!--
     Defines the XML file structure for COrnLathe software.
 
-    PUBLIC ID: -//IDN billooms.com//DTD COrnLathe file format 3.0//EN
-    SYSTEM ID: http://www.billooms.com/dtds/cornlathe3_0.dtd
+    PUBLIC ID: -//IDN billooms.com//DTD COrnLathe file format 3.1//EN
+    SYSTEM ID: http://www.billooms.com/dtds/cornlathe3_1.dtd
 
 -->
 
@@ -12,7 +12,7 @@
     An example how to use this DTD from your XML document:
 
     <?xml version="1.0"?>
-    <!DOCTYPE COrnLathe PUBLIC "-//IDN billooms.com//DTD COrnLathe file format 3.0//EN" "http://www.billooms.com/dtds/cornlathe3_0.dtd">
+    <!DOCTYPE COrnLathe PUBLIC "-//IDN billooms.com//DTD COrnLathe file format 3.1//EN" "http://www.billooms.com/dtds/cornlathe3_1.dtd">
     <COrnLathe version="3.0">
     ...
     </COrnLathe>
@@ -159,6 +159,7 @@
 <!ELEMENT GoToPoint (Pt)>
 <!ATTLIST GoToPoint
     n CDATA #REQUIRED
+    cutter CDATA #IMPLIED
   >
 
 <!--- Indexed CutPoint -->
@@ -210,6 +211,8 @@
 <!ELEMENT SpiralIndex (Pt, IndexPoint, Spiral, GoToPoint*)>
 <!ATTLIST SpiralIndex
     n CDATA #REQUIRED
+    snap CDATA "true"
+    cutter CDATA #REQUIRED
     endDepth CDATA #REQUIRED
   >
 
@@ -217,6 +220,8 @@
 <!ELEMENT SpiralRosette (Pt, RosettePoint, Spiral, GoToPoint*)>
 <!ATTLIST SpiralRosette
     n CDATA #REQUIRED
+    snap CDATA "true"
+    cutter CDATA #REQUIRED
     endDepth CDATA #REQUIRED
   >
 
@@ -224,6 +229,8 @@
 <!ELEMENT SpiralLine (Pt, LinePoint, Spiral, GoToPoint*)>
 <!ATTLIST SpiralLine
     n CDATA #REQUIRED
+    snap CDATA "true"
+    cutter CDATA #REQUIRED
     scaleDepth CDATA #REQUIRED
     endDepth CDATA #REQUIRED
   >
@@ -264,6 +271,8 @@
     maskPhase CDATA "0.0"
     n2 CDATA "0.0"
     amp2 CDATA "0.0"
+    symmetryAmp CDATA ""
+    symmetryWid CDATA ""
   >
 
 <!--- These attributes define a pattern bar -->

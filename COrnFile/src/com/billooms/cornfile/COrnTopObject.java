@@ -147,7 +147,7 @@ public final class COrnTopObject extends CLclass {
     indent = "";    // reset it just to make sure
     double thisVersion = Double.parseDouble(NbBundle.getMessage(COrnTopObject.class, "COrnLathe_Version"));
     out.println("<?xml version=\"1.0\"?>");
-    out.println("<!DOCTYPE COrnLathe PUBLIC \"-//IDN billooms.com//DTD COrnLathe file format 3.0//EN\" \"http://www.billooms.com/dtds/cornlathe3.dtd\">");
+    out.println("<!DOCTYPE COrnLathe PUBLIC \"-//IDN billooms.com//DTD COrnLathe file format 3.1//EN\" \"http://www.billooms.com/dtds/cornlathe3_1.dtd\">");
     out.println("<COrnLathe"
         + " version='" + F1.format(thisVersion) + "'"
         + ">");
