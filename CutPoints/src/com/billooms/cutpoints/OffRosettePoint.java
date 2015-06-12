@@ -16,6 +16,7 @@ import com.billooms.drawables.simple.Arc;
 import com.billooms.drawables.vecmath.Vector2d;
 import com.billooms.outline.Outline;
 import com.billooms.patterns.Patterns;
+import com.billooms.rosette.CompoundRosette;
 import com.billooms.rosette.Rosette;
 import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
@@ -101,9 +102,11 @@ public class OffRosettePoint extends RosettePoint implements OffPoint {
     super(rpt.getPos2D(), rpt);
     this.parent = parent;
     this.motion = rpt.getMotion();
-    this.rosette = new Rosette(rpt.getRosette());
+//    this.rosette = new Rosette(rpt.getRosette());
+    this.rosette = (rosette instanceof Rosette) ? new Rosette((Rosette) rpt.getRosette()) : new CompoundRosette((CompoundRosette) rpt.getRosette()); 
     if (motion.equals(Motion.BOTH)) {
-      this.rosette2 = new Rosette(rpt.getRosette2());
+//      this.rosette2 = new Rosette(rpt.getRosette2());
+      this.rosette2 = (rosette2 instanceof Rosette) ? new Rosette((Rosette) rpt.getRosette2()) : new CompoundRosette((CompoundRosette) rpt.getRosette2()); 
     }
 //    makeDrawables();
     rosette.addPropertyChangeListener(this);

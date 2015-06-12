@@ -95,9 +95,6 @@ public class RosetteEditPanel extends JPanel implements PropertyChangeListener {
     if (patternMgr != null) {
       patternMgr.removePropertyChangeListener(this);
     }
-    if (rosette != null) {
-      rosette.removePropertyChangeListener((PropertyChangeListener) viewPanel);
-    }
     
     this.patternMgr = newPatternMgr;
     updatePatternCombo();
@@ -106,7 +103,6 @@ public class RosetteEditPanel extends JPanel implements PropertyChangeListener {
       setRosette(null);
     } else {
       setRosette(new Rosette(patternMgr));
-      rosette.addPropertyChangeListener((PropertyChangeListener) viewPanel);
       if (patternMgr.getAllCustom().size() > 0) {
         rosette.setPattern(patternMgr.getAllCustom().get(0));    // set to first custom pattern
       } else {
@@ -124,11 +120,13 @@ public class RosetteEditPanel extends JPanel implements PropertyChangeListener {
   public void setRosette(Rosette newRosette) {
     if (rosette != null) {
       rosette.removePropertyChangeListener(this);
+      rosette.removePropertyChangeListener((PropertyChangeListener) viewPanel);
     }
-    Rosette old = this.rosette;
+    BasicRosette old = this.rosette;
     this.rosette = newRosette;
     if (rosette != null) {
       rosette.addPropertyChangeListener(this);
+      rosette.addPropertyChangeListener((PropertyChangeListener) viewPanel);
     }
     updateForm();
     pcs.firePropertyChange(PROP_ROSETTE, old, newRosette);

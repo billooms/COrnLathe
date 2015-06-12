@@ -19,6 +19,7 @@ import com.billooms.drawables.simple.Line;
 import com.billooms.drawables.vecmath.Vector2d;
 import com.billooms.outline.Outline;
 import com.billooms.patterns.Patterns;
+import com.billooms.rosette.Rosette;
 import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
 import java.io.PrintWriter;
@@ -345,7 +346,10 @@ public class SpiralRosette extends SpiralCut {
   protected void make3DLines() {
     list3D.clear();
     // Note: the spirals are made from Rock rosette when BOTH are specified (not from pumping rosette)
-    String mask = ((RosettePoint) beginPt).getRosette().getMask();
+    String mask = "";
+    if (((RosettePoint) beginPt).getRosette() instanceof Rosette) {
+      mask = ((Rosette)((RosettePoint) beginPt).getRosette()).getMask();
+    }
     int repeat = ((RosettePoint) beginPt).getRosette().getRepeat();
     double phase = ((RosettePoint) beginPt).getRosette().getPhase();
 
@@ -355,12 +359,14 @@ public class SpiralRosette extends SpiralCut {
         fullMask += mask;	// fill out to full length
       }
     }
-    if (((RosettePoint) beginPt).getRosette().usesSymmetryWid()) {
-      double[] angles = ((RosettePoint) beginPt).getRosette().getAngleBreaks();
-      for (int i = 0; i < repeat; i++) {
-        Line3D line = new Line3D(getPointsForLine());
-        line.rotate(RotMatrix.Axis.Z, (phase / repeat) - angles[i]);
-        list3D.add(line);
+    if (((RosettePoint) beginPt).getRosette() instanceof Rosette) {
+      if (((Rosette)((RosettePoint) beginPt).getRosette()).usesSymmetryWid()) {
+        double[] angles = ((Rosette)((RosettePoint) beginPt).getRosette()).getAngleBreaks();
+        for (int i = 0; i < repeat; i++) {
+          Line3D line = new Line3D(getPointsForLine());
+          line.rotate(RotMatrix.Axis.Z, (phase / repeat) - angles[i]);
+          list3D.add(line);
+        }
       }
     } else {
       double ang = phase / repeat;

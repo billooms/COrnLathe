@@ -2,6 +2,9 @@ package com.billooms.cutpoints.nodes;
 
 import com.billooms.cutpoints.RosettePoint;
 import com.billooms.cutpoints.RosettePoint.Motion;
+import com.billooms.rosette.BasicRosette;
+import com.billooms.rosette.CompoundRosette;
+import com.billooms.rosette.CompoundRosetteNode;
 import com.billooms.rosette.Rosette;
 import com.billooms.rosette.RosetteNode;
 import java.beans.PropertyChangeEvent;
@@ -28,7 +31,7 @@ import org.openide.nodes.Node;
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-public class RosettePointChildFactory extends ChildFactory.Detachable<Rosette> implements PropertyChangeListener {
+public class RosettePointChildFactory extends ChildFactory.Detachable<BasicRosette> implements PropertyChangeListener {
 
   /** Local copy of the RosettePoint. */
   private final RosettePoint rpt;
@@ -44,7 +47,7 @@ public class RosettePointChildFactory extends ChildFactory.Detachable<Rosette> i
   }
 
   @Override
-  protected boolean createKeys(List<Rosette> list) {
+  protected boolean createKeys(List<BasicRosette> list) {
     list.add(rpt.getRosette());
     if (rpt.getMotion().equals(Motion.BOTH)) {
       list.add(rpt.getRosette2());
@@ -53,8 +56,13 @@ public class RosettePointChildFactory extends ChildFactory.Detachable<Rosette> i
   }
 
   @Override
-  protected Node createNodeForKey(Rosette key) {
-    return new RosetteNode(key);
+  protected Node createNodeForKey(BasicRosette key) {
+    if (key instanceof Rosette) {
+      return new RosetteNode((Rosette) key);
+    } else if (key instanceof CompoundRosette) {
+      return new CompoundRosetteNode((CompoundRosette) key);
+    }
+    return null;  // should not happen
   }
 
   @Override

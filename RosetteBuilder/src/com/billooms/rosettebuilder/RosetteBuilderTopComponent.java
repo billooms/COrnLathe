@@ -1,18 +1,17 @@
 package com.billooms.rosettebuilder;
 
 import com.billooms.drawables.Grid;
-import com.billooms.drawables.simple.Circle;
-import com.billooms.drawables.simple.Curve;
 import com.billooms.patterns.Patterns;
-import java.awt.BasicStroke;
+import com.billooms.rosette.Combine.CombineType;
+import com.billooms.rosette.CompoundRosette;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
-import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
@@ -64,32 +63,7 @@ import org.openide.windows.WindowManager;
 })
 public final class RosetteBuilderTopComponent extends TopComponent implements PropertyChangeListener {
 
-  /** Different ways to combine rosettes. */
-  public static enum Combine {
-    /** Use the first one and ignore the second one. */
-    NONE,
-    /** Use the Minimum of the two at any given point. */
-    MIN,
-    /** Use the Maximum of the two at any given point. */
-    MAX, 
-    /** Add the two at any given point. */
-    ADD;
-    
-    public double combine(double n1, double n2) {
-      switch (Combine.this) {
-        default:
-        case NONE:
-          return n1;
-        case MIN:
-          return Math.min(n1, n2);
-        case MAX:
-          return Math.max(n1, n2);
-        case ADD:
-          return n1+n2;
-      }
-    }
-  }
-  
+  private CompoundRosette cRosette = null;
   private final DisplayPanel display;
   private static ExplorerManager em = null;   // all instances share one ExplorerManager
 
@@ -100,11 +74,11 @@ public final class RosetteBuilderTopComponent extends TopComponent implements Pr
     centerPanel.add(display, BorderLayout.CENTER);
     
     comboBox12.removeAllItems();	  // set the hiLoCombo values
-    for (Combine c : Combine.values()) {
+    for (CombineType c : CombineType.values()) {
       comboBox12.addItem(c.toString());
     }
     comboBox123.removeAllItems();	  // set the hiLoCombo values
-    for (Combine c : Combine.values()) {
+    for (CombineType c : CombineType.values()) {
       comboBox123.addItem(c.toString());
     }
     
@@ -123,14 +97,46 @@ public final class RosetteBuilderTopComponent extends TopComponent implements Pr
     Node rootNode = em.getRootContext();
     if (rootNode == Node.EMPTY) {
       setName(Bundle.CTL_RosetteBuilderTopComponent() + ": (no patterns)");
+      rosetteEditPanel0.setPatternMgr(null);
       rosetteEditPanel1.setPatternMgr(null);
       rosetteEditPanel2.setPatternMgr(null);
-      rosetteEditPanel3.setPatternMgr(null);
+      cRosette = null;
     } else {
       setName(Bundle.CTL_RosetteBuilderTopComponent() + ": " + rootNode.getDisplayName());
-      rosetteEditPanel1.setPatternMgr(rootNode.getLookup().lookup(Patterns.class));
-      rosetteEditPanel2.setPatternMgr(rootNode.getLookup().lookup(Patterns.class));
-      rosetteEditPanel3.setPatternMgr(rootNode.getLookup().lookup(Patterns.class));
+      Patterns patternMgr = rootNode.getLookup().lookup(Patterns.class);
+      cRosette = new CompoundRosette(patternMgr, 3);
+      rosetteEditPanel0.setPatternMgr(patternMgr);    // set patternMgr first
+      rosetteEditPanel1.setPatternMgr(patternMgr);
+      rosetteEditPanel2.setPatternMgr(patternMgr);
+      rosetteEditPanel0.setRosette(cRosette.getRosette(0));   // then set rosette so it's shared with cRosette
+      rosetteEditPanel1.setRosette(cRosette.getRosette(1));
+      rosetteEditPanel2.setRosette(cRosette.getRosette(2));
+      cRosette.addPropertyChangeListener(display);
+    }
+  }
+  
+  private void setRosette(CompoundRosette cRos) {
+    if (cRos.size() == 3) {
+      if (this.cRosette != null) {
+        cRosette.removePropertyChangeListener(display);
+      }
+      this.cRosette = cRos;
+      if (cRosette != null) {
+        rosetteEditPanel0.setRosette(cRosette.getRosette(0));   // then set rosette so it's shared with cRosette
+        rosetteEditPanel1.setRosette(cRosette.getRosette(1));
+        rosetteEditPanel2.setRosette(cRosette.getRosette(2));
+        System.out.println(cRosette.getCombineType(0) + " " + cRosette.getCombineType(0).ordinal());
+        System.out.println(cRosette.getCombineType(1) + " " + cRosette.getCombineType(1).ordinal());
+        comboBox12.setSelectedIndex(cRosette.getCombineType(0).ordinal());
+        comboBox123.setSelectedIndex(cRosette.getCombineType(1).ordinal());
+        System.out.println("  " + comboBox12.getSelectedIndex() + " " + comboBox123.getSelectedIndex());
+        cRosette.addPropertyChangeListener(display);
+      }
+    } else {
+      JOptionPane.showMessageDialog(this,
+          "RosetteBuilder requires a CompoundRosette with 3 rosettes",
+          "Compatibility warning",
+          JOptionPane.WARNING_MESSAGE);
     }
   }
 
@@ -158,9 +164,9 @@ public final class RosetteBuilderTopComponent extends TopComponent implements Pr
   private void initComponents() {
 
     topPanel = new javax.swing.JPanel();
+    rosetteEditPanel0 = new com.billooms.rosette.RosetteEditPanel();
     rosetteEditPanel1 = new com.billooms.rosette.RosetteEditPanel();
     rosetteEditPanel2 = new com.billooms.rosette.RosetteEditPanel();
-    rosetteEditPanel3 = new com.billooms.rosette.RosetteEditPanel();
     centerPanel = new javax.swing.JPanel();
     contolPanel = new javax.swing.JPanel();
     label1 = new javax.swing.JLabel();
@@ -168,19 +174,20 @@ public final class RosetteBuilderTopComponent extends TopComponent implements Pr
     label2 = new javax.swing.JLabel();
     comboBox123 = new javax.swing.JComboBox();
     label3 = new javax.swing.JLabel();
+    getButton = new javax.swing.JButton();
 
     setLayout(new java.awt.BorderLayout());
 
     topPanel.setLayout(new java.awt.GridLayout(3, 1));
+
+    rosetteEditPanel0.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+    topPanel.add(rosetteEditPanel0);
 
     rosetteEditPanel1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
     topPanel.add(rosetteEditPanel1);
 
     rosetteEditPanel2.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
     topPanel.add(rosetteEditPanel2);
-
-    rosetteEditPanel3.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-    topPanel.add(rosetteEditPanel3);
 
     add(topPanel, java.awt.BorderLayout.PAGE_START);
 
@@ -206,19 +213,30 @@ public final class RosetteBuilderTopComponent extends TopComponent implements Pr
 
     org.openide.awt.Mnemonics.setLocalizedText(label3, org.openide.util.NbBundle.getMessage(RosetteBuilderTopComponent.class, "RosetteBuilderTopComponent.label3.text")); // NOI18N
 
+    org.openide.awt.Mnemonics.setLocalizedText(getButton, org.openide.util.NbBundle.getMessage(RosetteBuilderTopComponent.class, "RosetteBuilderTopComponent.getButton.text")); // NOI18N
+    getButton.setToolTipText(org.openide.util.NbBundle.getMessage(RosetteBuilderTopComponent.class, "RosetteBuilderTopComponent.getButton.toolTipText")); // NOI18N
+    getButton.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        getButtonActionPerformed(evt);
+      }
+    });
+
     javax.swing.GroupLayout contolPanelLayout = new javax.swing.GroupLayout(contolPanel);
     contolPanel.setLayout(contolPanelLayout);
     contolPanelLayout.setHorizontalGroup(
       contolPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
       .addGroup(contolPanelLayout.createSequentialGroup()
+        .addComponent(comboBox123, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+        .addGap(0, 0, Short.MAX_VALUE))
+      .addGroup(contolPanelLayout.createSequentialGroup()
         .addGroup(contolPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-          .addComponent(comboBox12, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-          .addComponent(comboBox123, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-        .addGap(0, 107, Short.MAX_VALUE))
+          .addComponent(label1)
+          .addComponent(comboBox12, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 15, Short.MAX_VALUE)
+        .addComponent(getButton))
       .addGroup(contolPanelLayout.createSequentialGroup()
         .addContainerGap()
         .addGroup(contolPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-          .addComponent(label1)
           .addComponent(label2)
           .addComponent(label3))
         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -226,8 +244,10 @@ public final class RosetteBuilderTopComponent extends TopComponent implements Pr
     contolPanelLayout.setVerticalGroup(
       contolPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
       .addGroup(contolPanelLayout.createSequentialGroup()
-        .addContainerGap()
-        .addComponent(label1)
+        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        .addGroup(contolPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+          .addComponent(label1)
+          .addComponent(getButton))
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
         .addComponent(comboBox12, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -235,8 +255,7 @@ public final class RosetteBuilderTopComponent extends TopComponent implements Pr
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
         .addComponent(comboBox123, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-        .addComponent(label3)
-        .addContainerGap(56, Short.MAX_VALUE))
+        .addComponent(label3))
     );
 
     centerPanel.add(contolPanel, java.awt.BorderLayout.LINE_START);
@@ -245,24 +264,48 @@ public final class RosetteBuilderTopComponent extends TopComponent implements Pr
   }// </editor-fold>//GEN-END:initComponents
 
   private void comboBox12Changed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboBox12Changed
-    display.repaint();
+    if (comboBox12.isFocusOwner() && (cRosette != null)) {
+      cRosette.setCombineType(0, CombineType.values()[comboBox12.getSelectedIndex()]);
+    }
   }//GEN-LAST:event_comboBox12Changed
 
   private void comboBox123Changed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboBox123Changed
-    display.repaint();
+    if (comboBox123.isFocusOwner() && (cRosette != null)) {
+      cRosette.setCombineType(1, CombineType.values()[comboBox123.getSelectedIndex()]);
+    }
   }//GEN-LAST:event_comboBox123Changed
+
+  private void getButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_getButtonActionPerformed
+    if ((em.getSelectedNodes().length == 1)) {
+      Node n = em.getSelectedNodes()[0];
+      if (n.getLookup().lookup(CompoundRosette.class) != null) {
+        setRosette(n.getLookup().lookup(CompoundRosette.class));
+      } else {
+        JOptionPane.showMessageDialog(this,
+            "No CompoundRosette is selected in the DataNavigator",
+            "Selection warning",
+            JOptionPane.WARNING_MESSAGE);
+      }
+    } else {
+      JOptionPane.showMessageDialog(this,
+          "Only one node can be selected in the DataNavigator",
+          "Selection warning",
+          JOptionPane.WARNING_MESSAGE);
+    }
+  }//GEN-LAST:event_getButtonActionPerformed
 
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JPanel centerPanel;
   private javax.swing.JComboBox comboBox12;
   private javax.swing.JComboBox comboBox123;
   private javax.swing.JPanel contolPanel;
+  private javax.swing.JButton getButton;
   private javax.swing.JLabel label1;
   private javax.swing.JLabel label2;
   private javax.swing.JLabel label3;
+  private com.billooms.rosette.RosetteEditPanel rosetteEditPanel0;
   private com.billooms.rosette.RosetteEditPanel rosetteEditPanel1;
   private com.billooms.rosette.RosetteEditPanel rosetteEditPanel2;
-  private com.billooms.rosette.RosetteEditPanel rosetteEditPanel3;
   private javax.swing.JPanel topPanel;
   // End of variables declaration//GEN-END:variables
   @Override
@@ -272,9 +315,9 @@ public final class RosetteBuilderTopComponent extends TopComponent implements Pr
 //    System.out.println("  >>RosetteBuilderTopComponent.componentOpened em=" + em);
     updatePatternMgr();
     em.addPropertyChangeListener(this);
-    rosetteEditPanel1.addPropertyChangeListener(display);
-    rosetteEditPanel2.addPropertyChangeListener(display);
-    rosetteEditPanel3.addPropertyChangeListener(display);
+    if (cRosette != null) {
+      cRosette.addPropertyChangeListener(display);
+    }
   }
 
   @Override
@@ -283,9 +326,9 @@ public final class RosetteBuilderTopComponent extends TopComponent implements Pr
     if (em != null) {
       em.removePropertyChangeListener(this);
     }
-    rosetteEditPanel1.removePropertyChangeListener(display);
-    rosetteEditPanel2.removePropertyChangeListener(display);
-    rosetteEditPanel3.removePropertyChangeListener(display);
+    if (cRosette != null) {
+      cRosette.removePropertyChangeListener(display);
+    }
   }
 
   void writeProperties(java.util.Properties p) {
@@ -313,14 +356,6 @@ public final class RosetteBuilderTopComponent extends TopComponent implements Pr
     private final Point INITIAL_ZPIX = new Point(150, 200);   // artibrary
     private double dpi = INITIAL_DPI;           // Dots per inch for zooming in/out
     private Point zeroPix = INITIAL_ZPIX;       // Location of 0.0, 0.0 in pixels\
-    
-  /* Information for drawing */
-    private final BasicStroke SOLID_LINE = new BasicStroke(1.0f);
-    private final BasicStroke DOT_LINE = new BasicStroke(1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 10, new float[]{3, 3}, 0);
-    private final Color OUTLINE_COLOR = Color.BLACK;
-    private final Color RADIUS_COLOR = Color.BLUE;
-    private final int NUM_POINTS = 720;	    // draw a point every 1/2 degree
-    private final Point2D.Double center = new Point2D.Double(0.0, 0.0);   // center of the rosette is always 0.0, 0.0
     private final double ROSETTE_RADIUS = 2.0;  // The radius of the Rosette for drawing purposes
 
     /** Creates new DisplayPanel */
@@ -343,34 +378,9 @@ public final class RosetteBuilderTopComponent extends TopComponent implements Pr
       // Paint the grid
       new Grid(-(double) zeroPix.x / dpi, -(double) (getHeight() - zeroPix.y) / dpi,
           (double) getWidth() / dpi, (double) getHeight() / dpi).paint(g2d);
-      new Circle(new Point2D.Double(0.0, 0.0), ROSETTE_RADIUS, RADIUS_COLOR, DOT_LINE).paint(g2d);
 
-      if (rosetteEditPanel1.getRosette() != null) {       // make sure there are rosettes
-        double[] deflection = new double[NUM_POINTS + 1];     // add 1 for wrap-around
-        for (int i = 0; i <= NUM_POINTS; i++) {
-          deflection[i] = rosetteEditPanel1.getRosette().getAmplitudeAt((double) i);
-        }
-        for (int i = 0; i <= NUM_POINTS; i++) {
-          deflection[i] = Combine.values()[comboBox12.getSelectedIndex()].combine(
-              deflection[i], 
-              rosetteEditPanel2.getRosette().getAmplitudeAt((double) i));
-        }
-        for (int i = 0; i <= NUM_POINTS; i++) {
-          deflection[i] = Combine.values()[comboBox123.getSelectedIndex()].combine(
-              deflection[i], 
-              rosetteEditPanel3.getRosette().getAmplitudeAt((double) i));
-        }
-        // convert radius to xy points
-        Point2D.Double[] pts = new Point2D.Double[NUM_POINTS + 1];     // add 1 for wrap-around
-        for (int i = 0; i <= NUM_POINTS; i++) {
-          double radius = ROSETTE_RADIUS - deflection[i];
-          // Add PI so that the pattern starts on the left side.
-          // Minus sign so that pattern goes clockwise such that 
-          // a positive spindle rotation brings the feature to the left side.
-          double angelRad = -Math.toRadians((double) i) + Math.PI;
-          pts[i] = new Point2D.Double(radius * Math.cos(angelRad), radius * Math.sin(angelRad));
-        }
-        new Curve(pts, OUTLINE_COLOR, SOLID_LINE).paint(g2d);
+      if (cRosette != null) {       // make sure there are rosettes
+        cRosette.paint2(g2d, ROSETTE_RADIUS);		// paint the rosette without scaling to pToP
       }
     }
 

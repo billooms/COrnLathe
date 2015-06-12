@@ -186,7 +186,7 @@
   >
 
 <!--- RosettePoint -->
-<!ELEMENT RosettePoint (Pt, Rosette+)>
+<!ELEMENT RosettePoint (Pt, Rosette*, CompoundRosette*)>
 <!ATTLIST RosettePoint
     n CDATA #REQUIRED
     snap CDATA "true"
@@ -273,6 +273,21 @@
     amp2 CDATA "0.0"
     symmetryAmp CDATA ""
     symmetryWid CDATA ""
+  >
+
+<!--- These attributes define a compound rosette -->
+<!ELEMENT CompoundRosette (Rosette+, Combine+)>
+<!ATTLIST CompoundRosette
+    amp CDATA #REQUIRED
+    phase CDATA #REQUIRED
+    size CDATA #REQUIRED
+    invert CDATA "false"
+  >
+
+<!--- These attributes define a combiner -->
+<!ELEMENT Combine EMPTY>
+<!ATTLIST Combine
+    type (NONE|MIN|MAX|ADD) "NONE"
   >
 
 <!--- These attributes define a pattern bar -->

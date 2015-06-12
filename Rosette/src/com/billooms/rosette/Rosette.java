@@ -1,28 +1,17 @@
 package com.billooms.rosette;
 
 import com.billooms.clclass.CLUtilities;
-import com.billooms.clclass.CLclass;
 import com.billooms.cornlatheprefs.COrnLathePrefs;
-import com.billooms.drawables.simple.Curve;
-import com.billooms.drawables.Drawable;
-import com.billooms.drawables.simple.Circle;
-import com.billooms.drawables.simple.Plus;
 import com.billooms.patterns.CustomPattern;
 import com.billooms.patterns.Pattern;
 import com.billooms.patterns.Patterns;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
-import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import org.openide.util.Lookup;
 import org.w3c.dom.Element;
 
 /**
- * A Rose Engine rosette.
+ * A simple Rose Engine rosette.
  *
  * @author Bill Ooms. Copyright 2015 Studio of Bill Ooms. All rights reserved.
  * 
@@ -39,20 +28,10 @@ import org.w3c.dom.Element;
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-public class Rosette extends CLclass {
+public class Rosette extends BasicRosette {
 
-  /** All Rosette property change names start with this prefix */
-  public final static String PROP_PREFIX = "Rosette" + "_";
   /** Property name used for changing the pattern */
   public final static String PROP_PATTERN = PROP_PREFIX + "Pattern";
-  /** Property name used for changing the repeat */
-  public final static String PROP_REPEAT = PROP_PREFIX + "Repeat";
-  /** Property name used for changing the peak-to-peak amplitude */
-  public final static String PROP_PTOP = PROP_PREFIX + "PeakToPeak";
-  /** Property name used for changing the phase */
-  public final static String PROP_PHASE = PROP_PREFIX + "Phase";
-  /** Property name used for changing the invert flag */
-  public final static String PROP_INVERT = PROP_PREFIX + "Invert";
   /** Property name used for changing the mask */
   public final static String PROP_MASK = PROP_PREFIX + "Mask";
   /** Property name used for changing the maskHiLo flag */
@@ -70,12 +49,6 @@ public class Rosette extends CLclass {
 
   /** Default Style Name (currently set to "SINE") */
   public final static String DEFAULT_PATTERN = "SINE";
-  /** Default repeat (currently set to 8) */
-  public final static int DEFAULT_REPEAT = 8;
-  /** Default peak-to-peak amplitude (currently set to 0.1) */
-  public final static double DEFAULT_PTOP = 0.1;
-  /** Default phase (currently set to 0.0) */
-  public final static double DEFAULT_PHASE = 0.0;
   /** Default mask (currently set to "") */
   public final static String DEFAULT_MASK = "";
   /** Default mask phase (currently set to 0.0) */
@@ -99,14 +72,6 @@ public class Rosette extends CLclass {
 
   /** Pattern for the rosette. */
   private Pattern pattern;
-  /** Number of repeats around the rosette. */
-  private int repeat = DEFAULT_REPEAT;
-  /** Peak-to-Peak amplitude. */
-  private double pToP = DEFAULT_PTOP;
-  /** Phase shift in degrees (0 to 360), +phase is CCW. */
-  private double phase = DEFAULT_PHASE;
-  /** Flag to invert the pattern (like rubbing on the backside). */
-  private boolean invert = false;
   /** Mask some of the pattern repeats -- 0 is skip, 1 is don't skip. */
   private String mask = DEFAULT_MASK;
   /** Flag if mask is to a high point or low point of the rosette. */
@@ -123,41 +88,6 @@ public class Rosette extends CLclass {
   private DoubleArray symmetryWid = new DoubleArray(DEFAULT_SYMWID);
 
   private static COrnLathePrefs prefs = Lookup.getDefault().lookup(COrnLathePrefs.class);
-  private Patterns patternMgr = null;
-
-  /* Information for drawing */
-  private final static BasicStroke SOLID_LINE = new BasicStroke(1.0f);
-  private final static BasicStroke DOT_LINE = new BasicStroke(1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 10, new float[]{3, 3}, 0);
-  private final static Color OUTLINE_COLOR = Color.BLACK;
-  private final static Color RADIUS_COLOR = Color.BLUE;
-  private final static int NUM_POINTS = 720;	    // draw a point every 1/2 degree
-  private final Point2D.Double center = new Point2D.Double(0.0, 0.0);   // center of the rosette is always 0.0, 0.0
-  private final ArrayList<Drawable> drawList = new ArrayList<>();   // a list of things to draw for a visual representaiton of the rosette
-
-  /**
-   * Construct a rosette with the given values.
-   *
-   * @param patternName Pattern name of the pattern to use
-   * @param repeat Repeat
-   * @param amplitude Peak-to-Peak
-   * @param phase Phase in degrees, where 360 means one pattern repeat
-   * @param patMgr pattern manager with available patterns
-   */
-  public Rosette(String patternName, int repeat, double amplitude, double phase, Patterns patMgr) {
-    this.patternMgr = patMgr;
-    this.pattern = patternMgr.getPattern(patternName);
-    this.repeat = repeat;
-    if (pattern.getName().equals("NONE")) {
-      this.pToP = 0.0;
-      this.phase = 0.0;
-    } else {
-      this.pToP = amplitude;
-      this.phase = phase;
-      if (pattern instanceof CustomPattern) {
-        ((CustomPattern) pattern).addPropertyChangeListener(this);
-      }
-    }
-  }
 
   /**
    * Construct a rosette with default values.
@@ -165,7 +95,8 @@ public class Rosette extends CLclass {
    * @param patMgr pattern manager with available patterns
    */
   public Rosette(Patterns patMgr) {
-    this(DEFAULT_PATTERN, DEFAULT_REPEAT, DEFAULT_PTOP, DEFAULT_PHASE, patMgr);
+    super(patMgr);    // assigns patternManager
+    this.pattern = patternMgr.getDefaultPattern();
   }
 
   /**
@@ -174,12 +105,11 @@ public class Rosette extends CLclass {
    * @param rosette Rosette
    */
   public Rosette(Rosette rosette) {
-    this(rosette.pattern.getName(), rosette.getRepeat(), rosette.getPToP(), rosette.getPhase(), rosette.patternMgr);
-    this.patternMgr = rosette.patternMgr;
+    super(rosette);   // copies patternManager, pToP, repeat, phase, int
+    this.pattern = patternMgr.getPattern(rosette.pattern.getName());
     this.mask = rosette.getMask();
     this.maskHiLo = rosette.getMaskHiLo();
     this.maskPhase = rosette.getMaskPhase();
-    this.invert = rosette.getInvert();
     this.amp2 = rosette.getAmp2();
     this.n2 = rosette.getN2();
     this.symmetryAmp = new DoubleArray(rosette.getSymmetryAmp());
@@ -193,12 +123,9 @@ public class Rosette extends CLclass {
    * @param patMgr pattern manager with available patterns
    */
   public Rosette(Element element, Patterns patMgr) {
-    this(CLUtilities.getString(element, "pattern", DEFAULT_PATTERN),
-        CLUtilities.getInteger(element, "repeat", DEFAULT_REPEAT),
-        CLUtilities.getDouble(element, "amp", DEFAULT_PTOP),
-        CLUtilities.getDouble(element, "phase", DEFAULT_PHASE),
-        patMgr);
-    invert = CLUtilities.getBoolean(element, "invert", false);
+    super(element, patMgr);   // stores patternMgr, reads pToP, phase, invert
+    this.pattern = patternMgr.getPattern(CLUtilities.getString(element, "pattern", DEFAULT_PATTERN));
+    this.repeat = CLUtilities.getInteger(element, "repeat", DEFAULT_REPEAT);
     mask = CLUtilities.getString(element, "mask", DEFAULT_MASK);
     maskHiLo = CLUtilities.getEnum(element, "hilo", Mask.class, Mask.HIGH);
     maskPhase = CLUtilities.getDouble(element, "maskPhase", DEFAULT_MASK_PHASE);
@@ -248,6 +175,7 @@ public class Rosette extends CLclass {
    * The only thing this does is remove any CustomPattern
    * propertyChangeListener.
    */
+  @Override
   public void clear() {
     if (pattern instanceof CustomPattern) {
       ((CustomPattern) pattern).removePropertyChangeListener(this);
@@ -287,35 +215,18 @@ public class Rosette extends CLclass {
   }
 
   /**
-   * Get the number of repeats on the rosette.
-   *
-   * @return number of repeats
-   */
-  public int getRepeat() {
-    return repeat;
-  }
-
-  /**
    * Set the number of repeats on the rosette.
    *
    * This fires a PROP_REPEAT property change with the old and new repeats.
    *
    * @param n number of repeats
    */
+  @Override
   public synchronized void setRepeat(int n) {
     int old = repeat;
     this.repeat = Math.max(n, pattern.getMinRepeat());
     checkSymWid();    // in case repeat gets smaller than symmetryWid
     this.pcs.firePropertyChange(PROP_REPEAT, old, repeat);
-  }
-
-  /**
-   * Get the peak-to-peak amplitude of the rosette.
-   *
-   * @return peak-to-peak amplitude
-   */
-  public double getPToP() {
-    return pToP;
   }
 
   /**
@@ -325,6 +236,7 @@ public class Rosette extends CLclass {
    *
    * @param p peak-to-peak amplitude
    */
+  @Override
   public synchronized void setPToP(double p) {
     double old = this.pToP;
     this.pToP = p;
@@ -332,26 +244,6 @@ public class Rosette extends CLclass {
       this.pToP = 0.0;
     }
     this.pcs.firePropertyChange(PROP_PTOP, old, pToP);
-  }
-
-  /**
-   * Get the phase of the rosette
-   *
-   * @return phase in degrees: 180 means 1/2 of the repeat, 90 means 1/4 of the
-   * repeat, etc.
-   */
-  public double getPhase() {
-    return phase;
-  }
-
-  /**
-   * Get the phase of the rosette as a fraction of a repeat.
-   *
-   * @return phase: 0.5 means 1/2 of the repeat, 0.25 means 1/4 of the repeat,
-   * etc.
-   */
-  public double getPh() {
-    return phase / 360.0;
   }
 
   /**
@@ -363,6 +255,7 @@ public class Rosette extends CLclass {
    * @param ph phase in degrees: 180 means 1/2 of the repeat, 90 means 1/4 of
    * the repeat, etc.
    */
+  @Override
   public synchronized void setPhase(double ph) {
     double old = this.phase;
     this.phase = ph;
@@ -381,30 +274,9 @@ public class Rosette extends CLclass {
    * @param ph phase: 0.5 means 1/2 of the repeat, 0.25 means 1/4 of the repeat,
    * etc.
    */
+  @Override
   public synchronized void setPh(double ph) {
     setPhase(ph * 360.0);
-  }
-
-  /**
-   * Get the invert flag.
-   *
-   * @return invert flag
-   */
-  public boolean getInvert() {
-    return invert;
-  }
-
-  /**
-   * Set the invert flag.
-   *
-   * This fires a PROP_INVERT property change with the old and new values.
-   *
-   * @param inv true=invert
-   */
-  public void setInvert(boolean inv) {
-    boolean old = invert;
-    this.invert = inv;
-    this.pcs.firePropertyChange(PROP_INVERT, old, invert);
   }
 
   /**
@@ -683,46 +555,6 @@ public class Rosette extends CLclass {
   }
 
   /**
-   * Paint the object.
-   *
-   * @param g2d Graphics2D
-   * @param nomRadius Nominal radius of the drawn rosette
-   */
-  public void paint(Graphics2D g2d, double nomRadius) {
-    g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-    g2d.setStroke(SOLID_LINE);
-
-    makeDrawables(nomRadius);    // make drawables when needed for painting
-    drawList.stream().forEach((item) -> {
-      // paint everything in the drawlist
-      item.paint(g2d);
-    });
-  }
-
-  /**
-   * Make the rosette appearance based on stored values.
-   * 
-   * @param nomRadius Nominal radius of the drawn rosette
-   */
-  private void makeDrawables(double nomRadius) {
-    drawList.clear();			// clear out the old drawlist
-    drawList.add(new Plus(center, RADIUS_COLOR));  // always draw a center mark
-    drawList.add(new Circle(new Point2D.Double(0.0, 0.0), nomRadius, RADIUS_COLOR, DOT_LINE));  // circle at nominal radius
-
-    Point2D.Double[] pts = new Point2D.Double[NUM_POINTS + 1];     // add 1 for wrap-around
-    double rad, r;
-    for (int i = 0; i <= NUM_POINTS; i++) {
-      // Add PI so that the pattern starts on the left side.
-      // Minus sign so that pattern goes clockwise such that 
-      // a positive spindle rotation brings the feature to the left side.
-      rad = -Math.toRadians((double) i) + Math.PI;
-      r = nomRadius - getAmplitudeAt((double) i);
-      pts[i] = new Point2D.Double(r * Math.cos(rad), r * Math.sin(rad));
-    }
-    drawList.add(new Curve(pts, OUTLINE_COLOR, SOLID_LINE));
-  }
-
-  /**
    * Get the amplitude (offset from nominal radius) of the rosette at a given
    * angle in degrees. A returned value of zero means zero deflection from its
    * nominal radius.
@@ -732,6 +564,7 @@ public class Rosette extends CLclass {
    * rosette).
    * @return amplitude which will be a positive number from 0.0 to pToP
    */
+  @Override
   public double getAmplitudeAt(double ang, boolean inv) {
     if (inv) {
       return pToP - getAmplitudeAt(ang);
@@ -747,6 +580,7 @@ public class Rosette extends CLclass {
    * @param ang Angle in degrees around the rosette
    * @return amplitude which will be a positive number from 0.0 to pToP
    */
+  @Override
   public double getAmplitudeAt(double ang) {
     if (isMasked(ang)) {
       switch (maskHiLo) {

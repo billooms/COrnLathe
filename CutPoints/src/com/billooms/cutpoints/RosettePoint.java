@@ -18,6 +18,8 @@ import com.billooms.outline.Outline;
 import com.billooms.patterns.CustomPattern;
 import com.billooms.patterns.CustomPattern.CustomStyle;
 import com.billooms.patterns.Patterns;
+import com.billooms.rosette.BasicRosette;
+import com.billooms.rosette.CompoundRosette;
 import com.billooms.rosette.Rosette;
 import java.awt.Color;
 import java.awt.geom.Point2D;
@@ -95,9 +97,9 @@ public class RosettePoint extends CutPoint implements ActiveEditorDrop {
   /** Motion of the cuts. */
   protected Motion motion = DEFAULT_MOTION;
   /** Primary rosette. */
-  protected Rosette rosette;
+  protected BasicRosette rosette;
   /** Second rosette used only for Motion.BOTH. */
-  protected Rosette rosette2;
+  protected BasicRosette rosette2;
 
   /**
    * Construct a new RosettePoint from the given DOM Element.
@@ -111,9 +113,18 @@ public class RosettePoint extends CutPoint implements ActiveEditorDrop {
     super(element, cutMgr, outline);
     this.motion = CLUtilities.getEnum(element, "motion", Motion.class, DEFAULT_MOTION);
     NodeList rosNodes = element.getElementsByTagName("Rosette");
-    rosette = new Rosette((Element) rosNodes.item(0), patMgr);    // should always be one
-    if (motion.equals(Motion.BOTH)) {
-      rosette2 = new Rosette((Element) rosNodes.item(1), patMgr);  // should be a second
+    if (rosNodes.getLength() > 0) {
+      rosette = new Rosette((Element) rosNodes.item(0), patMgr);    // should always be one
+      if (motion.equals(Motion.BOTH)) {
+        rosette2 = new Rosette((Element) rosNodes.item(1), patMgr);  // should be a second
+      }
+    }
+    rosNodes = element.getElementsByTagName("CompoundRosette");
+    if (rosNodes.getLength() > 0) {
+      rosette = new CompoundRosette((Element) rosNodes.item(0), patMgr);    // should always be one
+      if (motion.equals(Motion.BOTH)) {
+        rosette2 = new CompoundRosette((Element) rosNodes.item(1), patMgr);  // should be a second
+      }
     }
     makeDrawables();
     rosette.addPropertyChangeListener(this);
@@ -133,9 +144,11 @@ public class RosettePoint extends CutPoint implements ActiveEditorDrop {
   public RosettePoint(Point2D.Double pos, RosettePoint cpt) {
     super(pos, cpt);
     this.motion = cpt.getMotion();
-    this.rosette = new Rosette(cpt.getRosette());
+//    this.rosette = new Rosette(cpt.getRosette());
+    this.rosette = (rosette instanceof Rosette) ? new Rosette((Rosette) cpt.getRosette()) : new CompoundRosette((CompoundRosette) cpt.getRosette()); 
     if (motion.equals(Motion.BOTH)) {
-      this.rosette2 = new Rosette(cpt.getRosette2());
+//      this.rosette2 = new Rosette(cpt.getRosette2());
+      this.rosette2 = (rosette2 instanceof Rosette) ? new Rosette((Rosette) cpt.getRosette2()) : new CompoundRosette((CompoundRosette) cpt.getRosette2()); 
     }
     makeDrawables();
     rosette.addPropertyChangeListener(this);
@@ -204,7 +217,8 @@ public class RosettePoint extends CutPoint implements ActiveEditorDrop {
     Motion old = this.motion;
     this.motion = newDir;
     if (motion.equals(Motion.BOTH)) {
-      rosette2 = new Rosette(rosette);    // copy the Rock rosette for the Pump rosette
+//      rosette2 = new Rosette(rosette);    // copy the Rock rosette for the Pump rosette
+      rosette2 = (rosette2 instanceof Rosette) ? new Rosette((Rosette) rosette) : new CompoundRosette((CompoundRosette) rosette); 
       rosette2.addPropertyChangeListener(this);
     }
     makeDrawables();
@@ -216,7 +230,7 @@ public class RosettePoint extends CutPoint implements ActiveEditorDrop {
    *
    * @return primary rosette
    */
-  public Rosette getRosette() {
+  public BasicRosette getRosette() {
     return rosette;
   }
 
@@ -225,7 +239,7 @@ public class RosettePoint extends CutPoint implements ActiveEditorDrop {
    *
    * @return secondary rosette
    */
-  public Rosette getRosette2() {
+  public BasicRosette getRosette2() {
     return rosette2;
   }
 
@@ -642,8 +656,8 @@ public class RosettePoint extends CutPoint implements ActiveEditorDrop {
     // If custom pattern with STRAIGHT line segments, just use the breakpoints.
     // It runs faster!
     // Can't currently use this if BOTH rosettes are used.
-    if (!motion.equals(Motion.BOTH) && (rosette.getPattern() instanceof CustomPattern)) {
-      CustomPattern pat = (CustomPattern) rosette.getPattern();
+    if (!motion.equals(Motion.BOTH) && (rosette instanceof Rosette) && (((Rosette)rosette).getPattern() instanceof CustomPattern)) {
+      CustomPattern pat = (CustomPattern) ((Rosette)rosette).getPattern();
       if (pat.getCustomStyle() == CustomStyle.STRAIGHT) {
         int repeat = rosette.getRepeat();
         double phase = rosette.getPhase();
@@ -824,7 +838,7 @@ public class RosettePoint extends CutPoint implements ActiveEditorDrop {
       case PERP:
       case TANGENT:
       case PUMP:
-        if (rosette.getPattern().getName().equals("NONE")) {
+        if ((rosette instanceof Rosette) && (((Rosette)rosette).getPattern().getName().equals("NONE"))) {
           return true;
         }
         if (rosette.getPToP() == 0.0) {
@@ -832,8 +846,8 @@ public class RosettePoint extends CutPoint implements ActiveEditorDrop {
         }
         break;
       case BOTH:
-        if (rosette.getPattern().getName().equals("NONE")
-            && rosette2.getPattern().getName().equals("NONE")) {
+        if (((Rosette)rosette).getPattern().getName().equals("NONE")
+            && ((Rosette)rosette2).getPattern().getName().equals("NONE")) {
           return true;
         }
         if ((rosette.getPToP() == 0.0)

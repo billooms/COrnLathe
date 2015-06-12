@@ -74,15 +74,15 @@ public class RosetteNode extends AbstractNode implements PropertyChangeListener 
       patternProp.setPropertyEditorClass(PatternEditorInplace.class);
       set.put(patternProp);
 
-      Property<Integer> repeatProp = new PropertySupport.Reflection<>(ros, int.class, "repeat");
-      repeatProp.setName("Repeat");
-      repeatProp.setShortDescription("number of repetitions of pattern");
-      set.put(repeatProp);
-
       Property<Double> ampProp = new PropertySupport.Reflection<>(ros, double.class, "pToP");
       ampProp.setName("Amplitude");
       ampProp.setShortDescription("peak-to-peak amplitude");
       set.put(ampProp);
+
+      Property<Integer> repeatProp = new PropertySupport.Reflection<>(ros, int.class, "repeat");
+      repeatProp.setName("Repeat");
+      repeatProp.setShortDescription("number of repetitions of pattern");
+      set.put(repeatProp);
 
       Property<Double> phaseProp;
       if (prefs.isFracPhase()) {
