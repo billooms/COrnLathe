@@ -145,10 +145,10 @@ public class RosettePoint extends CutPoint implements ActiveEditorDrop {
     super(pos, cpt);
     this.motion = cpt.getMotion();
 //    this.rosette = new Rosette(cpt.getRosette());
-    this.rosette = (rosette instanceof Rosette) ? new Rosette((Rosette) cpt.getRosette()) : new CompoundRosette((CompoundRosette) cpt.getRosette()); 
+    this.rosette = (cpt.getRosette() instanceof Rosette) ? new Rosette((Rosette) cpt.getRosette()) : new CompoundRosette((CompoundRosette) cpt.getRosette()); 
     if (motion.equals(Motion.BOTH)) {
 //      this.rosette2 = new Rosette(cpt.getRosette2());
-      this.rosette2 = (rosette2 instanceof Rosette) ? new Rosette((Rosette) cpt.getRosette2()) : new CompoundRosette((CompoundRosette) cpt.getRosette2()); 
+      this.rosette2 = (cpt.getRosette2() instanceof Rosette) ? new Rosette((Rosette) cpt.getRosette2()) : new CompoundRosette((CompoundRosette) cpt.getRosette2()); 
     }
     makeDrawables();
     rosette.addPropertyChangeListener(this);
