@@ -700,19 +700,30 @@ public class Rosette extends BasicRosette {
     if (mask.isEmpty()) {		// nothing is masked
       return false;
     }
-    double angle = angleCheck(ang);		// must be in range of 0 to 360
-    angle = angle + phase / repeat;		// angle relative to the start of first pattern
-    angle = angle - maskPhase / repeat;		// angle relative to the start of first mask
-    if (angle < 0.0) {
-      angle += 360.0;	// in case we aren't in the first mask portion yet
-    }
-    double anglePerRepeat = 360.0 / repeat;	// degrees per every repeat of pattern
-    int m = (int) (angle / anglePerRepeat);	// which mask is the pattern in
-
     String fullMask = mask;
     while (fullMask.length() <= getRepeat()) {	// note: "<=" because m can equal repeat!				
       fullMask += mask;			// fill out to full length
     }
+    
+    int m = 0;        // which repeat is the pattern in (0 to repeat)
+    double anglePerRepeat = 360.0 / repeat;	// degrees per every repeat of pattern
+    double phaseAdjustedAngle = angleCheck(ang + phase / repeat - maskPhase / repeat);	// angle relative to the start of first pattern (based on symmetrical rosette)
+    if (!usesSymmetryWid()) {   // symmetrical widths
+      m = (int) (phaseAdjustedAngle / anglePerRepeat);          // which repeat is the pattern in (0 to repeat)
+    } else {    // not symmetrical widths
+      // TODO: is there a way to calculate just once?
+      // factors are the amount each repeat is stretched (>1.0) or shrunk (<1.0)
+      double[] factors = getFactors();
+      // angleBreaks are the angles where each repeat starts/ends
+      double[] angleBreaks = getAngleBreaks(factors);
+      for (int i = angleBreaks.length - 1; i >= 0; i--) {   // find which repeat the angle is in
+        if (phaseAdjustedAngle >= angleBreaks[i]) {
+          m = i;
+          break;
+        }
+      }
+    }
+
     return (fullMask.charAt(m) == '0');
   }
 
