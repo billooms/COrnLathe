@@ -65,6 +65,8 @@ public class Combine extends CLclass {
           return Math.max(n1, n2);
         case ADD:
           return n1+n2;
+        case SUB:
+          return n1-n2;
       }
     }
   }
