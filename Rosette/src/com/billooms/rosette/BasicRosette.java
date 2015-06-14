@@ -118,6 +118,15 @@ public abstract class BasicRosette extends CLclass {
     this.phase = CLUtilities.getDouble(element, "phase", DEFAULT_PHASE);
     this.invert = CLUtilities.getBoolean(element, "invert", false);
   }
+  
+  /**
+   * Get the pattern manager for this rosette.
+   * 
+   * @return pattern manager
+   */
+  public Patterns getPatternMgr() {
+    return patternMgr;
+  }
 
   /**
    * Get the peak-to-peak amplitude of the rosette.

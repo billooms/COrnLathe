@@ -65,6 +65,8 @@ public class RosettePoint extends CutPoint implements ActiveEditorDrop {
 
   /** Property name used when changing an RosettePoint's motion */
   String PROP_MOTION = PROP_PREFIX + "Motion";
+  /** Property name used when changing a rosette */
+  String PROP_ROSETTE = PROP_PREFIX + "Rosette";
 
   /** Default motion for index cuts. */
   public final static Motion DEFAULT_MOTION = Motion.ROCK;
@@ -218,7 +220,7 @@ public class RosettePoint extends CutPoint implements ActiveEditorDrop {
     this.motion = newDir;
     if (motion.equals(Motion.BOTH)) {
 //      rosette2 = new Rosette(rosette);    // copy the Rock rosette for the Pump rosette
-      rosette2 = (rosette2 instanceof Rosette) ? new Rosette((Rosette) rosette) : new CompoundRosette((CompoundRosette) rosette); 
+      rosette2 = (rosette instanceof Rosette) ? new Rosette((Rosette) rosette) : new CompoundRosette((CompoundRosette) rosette); 
       rosette2.addPropertyChangeListener(this);
     }
     makeDrawables();
@@ -241,6 +243,42 @@ public class RosettePoint extends CutPoint implements ActiveEditorDrop {
    */
   public BasicRosette getRosette2() {
     return rosette2;
+  }
+  
+  /**
+   * Set the rosette to a new rosette.
+   * This fires a PROP_ROSETE with old and new values
+   * 
+   * @param newRosette new rosette
+   */
+  public void setRosette(BasicRosette newRosette) {
+    if (rosette != null) {
+      rosette.removePropertyChangeListener(this);
+    }
+    BasicRosette old = this.rosette;
+    this.rosette = newRosette;
+    if (rosette != null) {
+      rosette.addPropertyChangeListener(this);
+    }
+    pcs.firePropertyChange(PROP_ROSETTE, old, newRosette);
+  }
+  
+  /**
+   * Set the rosette2 to a new rosette.
+   * This fires a PROP_ROSETE with old and new values
+   * 
+   * @param newRosette new rosette
+   */
+  public void setRosette2(BasicRosette newRosette) {
+    if (rosette2 != null) {
+      rosette.removePropertyChangeListener(this);
+    }
+    BasicRosette old = this.rosette2;
+    this.rosette2 = newRosette;
+    if (rosette2 != null) {
+      rosette.addPropertyChangeListener(this);
+    }
+    pcs.firePropertyChange(PROP_ROSETTE, old, newRosette);
   }
 
   /**

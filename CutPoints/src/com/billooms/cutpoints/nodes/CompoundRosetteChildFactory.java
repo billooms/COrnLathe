@@ -1,6 +1,9 @@
-package com.billooms.rosette;
+package com.billooms.cutpoints.nodes;
 
 import com.billooms.clclass.CLclass;
+import com.billooms.rosette.Combine;
+import com.billooms.rosette.CompoundRosette;
+import com.billooms.rosette.Rosette;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.List;
