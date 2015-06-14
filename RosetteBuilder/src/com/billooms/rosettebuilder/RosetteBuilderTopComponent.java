@@ -125,11 +125,8 @@ public final class RosetteBuilderTopComponent extends TopComponent implements Pr
         rosetteEditPanel0.setRosette(cRosette.getRosette(0));   // then set rosette so it's shared with cRosette
         rosetteEditPanel1.setRosette(cRosette.getRosette(1));
         rosetteEditPanel2.setRosette(cRosette.getRosette(2));
-        System.out.println(cRosette.getCombineType(0) + " " + cRosette.getCombineType(0).ordinal());
-        System.out.println(cRosette.getCombineType(1) + " " + cRosette.getCombineType(1).ordinal());
         comboBox12.setSelectedIndex(cRosette.getCombineType(0).ordinal());
         comboBox123.setSelectedIndex(cRosette.getCombineType(1).ordinal());
-        System.out.println("  " + comboBox12.getSelectedIndex() + " " + comboBox123.getSelectedIndex());
         cRosette.addPropertyChangeListener(display);
       }
     } else {

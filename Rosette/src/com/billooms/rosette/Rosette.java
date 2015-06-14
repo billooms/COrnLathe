@@ -539,22 +539,6 @@ public class Rosette extends BasicRosette {
   }
 
   /**
-   * Make sure angle is in range 0.0 <= a < 360.0
-   *
-   * @param ang angle in degrees
-   * @return angle in range 0.0 <= a < 360.0
-   */
-  private double angleCheck(double ang) {
-    while (ang < 0.0) {
-      ang += 360.0;
-    }
-    while (ang >= 360.0) {
-      ang -= 360.0;
-    }
-    return ang;
-  }
-
-  /**
    * Get the amplitude (offset from nominal radius) of the rosette at a given
    * angle in degrees. A returned value of zero means zero deflection from its
    * nominal radius.

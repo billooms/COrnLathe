@@ -125,7 +125,7 @@ public abstract class SpiralCut extends CutPoint {
   @Override
   public String toString() {
     String str = num + ": " + F3.format(pt.getX()) + " " + F3.format(pt.getZ());
-    str += F3.format(beginPt.getDepth()) + "->" + F3.format(endCutDepth);
+    str += " " + F3.format(beginPt.getDepth()) + "->" + F3.format(endCutDepth);
     return str;
   }
 

@@ -241,14 +241,14 @@ public class Patterns extends CLclass {
   /**
    * Determine if there is a pattern of this name.
    *
-   * @param name given name
+   * @param name given name (can be name or displayName)
    * @return true=name exists
    */
   public boolean nameExists(String name) {
-    if (builtIns.stream().anyMatch((p) -> (p.getName().equals(name)))) {
+    if (getAllNames().contains(name)) {
       return true;
     }
-    return customs.stream().anyMatch((p) -> (p.getName().equals(name)));
+    return getAllDisplayNames().contains(name);
   }
 
   @Override

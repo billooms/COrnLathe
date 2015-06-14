@@ -194,9 +194,11 @@ public class RosetteEditPanel extends JPanel implements PropertyChangeListener {
       String oldPattern = (String) patternCombo.getSelectedItem();
       updatePatternCombo();
       if (patternMgr.nameExists(oldPattern)) {
-        rosette.setPattern(patternMgr.getPattern(oldPattern));
+        patternCombo.setSelectedItem(oldPattern);
+//        rosette.setPattern(patternMgr.getPattern(oldPattern));
       } else {
-        rosette.setPattern(patternMgr.get(0));
+        patternCombo.setSelectedItem(Patterns.DEFAULT_PROFILE);
+        rosette.setPattern(patternMgr.getDefaultPattern());
       }
     } else if (prop.startsWith(Rosette.PROP_PREFIX)) {	  // watch for rosette changes
       updateForm();

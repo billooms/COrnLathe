@@ -259,6 +259,22 @@ public abstract class BasicRosette extends CLclass {
   public abstract double getAmplitudeAt(double ang);
 
   /**
+   * Make sure angle is in range 0.0 <= a < 360.0
+   *
+   * @param ang angle in degrees
+   * @return angle in range 0.0 <= a < 360.0
+   */
+  protected double angleCheck(double ang) {
+    while (ang < 0.0) {
+      ang += 360.0;
+    }
+    while (ang >= 360.0) {
+      ang -= 360.0;
+    }
+    return ang;
+  }
+
+  /**
    * Paint the object.
    *
    * @param g2d Graphics2D

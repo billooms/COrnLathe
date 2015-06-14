@@ -151,7 +151,7 @@ public class CompoundRosette extends BasicRosette {
 
   /**
    * Set the number of repeats on the rosette. 
-   * For a CompoundRosette this will always be one.
+   * For a CompoundRosette this must always be one.
    *
    * @param n number of repeats
    */
@@ -276,9 +276,10 @@ public class CompoundRosette extends BasicRosette {
    * @return amplitude which will be a positive number from 0.0 to pToP
    */
   public double deflectionAt(double ang) {
+    double phaseAdjustedAngle = angleCheck(ang + phase / repeat);	// angle relative to the start of first pattern (based on symmetrical rosette)
     double[] deflections = new double[rosettes.length];
     for (int i = 0; i < deflections.length; i++) {
-      deflections[i] = rosettes[i].getAmplitudeAt(ang);
+      deflections[i] = rosettes[i].getAmplitudeAt(phaseAdjustedAngle);
     }
     double deflection = deflections[0];
     for (int i = 0; i < combiners.length; i++) {
@@ -315,7 +316,11 @@ public class CompoundRosette extends BasicRosette {
    */
   @Override
   public double getAmplitudeAt(double ang) {
-    return deflectionAt(ang) / maxDeflection * pToP;
+    double deltaR = deflectionAt(ang) / maxDeflection * pToP;
+    if (invert) {
+      return pToP - deltaR;
+    }
+    return deltaR;
   }
   
   @Override
