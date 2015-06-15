@@ -1,0 +1,154 @@
+<html>
+  <head>
+    <title>RosetteBuilder</title>
+    <link rel="stylesheet" href="nbdocs://org.netbeans.modules.usersguide/org/netbeans/modules/usersguide/ide.css" type="text/css">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  </head>
+  <body>
+    <h2>RosetteBuilder</h2>
+    <p>
+      The RosetteBuilder window allows for editing and viewing a CompoundRosette which is 
+      a combination of some number of rosettes. The RosetteBuilder is currently limited to 
+      combining a maximum of 3 rosettes, although more than 3 can be combined if read directly from 
+      the xml file. 
+    </p>
+    <p>
+      The window is filled with three editing panes, one for each simple rosette that can 
+      be used in the combination. For each simple rosette, you have the following parameters:
+    </p>
+    <ul>
+      <li>
+        <b>Pattern:</b> See the help file on Patterns for more information on the various patterns. 
+            Note that you can specify patterns that you design with the Pattern Editor as 
+      		well as for the built-in patterns. 
+      </li>
+      <li>
+        <b>Repeat:</b> The number of times the pattern is repeated around the perimeter of the rosette.
+      </li>
+      <li>
+        <b>Amplitude:</b> The peak-to-peak amplitude of the rosette. 
+      </li>
+      <li>
+        <b>Phase:</b> Phase shift for the cut. 
+        Phase shift can be displayed in two different ways depending on how you have set 
+        your preferences (see the Help topic on Preferences). 
+        In "Engineering" mode, phase shift is a value between 0 and 360 degrees where 360 degrees 
+        represents a full pattern shift, 180 degrees means 1/2 pattern shift, 90 degrees 
+        means 1/4 pattern shift, etc. 
+        Note that this is NOT the actual spindle rotation. 
+        The other mode you can set in the Preferences is "Fraction" mode where 1.0 means a 
+        full pattern shift, 0.5 means 1/2 pattern shift, etc.
+      </li>
+      <li>
+        <b>Invert</b> -- Invert the pattern on the rosette. 
+      </li>
+      <li>
+        <b>Mask:</b> Optional information for skipping some of the repeats. 
+        When left blank, all repeats are used. 
+        To mask certain repeat, enter a series of 0 and 1 digits. 
+        A 0 (zero) means to skip the repeat. 
+        A 1 (one) means to enable the repeat. 
+        If the sequence of digits is shorter than the repeat value, then the sequence will 
+        be used repeatedly. 
+        For example -- entering 0111 with Repeat=12 will skip the 1st repeat, the 
+        5th repeat, and the 9th repeat and use all other repeats. 
+      </li>
+
+      <li>
+        <b>MaskPhase:</b> Optional information for shifting the point in the pattern where 
+        the masking will start. 
+        As with Phase above, the number is either "Engineering" mode or "Fraction" mode 
+        depending on how you have set your preferences. 
+        In general, when you are cutting on the inside of a shape, you will probably want to 
+        start the masking at a point in the pattern where the pattern is at "1.0" in the pattern 
+        editor (which corresponds to a valley on the rosette). 
+        Likewise, when you are cutting on the outside of a shape, you will probably want to 
+        start the masking at a point in the pattern where the pattern is at "0.0" in the pattern 
+        editor (which corresponds to a peak on the rosette). 
+      </li>
+      <li>
+        <b>MaskHiLo:</b> Flag indicating if masking causes rosette to be the highest or the lowest in the pattern. 
+      </li>
+      <li>
+        <b>N2:</b> Some patterns use the optional <b>N2</b> parameter which is the number of small bumps within a repeat. 
+        For example -- an E rosette with 5 repeats and N2=6 will have a total of 30 bumps. 
+      </li>
+      <li>
+        <b>Amplitude2:</b> Some patterns use the optional <b>Amplitude2</b> parameter which is the amplitude of the small bumps as a 
+        fraction if the total amplitude. 
+        For example -- a Q rosette with a total amplitude of 0.3" and amplitude2=0.2" will have small bumps that are 
+        0.06" (0.3 * 0.2 = 0.06) high superimposed on the major shape.
+      </li>
+      <li>
+        <b>SymmetryAmplitude:</b> Optional information for changing the symmetry of a rosette by 
+        varying the amplitude of the various repeats. 
+        When left blank, there will be no variation in the amplitudes. 
+        If the sequence of numbers is shorter than the repeat value, then the sequence will be used repeatedly. 
+      </li>
+      <li>
+        <b>SymmetryWidth:</b> Optional information for changing the symmetry of a rosette by 
+        varying the width of the various repeats. 
+        When left blank, there will be no variation in the widths. 
+        If the sequence of numbers is shorter than the repeat value, then the sequence will be used repeatedly. 
+      </li>
+    </ul>
+    <p>
+    	In the lowest pane, you see a graphical representation of the combined result. 
+    	The amplitude if the pattern in the graphical representation is not particularly important 
+    	since the combined result will be scaled to the amplitude specified when used in a 
+    	RosettePoint. 
+    </p>
+    <p>
+    	On the left edge of the lowest pane, you see the possible ways of combining the rosettes. 
+    	The first two rosettes are combined first with the first combine parameter, then that 
+    	result is combined with the 3rd rosette base on the second combine parameter. 
+    </p>
+    <p>
+    	The combine parameters refer to the deflection from the maximum radius of the rosette. 
+    	Note that the deflection is always toward the center of the rosette (never outward from 
+    	the center). Possible ways of combining are: 
+    </p>
+    <ul>
+    	<li>
+    		<b>NONE:</b> No combination -- the 1st rosette is used and the 2nd is ignored.
+    	</li>
+    	<li>
+    		<b>MIN:</b> Use the minimum deflection of the two rosettes at every point in the 
+    		rotation. 
+    	</li>
+    	<li>
+    		<b>MAX:</b> Use the maximum deflection of the two rosettes at every point in the 
+    		rotation. 
+    	</li>
+    	<li>
+    		<b>ADD:</b> Add the deflection of the two rosettes at every point in the 
+    		rotation. 
+    	</li>
+    	<li>
+    		<b>SUB:</b> Subtract the deflection of the two rosettes at every point in the 
+    		rotation. Note that this could result a som points of the rosette being outside 
+    		the maximum radius of the rosette in the graphical representation. This will not cause 
+    		any problem, because the actual deflection will be based on the amplitude specified 
+    		when used in a RosettePoint. 
+    	</li>
+    </ul>
+    <p>
+    	To edit a CompoundRosette that is used in a RosettePoint, select the CompoundRosette's node
+    	in the DataNavigator window. Then press the "Get Selected" button in the RosetteBuilder 
+    	window. This will load the selected CompoundRosette for editing. Any edits you make in the 
+    	Properties window will be reflected in the RosetteBuilder window, and edits in the 
+    	RosetteBuilder window will be reflected in the Properties window.
+    </p>
+    <h3>Write Rosette Data</h3>
+    <p>
+      This allows you to write out the coordinates of the compound rosette to a tab-delimited file 
+      that can be read by a spreadsheet program. 
+      This is useful for those who wish to make their own rosettes. 
+      You have the option of specifying the maximum radius of the rosette and specifying the 
+      rotational spacing between points. 
+      The file will list the radius at each rotation from 0 to 360 degrees. 
+      Note that this option works for patterns that you design with the Pattern Editor as 
+      well as for the built-in patterns. 
+    </p>
+  </body>
+</html>

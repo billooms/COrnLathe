@@ -128,7 +128,15 @@
       </li>
     </ul>
     <p>
-      For rosettes, you have the following parameters:
+      Each rosette can be either a simple rosette, or a compound rosette (see RosetteBuilder help file 
+      for more information on compound rosettes). For each RosettePoint, the rosette can be changed from 
+      a simple rosette to a compound rosette by selecting the rosette node in the DataNavigator and right 
+      clicking on the rosette node and selecting "Change to CompoundRosette". Likewise a compound rosette 
+      can be changed to a simple rosette by selecting it in the DataNavigator and right clicking on 
+      "Change to Simple Rosette".
+    </p>
+    <p>
+      For simple rosettes, you have the following parameters:
     </p>
     <ul>
       <li>
@@ -204,6 +212,29 @@
         If the sequence of numbers is shorter than the repeat value, then the sequence will be used repeatedly. 
       </li>
     </ul>
+    <p>
+      For compound rosettes, you have the following parameters:
+    </p>
+    <ul>
+      <li>
+        <b>Amplitude:</b> The peak-to-peak amplitude of the compound rosette. 
+      </li>
+      <li>
+        <b>Phase:</b> Phase shift for the cut. 
+        Phase shift can be displayed in two different ways depending on how you have set 
+        your preferences (see the Help topic on Preferences). 
+        In "Engineering" mode, phase shift is a value between 0 and 360 degrees where 360 degrees 
+        represents a full pattern shift, 180 degrees means 1/2 pattern shift, 90 degrees 
+        means 1/4 pattern shift, etc. 
+        Note that for a compound rosette this is the actual spindle rotation since there is no 
+        explicit repeat parameter for a compound rosette. 
+        The other mode you can set in the Preferences is "Fraction" mode where 1.0 means a 
+        full pattern shift, 0.5 means 1/2 pattern shift, etc.
+      </li>
+      <li>
+        <b>Invert</b> -- Invert the pattern on the rosette. 
+      </li>
+    </ul
     <p>
       What you see in the Outline Editor is a solid yellow arc to indicate the maximum depth of the cut which is 
       always perpendicular to the surface. 

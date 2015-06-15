@@ -100,11 +100,11 @@ public class WriteDataPanel extends javax.swing.JPanel {
   }// </editor-fold>//GEN-END:initComponents
 
   // Variables declaration - do not modify//GEN-BEGIN:variables
-  protected javax.swing.JFormattedTextField degreeField;
+  public javax.swing.JFormattedTextField degreeField;
   private javax.swing.JLabel jLabel1;
   private javax.swing.JLabel jLabel2;
   private javax.swing.JLabel jLabel3;
   private javax.swing.JLabel jLabel4;
-  protected javax.swing.JFormattedTextField radiusField;
+  public javax.swing.JFormattedTextField radiusField;
   // End of variables declaration//GEN-END:variables
 }

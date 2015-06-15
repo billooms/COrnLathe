@@ -4,6 +4,7 @@ import com.billooms.drawables.Grid;
 import com.billooms.patterns.Patterns;
 import com.billooms.rosette.Combine.CombineType;
 import com.billooms.rosette.CompoundRosette;
+import com.billooms.rosetteviewer.WriteDataPanel;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -11,12 +12,21 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintWriter;
+import java.text.DecimalFormat;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import org.netbeans.api.settings.ConvertAsProperties;
+import org.openide.*;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
+import org.openide.awt.StatusDisplayer;
 import org.openide.explorer.ExplorerManager;
+import org.openide.filesystems.FileChooserBuilder;
 import org.openide.nodes.Node;
 import org.openide.windows.TopComponent;
 import org.openide.util.NbBundle.Messages;
@@ -62,6 +72,9 @@ import org.openide.windows.WindowManager;
   "HINT_RosetteBuilderTopComponent=This is a RosetteBuilder window"
 })
 public final class RosetteBuilderTopComponent extends TopComponent implements PropertyChangeListener {
+
+  private final static String EXTENSION = "txt";
+  private final static DecimalFormat F4 = new DecimalFormat("0.0000");
 
   private CompoundRosette cRosette = null;
   private final DisplayPanel display;
@@ -137,6 +150,66 @@ public final class RosetteBuilderTopComponent extends TopComponent implements Pr
     }
   }
 
+  private void writeRosetteData(double delta, double radius) {
+    if ((delta <= 0.0) || (radius <= 0.0)) {
+      return;
+    }
+
+    File textFile;
+    File home = new File(System.getProperty("user.home"));	//The default dir to use if no value is stored
+    textFile = new FileChooserBuilder("openfile")
+        .setTitle("Save g-code File As...")
+        .setDefaultWorkingDirectory(home)
+        .setApproveText("save")
+        .setFileFilter(new FileNameExtensionFilter(EXTENSION + " files", EXTENSION))
+        .showSaveDialog();
+    if (textFile == null) {
+      return;
+    }
+    if (!(textFile.toString()).endsWith("." + EXTENSION)) {   // make sure there's a .txt extention
+      textFile = new File(textFile.toString() + "." + EXTENSION);
+    }
+    if (textFile.exists()) {	// Ask the user whether to replace the file.
+      NotifyDescriptor d = new NotifyDescriptor.Confirmation(
+          "The file " + textFile.getName() + " already exists.\nDo you want to replace it?",
+          "Overwrite File Check",
+          NotifyDescriptor.YES_NO_OPTION,
+          NotifyDescriptor.WARNING_MESSAGE);
+      d.setValue(NotifyDescriptor.CANCEL_OPTION);
+      Object result = DialogDisplayer.getDefault().notify(d);
+      if (result != DialogDescriptor.YES_OPTION) {
+        return;
+      }
+    }
+    StatusDisplayer.getDefault().setStatusText("Saving Rosette File As: " + textFile.getName());
+
+    PrintWriter out;
+    try {
+      FileOutputStream stream = new FileOutputStream(textFile);
+      out = new PrintWriter(stream);
+    } catch (FileNotFoundException e) {
+      NotifyDescriptor d = new NotifyDescriptor.Message("Error while trying to open the text file:\n" + e,
+          NotifyDescriptor.ERROR_MESSAGE);
+      DialogDisplayer.getDefault().notify(d);
+      return;
+    }
+    try {
+      double degrees = 0.0;
+      out.println("degrees\tradius");
+      do {
+        out.println(F4.format(degrees) + "\t" + F4.format(radius - cRosette.getAmplitudeAt(degrees)));
+        degrees += delta;
+      } while (degrees < 360.0);
+
+    } catch (Exception e) {
+      NotifyDescriptor d = new NotifyDescriptor.Message("Error while trying to write the text file:\n" + e,
+          NotifyDescriptor.ERROR_MESSAGE);
+      DialogDisplayer.getDefault().notify(d);
+    } finally {
+      out.close();
+    }
+  }
+
   /**
    * Handle the addition/deletion of a pattern.
    *
@@ -172,6 +245,7 @@ public final class RosetteBuilderTopComponent extends TopComponent implements Pr
     comboBox123 = new javax.swing.JComboBox();
     label3 = new javax.swing.JLabel();
     getButton = new javax.swing.JButton();
+    writeButton = new javax.swing.JButton();
 
     setLayout(new java.awt.BorderLayout());
 
@@ -218,6 +292,13 @@ public final class RosetteBuilderTopComponent extends TopComponent implements Pr
       }
     });
 
+    org.openide.awt.Mnemonics.setLocalizedText(writeButton, org.openide.util.NbBundle.getMessage(RosetteBuilderTopComponent.class, "RosetteBuilderTopComponent.writeButton.text")); // NOI18N
+    writeButton.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        writeButtonwriteData(evt);
+      }
+    });
+
     javax.swing.GroupLayout contolPanelLayout = new javax.swing.GroupLayout(contolPanel);
     contolPanel.setLayout(contolPanelLayout);
     contolPanelLayout.setHorizontalGroup(
@@ -227,10 +308,10 @@ public final class RosetteBuilderTopComponent extends TopComponent implements Pr
         .addGroup(contolPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
           .addGroup(contolPanelLayout.createSequentialGroup()
             .addComponent(label3)
-            .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGap(0, 0, Short.MAX_VALUE))
           .addGroup(contolPanelLayout.createSequentialGroup()
             .addComponent(label1)
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 136, Short.MAX_VALUE)
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 162, Short.MAX_VALUE)
             .addComponent(getButton))))
       .addGroup(contolPanelLayout.createSequentialGroup()
         .addGroup(contolPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -241,7 +322,8 @@ public final class RosetteBuilderTopComponent extends TopComponent implements Pr
         .addGap(0, 0, Short.MAX_VALUE))
       .addGroup(contolPanelLayout.createSequentialGroup()
         .addComponent(comboBox12, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-        .addGap(0, 0, Short.MAX_VALUE))
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        .addComponent(writeButton, javax.swing.GroupLayout.PREFERRED_SIZE, 154, javax.swing.GroupLayout.PREFERRED_SIZE))
     );
     contolPanelLayout.setVerticalGroup(
       contolPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -251,14 +333,16 @@ public final class RosetteBuilderTopComponent extends TopComponent implements Pr
           .addComponent(label1)
           .addComponent(getButton))
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-        .addComponent(comboBox12, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+        .addGroup(contolPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+          .addComponent(comboBox12, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+          .addComponent(writeButton, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
         .addComponent(label2)
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
         .addComponent(comboBox123, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
         .addComponent(label3)
-        .addContainerGap(49, Short.MAX_VALUE))
+        .addContainerGap(43, Short.MAX_VALUE))
     );
 
     centerPanel.add(contolPanel, java.awt.BorderLayout.LINE_START);
@@ -297,6 +381,27 @@ public final class RosetteBuilderTopComponent extends TopComponent implements Pr
     }
   }//GEN-LAST:event_getButtonActionPerformed
 
+  private void writeButtonwriteData(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_writeButtonwriteData
+    if (cRosette != null) {
+      WriteDataPanel panel = new WriteDataPanel();
+      DialogDescriptor dd = new DialogDescriptor(
+        panel,
+        "Write Rosette Data",
+        true,
+        DialogDescriptor.OK_CANCEL_OPTION,
+        DialogDescriptor.OK_OPTION,
+        null);
+      Object result = DialogDisplayer.getDefault().notify(dd);
+      if (result != DialogDescriptor.OK_OPTION) {
+        return;
+      }
+      double delta = ((Number) panel.degreeField.getValue()).doubleValue();
+      double radius = ((Number) panel.radiusField.getValue()).doubleValue();
+
+      writeRosetteData(delta, radius);
+    }
+  }//GEN-LAST:event_writeButtonwriteData
+
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JPanel centerPanel;
   private javax.swing.JComboBox comboBox12;
@@ -310,6 +415,7 @@ public final class RosetteBuilderTopComponent extends TopComponent implements Pr
   private com.billooms.rosette.RosetteEditPanel rosetteEditPanel1;
   private com.billooms.rosette.RosetteEditPanel rosetteEditPanel2;
   private javax.swing.JPanel topPanel;
+  private javax.swing.JButton writeButton;
   // End of variables declaration//GEN-END:variables
   @Override
   public void componentOpened() {
