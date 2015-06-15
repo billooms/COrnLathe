@@ -56,9 +56,9 @@ public class RosettePointChildFactory extends ChildFactory.Detachable<BasicRoset
   @Override
   protected Node createNodeForKey(BasicRosette key) {
     if (key instanceof Rosette) {
-      return new RosetteNode((Rosette) key);
+      return new RosetteNodeEx((Rosette) key);
     } else if (key instanceof CompoundRosette) {
-      return new CompoundRosetteNode((CompoundRosette) key);
+      return new CompoundRosetteNodeEx((CompoundRosette) key);
     }
     return null;  // should not happen
   }

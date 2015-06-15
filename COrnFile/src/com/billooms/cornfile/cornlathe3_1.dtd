@@ -185,8 +185,8 @@
     direction (MOVE_X|MOVE_Z|MOVE_CURVE) "MOVE_Z"
   >
 
-<!--- RosettePoint -->
-<!ELEMENT RosettePoint (Pt, Rosette*, CompoundRosette*)>
+<!--- RosettePoint  with 1 or 2 Rosette and 1 or 2 CompoundRosette in either order -->
+<!ELEMENT RosettePoint (Pt, Rosette*, CompoundRosette*, Rosette*)>
 <!ATTLIST RosettePoint
     n CDATA #REQUIRED
     snap CDATA "true"

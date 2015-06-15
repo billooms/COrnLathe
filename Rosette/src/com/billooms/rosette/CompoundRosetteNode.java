@@ -1,15 +1,8 @@
-package com.billooms.cutpoints.nodes;
+package com.billooms.rosette;
 
 import com.billooms.cornlatheprefs.COrnLathePrefs;
-import com.billooms.cutpoints.RosettePoint;
-import com.billooms.rosette.CompoundRosette;
-import com.billooms.rosette.Rosette;
-import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import static javax.swing.Action.NAME;
 import org.openide.*;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Children;
@@ -41,7 +34,7 @@ public class CompoundRosetteNode extends AbstractNode implements PropertyChangeL
 
   private static final COrnLathePrefs prefs = Lookup.getDefault().lookup(COrnLathePrefs.class);
 
-  private final CompoundRosette cRosette;
+  protected final CompoundRosette cRosette;
 
   /**
    * Create a new CompoundRosetteNode for the given CompoundRosette
@@ -105,41 +98,5 @@ public class CompoundRosetteNode extends AbstractNode implements PropertyChangeL
   @Override
   public void propertyChange(PropertyChangeEvent evt) {
     this.setDisplayName(cRosette.toString());		// update the display name
-  }
-
-  @Override
-  public Action[] getActions(boolean context) {
-    Action[] defaults = super.getActions(context);	// the default actions includes "Properties"
-    int numAdd = 1;
-    Action[] newActions = new Action[defaults.length + numAdd];
-    newActions[0] = new ChangeAction();
-    System.arraycopy(defaults, 0, newActions, numAdd, defaults.length);
-    return newActions;
-  }
-
-  /** Nested inner class for action changing to a CompoundRosette. */
-  private class ChangeAction extends AbstractAction {
-
-    /** Create the ChangeAction. */
-    public ChangeAction() {
-      putValue(NAME, "Change to Simple Rosette");
-    }
-
-    /**
-     * Change to a simple Rosette.
-     *
-     * @param e
-     */
-    @Override
-    public void actionPerformed(ActionEvent e) {
-      RosettePoint rpt = CompoundRosetteNode.this.getParentNode().getLookup().lookup(RosettePoint.class);
-      if (rpt.getRosette().equals(cRosette)) {
-        rpt.setRosette(new Rosette(rpt.getRosette().getPatternMgr()));
-      } else if (rpt.getMotion().equals(RosettePoint.Motion.BOTH)) {
-        if (rpt.getRosette2().equals(cRosette)) {
-          rpt.setRosette2(new Rosette(rpt.getRosette2().getPatternMgr()));
-        }
-      }
-    }
   }
 }

@@ -1,6 +1,5 @@
-package com.billooms.cutpoints.nodes;
+package com.billooms.rosette;
 
-import com.billooms.rosette.Combine;
 import com.billooms.rosette.Combine.CombineType;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;

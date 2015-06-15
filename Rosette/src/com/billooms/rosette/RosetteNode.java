@@ -1,19 +1,11 @@
-package com.billooms.cutpoints.nodes;
+package com.billooms.rosette;
 
 import com.billooms.cornlatheprefs.COrnLathePrefs;
-import com.billooms.cutpoints.RosettePoint;
-import com.billooms.cutpoints.RosettePoint.Motion;
 import com.billooms.patterns.Pattern;
 import com.billooms.patterns.PatternEditorInplace;
-import com.billooms.rosette.CompoundRosette;
-import com.billooms.rosette.Rosette;
 import com.billooms.rosette.Rosette.Mask;
-import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import static javax.swing.Action.NAME;
 import org.openide.*;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Children;
@@ -45,7 +37,7 @@ public class RosetteNode extends AbstractNode implements PropertyChangeListener 
 
   private static final COrnLathePrefs prefs = Lookup.getDefault().lookup(COrnLathePrefs.class);
 
-  private final Rosette ros;
+  protected final Rosette ros;
   private Sheet.Set set;
   private Property<Integer> n2Prop;
   private Property<Double> amp2Prop;
@@ -179,42 +171,6 @@ public class RosetteNode extends AbstractNode implements PropertyChangeListener 
     } else {
       if (set != null) {
         set.remove("Amplitude2");
-      }
-    }
-  }
-
-  @Override
-  public Action[] getActions(boolean context) {
-    Action[] defaults = super.getActions(context);	// the default actions includes "Properties"
-    int numAdd = 1;
-    Action[] newActions = new Action[defaults.length + numAdd];
-    newActions[0] = new ChangeAction();
-    System.arraycopy(defaults, 0, newActions, numAdd, defaults.length);
-    return newActions;
-  }
-
-  /** Nested inner class for action changing to a CompoundRosette. */
-  private class ChangeAction extends AbstractAction {
-
-    /** Create the ChangeAction. */
-    public ChangeAction() {
-      putValue(NAME, "Change to CompoundRosette");
-    }
-
-    /**
-     * Change to a CompoundRosette.
-     *
-     * @param e
-     */
-    @Override
-    public void actionPerformed(ActionEvent e) {
-      RosettePoint rpt = RosetteNode.this.getParentNode().getLookup().lookup(RosettePoint.class);
-      if (rpt.getRosette().equals(ros)) {
-        rpt.setRosette(new CompoundRosette(rpt.getRosette().getPatternMgr()));
-      } else if (rpt.getMotion().equals(Motion.BOTH)) {
-        if (rpt.getRosette2().equals(ros)) {
-          rpt.setRosette2(new CompoundRosette(rpt.getRosette2().getPatternMgr()));
-        }
       }
     }
   }

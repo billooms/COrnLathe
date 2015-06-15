@@ -99,9 +99,9 @@ public class RosettePoint extends CutPoint implements ActiveEditorDrop {
   /** Motion of the cuts. */
   protected Motion motion = DEFAULT_MOTION;
   /** Primary rosette. */
-  protected BasicRosette rosette;
+  protected BasicRosette rosette = null;
   /** Second rosette used only for Motion.BOTH. */
-  protected BasicRosette rosette2;
+  protected BasicRosette rosette2 = null;
 
   /**
    * Construct a new RosettePoint from the given DOM Element.
@@ -114,18 +114,24 @@ public class RosettePoint extends CutPoint implements ActiveEditorDrop {
   public RosettePoint(Element element, Cutters cutMgr, Outline outline, Patterns patMgr) {
     super(element, cutMgr, outline);
     this.motion = CLUtilities.getEnum(element, "motion", Motion.class, DEFAULT_MOTION);
-    NodeList rosNodes = element.getElementsByTagName("Rosette");
-    if (rosNodes.getLength() > 0) {
-      rosette = new Rosette((Element) rosNodes.item(0), patMgr);    // should always be one
-      if (motion.equals(Motion.BOTH)) {
-        rosette2 = new Rosette((Element) rosNodes.item(1), patMgr);  // should be a second
-      }
-    }
-    rosNodes = element.getElementsByTagName("CompoundRosette");
-    if (rosNodes.getLength() > 0) {
-      rosette = new CompoundRosette((Element) rosNodes.item(0), patMgr);    // should always be one
-      if (motion.equals(Motion.BOTH)) {
-        rosette2 = new CompoundRosette((Element) rosNodes.item(1), patMgr);  // should be a second
+    NodeList rosNodes = element.getChildNodes();
+    for (int i = 0; i < rosNodes.getLength(); i++) {
+      if (rosNodes.item(i) instanceof Element) {
+        Element rosElement = (Element) rosNodes.item(i);
+        if (rosElement.getTagName().equals("Rosette")) {
+          if (rosette == null) {            // first one is rosette
+            rosette = new Rosette(element, patMgr);
+          } else if (rosette2 == null) {    // if there's a second one it's rosette2
+            rosette2 = new Rosette(element, patMgr);
+          }
+        }
+        if (rosElement.getTagName().equals("CompoundRosette")) {
+          if (rosette == null) {            // first one is rosette
+            rosette = new CompoundRosette(element, patMgr);
+          } else if (rosette2 == null) {   // if there's a second one it's rosette2
+            rosette2 = new CompoundRosette(element, patMgr);
+          }
+        }
       }
     }
     makeDrawables();
