@@ -874,7 +874,7 @@ public class CutPoints extends CLclass {
       double repeat = beginRosPt.getRosette().getRepeat();
       
       double ros2StartAmp = 0, deltaRos2Amp = 0.0, ros2StartPhase = 0, repeat2 = 0;
-      if (beginRosPt.getMotion() == Motion.BOTH) {
+      if (beginRosPt.getMotion().usesBoth()) {
         ros2StartAmp = beginRosPt.getRosette2().getPToP();
         if (ros2StartAmp == startDepth) {
           deltaRos2Amp = endCutDepth - ros2StartAmp;
@@ -905,19 +905,19 @@ public class CutPoints extends CLclass {
           // Cut depth (and rosette amplitude) should always scale with radius when deltaR != 0
           newPt.setDepth(startDepth + (x - rStart) / deltaR * deltaDepth);
           newPt.getRosette().setPToP(rosStartAmp + (x - rStart) / deltaR * deltaRosAmp);
-          if (beginRosPt.getMotion() == Motion.BOTH) {
+          if (beginRosPt.getMotion().usesBoth()) {
             newPt.getRosette2().setPToP(ros2StartAmp + (x - rStart) / deltaR * deltaRos2Amp);
           }
         } else {
           // when deltaR == 0, scale with distance
           newPt.setDepth(startDepth + target / cumTotal * deltaDepth);
           newPt.getRosette().setPToP(rosStartAmp + target / cumTotal * deltaRosAmp);
-          if (beginRosPt.getMotion() == Motion.BOTH) {
+          if (beginRosPt.getMotion().usesBoth()) {
             newPt.getRosette2().setPToP(ros2StartAmp + target / cumTotal * deltaRos2Amp);
           }
         }
         newPt.getRosette().setPhase(rosStartPhase + c * repeat);
-        if (beginRosPt.getMotion() == Motion.BOTH) {
+        if (beginRosPt.getMotion().usesBoth()) {
           newPt.getRosette2().setPhase(ros2StartPhase + c * repeat2);
         }
         newPt.move(x, z);
@@ -932,7 +932,7 @@ public class CutPoints extends CLclass {
       if (rosStartAmp == startDepth) {   // assume that we should scale amplitude if same as depth
         endRosPt.getRosette().setPToP(endCutDepth);
       }
-      if (endRosPt.getMotion() == Motion.BOTH) {
+      if (endRosPt.getMotion().usesBoth()) {
         if (ros2StartAmp == startDepth) {
           endRosPt.getRosette2().setPToP(endCutDepth);
         }

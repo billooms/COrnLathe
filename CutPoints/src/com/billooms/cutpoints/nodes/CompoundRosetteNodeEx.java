@@ -71,7 +71,7 @@ public class CompoundRosetteNodeEx extends CompoundRosetteNode {
       RosettePoint rpt = CompoundRosetteNodeEx.this.getParentNode().getLookup().lookup(RosettePoint.class);
       if (rpt.getRosette().equals(cRosette)) {
         rpt.setRosette(new Rosette(rpt.getRosette().getPatternMgr()));
-      } else if (rpt.getMotion().equals(RosettePoint.Motion.BOTH)) {
+      } else if (rpt.getMotion().usesBoth()) {
         if (rpt.getRosette2().equals(cRosette)) {
           rpt.setRosette2(new Rosette(rpt.getRosette2().getPatternMgr()));
         }

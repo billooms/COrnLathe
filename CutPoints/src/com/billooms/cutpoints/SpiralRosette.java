@@ -130,123 +130,141 @@ public class SpiralRosette extends SpiralCut {
     indentLess();
     out.println(indent + "</SpiralRosette>");
   }
-
-  /**
-   * Get the normalized end movement vector for PERP and CONTOUR motion. It is
-   * the direction of movement that will produce the rosette pattern. It will be
-   * in a direction AWAY from the point of deepest cut.
-   *
-   * @return the normalized end movement vector
+  
+  /** 
+   * Get the end move vector for PERP. 
+   * It is the direction of movement that will produce the rosette pattern. 
+   * It will be in a direction AWAY from the point of deepest cut.
+   * 
+   * @return normalized perpendicular vector
    */
-  protected Vector2d getEndMoveVectorN() {
+  private Vector2d endPerpVectorN() {
     Vector2d perpVectN = getPerpVector(1.0);
-    Vector2d moveN = new Vector2d();
-    Motion motion = ((RosettePoint) beginPt).getMotion();
-    if (motion == RosettePoint.Motion.PERP) {
-      moveN = new Vector2d(-perpVectN.x, -perpVectN.y);	// Always opposite direction from perpVector
-    } else if (motion == RosettePoint.Motion.TANGENT) {			// movement is right angle to perpVector
-      switch (cutter.getLocation()) {
-        case FRONT_INSIDE:
-        default:
-          moveN = new Vector2d(perpVectN.y, -perpVectN.x);	// back toward center and downward
-          break;
-        case BACK_INSIDE:
-          moveN = new Vector2d(-perpVectN.y, perpVectN.x);	// forward toward center and downward
-          break;
-        case FRONT_OUTSIDE:
-          if (isTopOutside()) {			// top of a shape
-            moveN = new Vector2d(-perpVectN.y, perpVectN.x);	// move out to front and downward
-          } else {						// bottom of a shape
-            moveN = new Vector2d(perpVectN.y, -perpVectN.x);	// move out to front and upward
-          }
-          break;
-        case BACK_OUTSIDE:
-          if (isTopOutside()) {			// top of a shape
-            moveN = new Vector2d(perpVectN.y, -perpVectN.x);	// move out to back and downward
-          } else {						// bottom of a shape
-            moveN = new Vector2d(-perpVectN.y, perpVectN.x);	// move out to back and upward
-          }
-          break;
-      }
+    return new Vector2d(-perpVectN.x, -perpVectN.y);	// Always opposite direction from perpVector
+  }
+  
+  /** 
+   * Get the end move vector for TANGENT. 
+   * It is the direction of movement that will produce the rosette pattern. 
+   * It will be in a direction AWAY from the point of deepest cut.
+   * 
+   * @return normalized tangent vector
+   */
+  private Vector2d endTanVectorN() {
+    Vector2d perpVectN = getPerpVector(1.0);
+    switch (cutter.getLocation()) {
+      case FRONT_INSIDE:
+      default:
+        return new Vector2d(perpVectN.y, -perpVectN.x);	// back toward center and downward
+      case BACK_INSIDE:
+        return new Vector2d(-perpVectN.y, perpVectN.x);	// forward toward center and downward
+      case FRONT_OUTSIDE:
+        if (isTopOutside()) {			// top of a shape
+          return new Vector2d(-perpVectN.y, perpVectN.x);	// move out to front and downward
+        } else {						// bottom of a shape
+          return new Vector2d(perpVectN.y, -perpVectN.x);	// move out to front and upward
+        }
+      case BACK_OUTSIDE:
+        if (isTopOutside()) {			// top of a shape
+          return new Vector2d(perpVectN.y, -perpVectN.x);	// move out to back and downward
+        } else {						// bottom of a shape
+          return new Vector2d(-perpVectN.y, perpVectN.x);	// move out to back and upward
+        }
     }
-    return moveN;
   }
 
   /**
-   * Get the scaled end movement vector. It is the direction of movement that
-   * will produce the rosette pattern. It will be in a direction AWAY from the
-   * point of deepest cut. In the case of BOTH, it is the total movement of both
-   * rosettes together.
+   * Get the end scaled movement vector for the rosette. 
+   * It is the direction of movement that will produce the rosette pattern. 
+   * It will be in a direction AWAY from the point of deepest cut. 
+   * In the case of BOTH or PERPTAN, it is the movement of only the first rosette.
    *
-   * @return
+   * @return scaled movement vector
    */
   private Vector2d getEndMoveVectorS() {
-    Vector2d moveS;
     double xMove = 0.0, zMove = 0.0;
     RosettePoint rPt = (RosettePoint) beginPt;
     switch (rPt.getMotion()) {
       default:
       case PERP:
-      case TANGENT:
-        moveS = getEndMoveVectorN();
-        if (((RosettePoint) beginPt).getDepth() == ((RosettePoint) beginPt).getRosette().getPToP()) {
-          moveS.scale(endCutDepth);   // special case: taper the rosette amplitude
+      case PERPTAN:
+        Vector2d perpS = endPerpVectorN();
+        if (rPt.getDepth() == rPt.getRosette().getPToP()) {
+          perpS.scale(endCutDepth);   // special case: taper the rosette amplitude
         } else {
-          moveS.scale(rPt.getRosette().getPToP());
+          perpS.scale(rPt.getRosette().getPToP());
         }
-        return moveS;
+        return perpS;
+      case TANGENT:
+        Vector2d tanS = endTanVectorN();
+        if (rPt.getDepth() == rPt.getRosette().getPToP()) {
+          tanS.scale(endCutDepth);   // special case: taper the rosette amplitude
+        } else {
+          tanS.scale(rPt.getRosette().getPToP());
+        }
+        return tanS;
 
       case BOTH:
-        if (((RosettePoint) beginPt).getDepth() == ((RosettePoint) beginPt).getRosette2().getPToP()) {
-          zMove = endCutDepth;    // special case: taper the rosette amplitude
-        } else {
-          zMove = rPt.getRosette2().getPToP();     // get the z movement from rosette2 only when there is both
-        }
-        if (((RosettePoint) beginPt).getDepth() == ((RosettePoint) beginPt).getRosette().getPToP()) {
+        if (rPt.getDepth() == rPt.getRosette().getPToP()) {
           xMove = endCutDepth;    // special case: taper the rosette amplitude
         } else {
           xMove = rPt.getRosette().getPToP();      // otherwise, always get the motion from the primary rosette
         }
         break;
       case PUMP:
-        if (((RosettePoint) beginPt).getDepth() == ((RosettePoint) beginPt).getRosette().getPToP()) {
+        if (rPt.getDepth() == rPt.getRosette().getPToP()) {
           zMove = endCutDepth;    // special case: taper the rosette amplitude
         } else {
           zMove = rPt.getRosette().getPToP();
         }
         break;
       case ROCK:
-        if (((RosettePoint) beginPt).getDepth() == ((RosettePoint) beginPt).getRosette().getPToP()) {
+        if (rPt.getDepth() == rPt.getRosette().getPToP()) {
           xMove = endCutDepth;    // special case: taper the rosette amplitude
         } else {
           xMove = rPt.getRosette().getPToP();
         }
         break;
     }
-    switch (cutter.getLocation()) {		// correct the sign of the motion for location of cutter
-      case FRONT_INSIDE:
-      default:
-        moveS = new Vector2d(-xMove, zMove);	// move back to center and/or upward
-        break;
-      case BACK_INSIDE:
-        moveS = new Vector2d(xMove, zMove);		// move forward to center and/or upward
-        break;
-      case FRONT_OUTSIDE:
-        if (isTopOutside()) {			// top of a shape
-          moveS = new Vector2d(xMove, zMove);		// move out to front and/or up
-        } else {						// bottom of a shape
-          moveS = new Vector2d(xMove, -zMove);	// move out to front and/or down
+    return rPt.correctForCutter(xMove, zMove);
+  }
+
+  /**
+   * Get the end scaled movement vector for rosette2. 
+   * It is the direction of movement that will produce the rosette pattern. 
+   * It will be in a direction AWAY from the point of deepest cut. 
+   * In the case of BOTH or PERPTAN, it is the movement of only the second rosette.
+   *
+   * @return scaled movement vector
+   */
+  private Vector2d getEndMoveVector2S() {
+    double xMove = 0.0, zMove = 0.0;
+    RosettePoint rPt = (RosettePoint) beginPt;
+    switch (rPt.getMotion()) {
+      default:      // should not call this except for BOTH and PERPTAN
+      case PUMP:
+      case ROCK:
+      case PERP:
+      case TANGENT:
+        return new Vector2d();
+      case PERPTAN:
+        Vector2d tan = endTanVectorN();
+        if (rPt.getDepth() == rPt.getRosette().getPToP()) {
+          tan.scale(endCutDepth);   // special case: taper the rosette amplitude
+        } else {
+          tan.scale(rPt.getRosette().getPToP());
         }
-        break;
-      case BACK_OUTSIDE:
-        if (isTopOutside()) {			// top of a shape
-          moveS = new Vector2d(-xMove, zMove);	// move out to back and/or up
-        } else {						// bottom of a shape
-          moveS = new Vector2d(-xMove, -zMove);	// move out to back and/or down
+        return tan;
+
+      case BOTH:
+        if (rPt.getDepth() == rPt.getRosette2().getPToP()) {
+          zMove = endCutDepth;    // special case: taper the rosette amplitude
+        } else {
+          zMove = rPt.getRosette2().getPToP();     // get the z movement from rosette2 only when there is both
         }
         break;
     }
-    return moveS;
+    return rPt.correctForCutter(xMove, zMove);
   }
 
   /**
@@ -270,27 +288,23 @@ public class SpiralRosette extends SpiralCut {
     drawList.add(new Line(getPos2D(), endPerpVectorS.x, endPerpVectorS.y, ROSETTE_COLOR));
 
     // cut extent
-    Vector2d endMoveVectorS = getEndMoveVectorS();		// scaled movement vector
+    Vector2d endMoveVectorS = getEndMoveVectorS();		// scaled movement vector for rosette
+    Vector2d endMoveVector2S = getEndMoveVector2S();	// scaled movement vector for rosette2
     Motion motion = ((RosettePoint) beginPt).getMotion();
     switch (cutter.getFrame()) {
       // Arc showing cut depth (for HCF & UCF)
       case HCF:
       case UCF:
         double angle = Math.atan2(endPerpVectorS.y, endPerpVectorS.x) * 180.0 / Math.PI;
-        if (motion.equals(RosettePoint.Motion.BOTH)) {
-          drawList.add(new Arc(new Point2D.Double(getX() + endPerpVectorS.x + endMoveVectorS.x, getZ() + endPerpVectorS.y),
-              cutter.getRadius(),
-              cutter.getUCFRotate(), cutter.getUCFAngle(),
-              angle, ARC_ANGLE, ROSETTE_COLOR2));
-          drawList.add(new Arc(new Point2D.Double(getX() + endPerpVectorS.x, getZ() + endPerpVectorS.y + endMoveVectorS.y),
+        drawList.add(new Arc(new Point2D.Double(getX() + endPerpVectorS.x + endMoveVectorS.x, getZ() + endPerpVectorS.y + endMoveVectorS.y),
+            cutter.getRadius(),
+            cutter.getUCFRotate(), cutter.getUCFAngle(),
+            angle, ARC_ANGLE, ROSETTE_COLOR2));
+        if (motion.usesBoth()) {
+          drawList.add(new Arc(new Point2D.Double(getX() + endPerpVectorS.x + endMoveVector2S.x, getZ() + endPerpVectorS.y + endMoveVector2S.y),
               cutter.getRadius(),
               cutter.getUCFRotate(), cutter.getUCFAngle(),
               angle, ARC_ANGLE, ROSETTE_COLOR3));
-        } else {
-          drawList.add(new Arc(new Point2D.Double(getX() + endPerpVectorS.x + endMoveVectorS.x, getZ() + endPerpVectorS.y + endMoveVectorS.y),
-              cutter.getRadius(),
-              cutter.getUCFRotate(), cutter.getUCFAngle(),
-              angle, ARC_ANGLE, ROSETTE_COLOR2));
         }
         drawList.add(new Arc(new Point2D.Double(getX() + endPerpVectorS.x, getZ() + endPerpVectorS.y),
             cutter.getRadius(),
@@ -299,14 +313,11 @@ public class SpiralRosette extends SpiralCut {
         break;
       // Profile of drill at cut depth
       case Drill:
-        if (motion.equals(RosettePoint.Motion.BOTH)) {
-          drawList.add(cutter.getProfile().getDrawable(new Point2D.Double(getX() + endPerpVectorS.x + endMoveVectorS.x, getZ() + endPerpVectorS.y),
-              cutter.getTipWidth(), -cutter.getUCFAngle(), ROSETTE_COLOR2, SOLID_LINE));
-          drawList.add(cutter.getProfile().getDrawable(new Point2D.Double(getX() + endPerpVectorS.x, getZ() + endPerpVectorS.y + endMoveVectorS.y),
+        drawList.add(cutter.getProfile().getDrawable(new Point2D.Double(getX() + endPerpVectorS.x + endMoveVectorS.x, getZ() + endPerpVectorS.y + endMoveVectorS.y),
+            cutter.getTipWidth(), -cutter.getUCFAngle(), ROSETTE_COLOR2, SOLID_LINE));
+        if (motion.usesBoth()) {
+          drawList.add(cutter.getProfile().getDrawable(new Point2D.Double(getX() + endPerpVectorS.x + endMoveVector2S.x, getZ() + endPerpVectorS.y + endMoveVector2S.y),
               cutter.getTipWidth(), -cutter.getUCFAngle(), ROSETTE_COLOR3, SOLID_LINE));
-        } else {
-          drawList.add(cutter.getProfile().getDrawable(new Point2D.Double(getX() + endPerpVectorS.x + endMoveVectorS.x, getZ() + endPerpVectorS.y + endMoveVectorS.y),
-              cutter.getTipWidth(), -cutter.getUCFAngle(), ROSETTE_COLOR2, SOLID_LINE));
         }
         drawList.add(cutter.getProfile().getDrawable(new Point2D.Double(getX() + endPerpVectorS.x, getZ() + endPerpVectorS.y),
             cutter.getTipWidth(), -cutter.getUCFAngle(), ROSETTE_COLOR, SOLID_LINE));
@@ -315,26 +326,20 @@ public class SpiralRosette extends SpiralCut {
       case ECF:
         Vector2d v1 = new Vector2d(cutter.getRadius(), 0.0);
         v1 = v1.rotate(-cutter.getUCFAngle());   // minus because + is toward front
-        if (motion.equals(RosettePoint.Motion.BOTH)) {
-          drawList.add(cutter.getProfile().getDrawable(new Point2D.Double(getX() + endPerpVectorS.x + v1.x + endMoveVectorS.x, getZ() + endPerpVectorS.y + v1.y),
-              cutter.getTipWidth(), -cutter.getUCFAngle(), ROSETTE_COLOR2, SOLID_LINE));
-          drawList.add(cutter.getProfile().getDrawable(new Point2D.Double(getX() + endPerpVectorS.x + v1.x, getZ() + endPerpVectorS.y + v1.y + endMoveVectorS.y),
+        drawList.add(cutter.getProfile().getDrawable(new Point2D.Double(getX() + endPerpVectorS.x + v1.x + endMoveVectorS.x, getZ() + endPerpVectorS.y + v1.y + endMoveVectorS.y),
+            cutter.getTipWidth(), -cutter.getUCFAngle(), ROSETTE_COLOR2, SOLID_LINE));
+        if (motion.usesBoth()) {
+          drawList.add(cutter.getProfile().getDrawable(new Point2D.Double(getX() + endPerpVectorS.x + v1.x + endMoveVector2S.x, getZ() + endPerpVectorS.y + v1.y + endMoveVector2S.y),
               cutter.getTipWidth(), -cutter.getUCFAngle(), ROSETTE_COLOR3, SOLID_LINE));
-        } else {
-          drawList.add(cutter.getProfile().getDrawable(new Point2D.Double(getX() + endPerpVectorS.x + v1.x + endMoveVectorS.x, getZ() + endPerpVectorS.y + v1.y + endMoveVectorS.y),
-              cutter.getTipWidth(), -cutter.getUCFAngle(), ROSETTE_COLOR2, SOLID_LINE));
         }
         drawList.add(cutter.getProfile().getDrawable(new Point2D.Double(getX() + endPerpVectorS.x + v1.x, getZ() + endPerpVectorS.y + v1.y),
             cutter.getTipWidth(), -cutter.getUCFAngle(), ROSETTE_COLOR, SOLID_LINE));
         v1 = v1.rotate(180.0);
-        if (motion.equals(RosettePoint.Motion.BOTH)) {
-          drawList.add(cutter.getProfile().getDrawable(new Point2D.Double(getX() + endPerpVectorS.x + v1.x + endMoveVectorS.x, getZ() + endPerpVectorS.y + v1.y),
-              cutter.getTipWidth(), -cutter.getUCFAngle(), ROSETTE_COLOR2, SOLID_LINE));
-          drawList.add(cutter.getProfile().getDrawable(new Point2D.Double(getX() + endPerpVectorS.x + v1.x, getZ() + endPerpVectorS.y + v1.y + endMoveVectorS.y),
+        drawList.add(cutter.getProfile().getDrawable(new Point2D.Double(getX() + endPerpVectorS.x + v1.x + endMoveVectorS.x, getZ() + endPerpVectorS.y + v1.y + endMoveVectorS.y),
+            cutter.getTipWidth(), -cutter.getUCFAngle(), ROSETTE_COLOR2, SOLID_LINE));
+        if (motion.usesBoth()) {
+          drawList.add(cutter.getProfile().getDrawable(new Point2D.Double(getX() + endPerpVectorS.x + v1.x + endMoveVector2S.x, getZ() + endPerpVectorS.y + v1.y + endMoveVector2S.y),
               cutter.getTipWidth(), -cutter.getUCFAngle(), ROSETTE_COLOR3, SOLID_LINE));
-        } else {
-          drawList.add(cutter.getProfile().getDrawable(new Point2D.Double(getX() + endPerpVectorS.x + v1.x + endMoveVectorS.x, getZ() + endPerpVectorS.y + v1.y + endMoveVectorS.y),
-              cutter.getTipWidth(), -cutter.getUCFAngle(), ROSETTE_COLOR2, SOLID_LINE));
         }
         drawList.add(cutter.getProfile().getDrawable(new Point2D.Double(getX() + endPerpVectorS.x + v1.x, getZ() + endPerpVectorS.y + v1.y),
             cutter.getTipWidth(), -cutter.getUCFAngle(), ROSETTE_COLOR, SOLID_LINE));
@@ -413,7 +418,7 @@ public class SpiralRosette extends SpiralCut {
     double rosPhase = modPt.getRosette().getPhase();
 
     double ros2StartAmp = 0.0, deltaRos2Amp = 0.0, ros2StartPhase = 0.0;
-    if (modPt.getMotion().equals(Motion.BOTH)) {
+    if (modPt.getMotion().usesBoth()) {
       ros2StartAmp = modPt.getRosette2().getPToP();
       if (ros2StartAmp == startDepth) {
         deltaRos2Amp = endCutDepth - ros2StartAmp;  // taper the pumping amplitude
@@ -441,7 +446,7 @@ public class SpiralRosette extends SpiralCut {
         modPt.getRosette().setPToP(rosStartAmp + cumLength / totLength * deltaRosAmp);
       }
       modPt.getRosette().setPhase(rosPhase + rzc[i].getZ() * repeat);
-      if (modPt.getMotion().equals(Motion.BOTH)) {
+      if (modPt.getMotion().usesBoth()) {
         if (deltaR != 0.0) {
           modPt.getRosette2().setPToP(ros2StartAmp + (rzc[i].getX() - rStart) / deltaR * deltaRos2Amp);
         } else {
@@ -486,7 +491,7 @@ public class SpiralRosette extends SpiralCut {
     double rosStartPhase = modPt.getRosette().getPhase();
 
     double ros2StartAmp = 0.0, deltaRos2Amp = 0.0, ros2StartPhase = 0.0;
-    if (modPt.getMotion().equals(Motion.BOTH)) {
+    if (modPt.getMotion().usesBoth()) {
       ros2StartAmp = modPt.getRosette2().getPToP();
       if (ros2StartAmp == startDepth) {
         deltaRos2Amp = endCutDepth - ros2StartAmp;  // taper the pumping amplitude
@@ -514,7 +519,7 @@ public class SpiralRosette extends SpiralCut {
         modPt.getRosette().setPToP(rosStartAmp + cumLength / totLength * deltaRosAmp);
       }
       modPt.getRosette().setPhase(rosStartPhase + rzc[i].getZ() * repeat);
-      if (modPt.getMotion().equals(Motion.BOTH)) {
+      if (modPt.getMotion().usesBoth()) {
         if (deltaR != 0.0) {
           modPt.getRosette2().setPToP(ros2StartAmp + (rzc[i].getX() - rStart) / deltaR * deltaRos2Amp);
         } else {

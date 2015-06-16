@@ -349,7 +349,7 @@ public class RosettePoint extends CutPoint implements ActiveEditorDrop {
    * 
    * @return corrected vector
    */
-  private Vector2d correctForCutter(double xMove, double zMove) {
+  protected Vector2d correctForCutter(double xMove, double zMove) {
     switch (cutter.getLocation()) {		// correct the sign of the motion for location of cutter
       case FRONT_INSIDE:
       default:

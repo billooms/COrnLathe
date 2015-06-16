@@ -124,7 +124,6 @@ public class Rosette extends BasicRosette {
    */
   public Rosette(Element element, Patterns patMgr) {
     super(element, patMgr);   // stores patternMgr, reads pToP, phase, invert
-    System.out.println("element:" + element.toString() + " " + element.getAttribute("repeat") + " " + element.getAttribute("pattern"));
     this.pattern = patternMgr.getPattern(CLUtilities.getString(element, "pattern", DEFAULT_PATTERN));
     this.repeat = CLUtilities.getInteger(element, "repeat", DEFAULT_REPEAT);
     mask = CLUtilities.getString(element, "mask", DEFAULT_MASK);
