@@ -47,7 +47,7 @@ public class RosettePointChildFactory extends ChildFactory.Detachable<BasicRoset
   @Override
   protected boolean createKeys(List<BasicRosette> list) {
     list.add(rpt.getRosette());
-    if (rpt.getMotion().equals(Motion.BOTH)) {
+    if (rpt.getMotion().usesBoth()) {
       list.add(rpt.getRosette2());
     }
     return true;

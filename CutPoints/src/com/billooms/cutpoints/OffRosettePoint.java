@@ -102,38 +102,54 @@ public class OffRosettePoint extends RosettePoint implements OffPoint {
     super(rpt.getPos2D(), rpt);
     this.parent = parent;
     this.motion = rpt.getMotion();
-//    this.rosette = new Rosette(rpt.getRosette());
-    this.rosette = (rosette instanceof Rosette) ? new Rosette((Rosette) rpt.getRosette()) : new CompoundRosette((CompoundRosette) rpt.getRosette()); 
-    if (motion.equals(Motion.BOTH)) {
-//      this.rosette2 = new Rosette(rpt.getRosette2());
-      this.rosette2 = (rosette2 instanceof Rosette) ? new Rosette((Rosette) rpt.getRosette2()) : new CompoundRosette((CompoundRosette) rpt.getRosette2()); 
+    this.rosette = (rpt.getRosette() instanceof Rosette) ? new Rosette((Rosette) rpt.getRosette()) : new CompoundRosette((CompoundRosette) rpt.getRosette()); 
+    if (motion.usesBoth()) {
+      this.rosette2 = (rpt.getRosette2() instanceof Rosette) ? new Rosette((Rosette) rpt.getRosette2()) : new CompoundRosette((CompoundRosette) rpt.getRosette2()); 
     }
 //    makeDrawables();
     rosette.addPropertyChangeListener(this);
-    if (motion.equals(Motion.BOTH)) {
+    if (motion.usesBoth()) {
       rosette2.addPropertyChangeListener(this);
     }
   }
 
   /**
-   * Get the scaled movement vector. It is the direction of movement that will
-   * produce the rosette pattern. It will be in a direction AWAY from the point
-   * of deepest cut. In the case of BOTH, it is the total movement of both
-   * rosettes together. For ROCK, PUMP, or BOTH, the vector is rotated by the
-   * parent's tangent angle to properly show what the motion would be after
-   * rotation.
+   * Get the scaled movement vector for the rosette. 
+   * It is the direction of movement that will produce the rosette pattern. 
+   * It will be in a direction AWAY from the point of deepest cut. 
+   * In the case of BOTH or PERPTAN, it is the movement of only the first rosette.
    *
    * @return scaled movement vector
    */
   @Override
   protected Vector2d getMoveVectorS() {
-    switch (motion) {
+    switch (motion) {       // TODO: not yet defined for PERP, TANGENT, or PERPTAN
       case ROCK:
       case PUMP:
       case BOTH:
         return (super.getMoveVectorS()).rotate(-parent.getTangentAngle());
       default:
         return super.getMoveVectorS();
+    }
+  }
+
+  /**
+   * Get the scaled movement vector for rosette2. 
+   * It is the direction of movement that will produce the rosette pattern. 
+   * It will be in a direction AWAY from the point of deepest cut. 
+   * In the case of BOTH or PERPTAN, it is the movement of only the second rosette.
+   *
+   * @return scaled movement vector
+   */
+  @Override
+  protected Vector2d getMoveVector2S() {
+    switch (motion) {       // TODO: not yet defined for PERP, TANGENT, or PERPTAN
+      case ROCK:
+      case PUMP:
+      case BOTH:
+        return (super.getMoveVector2S()).rotate(-parent.getTangentAngle());
+      default:
+        return super.getMoveVector2S();
     }
   }
 
@@ -184,30 +200,30 @@ public class OffRosettePoint extends RosettePoint implements OffPoint {
 
     // cut extent
     Vector2d perpVectorS = getPerpVector(cutDepth);	// maximum cut displacement
-    Vector2d moveVectorS = getMoveVectorS();		// scaled movement vector
+    Vector2d moveVectorS = getMoveVectorS();		// scaled movement vector for rosette
+    Vector2d moveVector2S = getMoveVector2S();		// scaled movement vector for rosette2
     Point2D.Double p;
     switch (cutter.getFrame()) {
       // Arc showing cut depth (for HCF & UCF)
       case HCF:
       case UCF:
         double angle = Math.atan2(perpVectorS.y, perpVectorS.x) * 180.0 / Math.PI;
-        if (motion.equals(Motion.BOTH)) {
-          p = new Point2D.Double(getX() + perpVectorS.x + moveVectorS.x, getZ() + perpVectorS.y);
-          drawList.add(new Arc(p, cutter.getRadius(), cutter.getUCFRotate(), cutter.getUCFAngle(),
-              angle, ARC_ANGLE, ROSETTE_COLOR2));
-          drawList.add(new Arc(mirrorPt(p), cutter.getRadius(), cutter.getUCFRotate(), cutter.getUCFAngle(),
-              angle, ARC_ANGLE, ROSETTE_COLOR2));
-          p = new Point2D.Double(getX() + perpVectorS.x, getZ() + perpVectorS.y + moveVectorS.y);
-          drawList.add(new Arc(p, cutter.getRadius(), cutter.getUCFRotate(), cutter.getUCFAngle(),
-              angle, ARC_ANGLE, ROSETTE_COLOR3));
-          drawList.add(new Arc(mirrorPt(p), cutter.getRadius(), cutter.getUCFRotate(), cutter.getUCFAngle(),
-              angle, ARC_ANGLE, ROSETTE_COLOR3));
-        } else {
+        p = new Point2D.Double(getX() + perpVectorS.x + moveVectorS.x, getZ() + perpVectorS.y + moveVectorS.y);
+        drawList.add(new Arc(p, cutter.getRadius(), cutter.getUCFRotate(), cutter.getUCFAngle(),
+            angle, ARC_ANGLE, ROSETTE_COLOR2));
+        drawList.add(new Arc(mirrorPt(p), cutter.getRadius(), cutter.getUCFRotate(), cutter.getUCFAngle(),
+            angle, ARC_ANGLE, ROSETTE_COLOR2));
+        if (motion.usesBoth()) {
           p = new Point2D.Double(getX() + perpVectorS.x + moveVectorS.x, getZ() + perpVectorS.y + moveVectorS.y);
           drawList.add(new Arc(p, cutter.getRadius(), cutter.getUCFRotate(), cutter.getUCFAngle(),
               angle, ARC_ANGLE, ROSETTE_COLOR2));
           drawList.add(new Arc(mirrorPt(p), cutter.getRadius(), cutter.getUCFRotate(), cutter.getUCFAngle(),
               angle, ARC_ANGLE, ROSETTE_COLOR2));
+          p = new Point2D.Double(getX() + perpVectorS.x + moveVector2S.x, getZ() + perpVectorS.y + moveVector2S.y);
+          drawList.add(new Arc(p, cutter.getRadius(), cutter.getUCFRotate(), cutter.getUCFAngle(),
+              angle, ARC_ANGLE, ROSETTE_COLOR3));
+          drawList.add(new Arc(mirrorPt(p), cutter.getRadius(), cutter.getUCFRotate(), cutter.getUCFAngle(),
+              angle, ARC_ANGLE, ROSETTE_COLOR3));
         }
         p = new Point2D.Double(getX() + perpVectorS.x, getZ() + perpVectorS.y);
         drawList.add(new Arc(p, cutter.getRadius(), cutter.getUCFRotate(), cutter.getUCFAngle(),
@@ -217,23 +233,17 @@ public class OffRosettePoint extends RosettePoint implements OffPoint {
         break;
       // Profile of drill at cut depth
       case Drill:
-        if (motion.equals(Motion.BOTH)) {
-          p = new Point2D.Double(getX() + perpVectorS.x + moveVectorS.x, getZ() + perpVectorS.y);
-          drawList.add(cutter.getProfile().getDrawable(p, cutter.getTipWidth(),
-              -cutter.getUCFAngle() - parent.getTangentAngle(), ROSETTE_COLOR2, SOLID_LINE));
-          drawList.add(cutter.getProfile().getDrawable(mirrorPt(p), cutter.getTipWidth(),
-              -cutter.getUCFAngle() - parent.getTangentAngle(), ROSETTE_COLOR2, SOLID_LINE));
-          p = new Point2D.Double(getX() + perpVectorS.x, getZ() + perpVectorS.y + moveVectorS.y);
+        p = new Point2D.Double(getX() + perpVectorS.x + moveVectorS.x, getZ() + perpVectorS.y + moveVectorS.y);
+        drawList.add(cutter.getProfile().getDrawable(p, cutter.getTipWidth(),
+            -cutter.getUCFAngle() - parent.getTangentAngle(), ROSETTE_COLOR2, SOLID_LINE));
+        drawList.add(cutter.getProfile().getDrawable(mirrorPt(p), cutter.getTipWidth(),
+            -cutter.getUCFAngle() - parent.getTangentAngle(), ROSETTE_COLOR2, SOLID_LINE));
+        if (motion.usesBoth()) {
+          p = new Point2D.Double(getX() + perpVectorS.x + moveVector2S.x, getZ() + perpVectorS.y + moveVector2S.y);
           drawList.add(cutter.getProfile().getDrawable(p, cutter.getTipWidth(),
               -cutter.getUCFAngle() - parent.getTangentAngle(), ROSETTE_COLOR3, SOLID_LINE));
           drawList.add(cutter.getProfile().getDrawable(mirrorPt(p), cutter.getTipWidth(),
               -cutter.getUCFAngle() - parent.getTangentAngle(), ROSETTE_COLOR3, SOLID_LINE));
-        } else {
-          p = new Point2D.Double(getX() + perpVectorS.x + moveVectorS.x, getZ() + perpVectorS.y + moveVectorS.y);
-          drawList.add(cutter.getProfile().getDrawable(p, cutter.getTipWidth(),
-              -cutter.getUCFAngle() - parent.getTangentAngle(), ROSETTE_COLOR2, SOLID_LINE));
-          drawList.add(cutter.getProfile().getDrawable(mirrorPt(p), cutter.getTipWidth(),
-              -cutter.getUCFAngle() - parent.getTangentAngle(), ROSETTE_COLOR2, SOLID_LINE));
         }
         p = new Point2D.Double(getX() + perpVectorS.x, getZ() + perpVectorS.y);
         drawList.add(cutter.getProfile().getDrawable(p, cutter.getTipWidth(),
@@ -246,34 +256,26 @@ public class OffRosettePoint extends RosettePoint implements OffPoint {
       case ECF:
         Vector2d v1 = new Vector2d(cutter.getRadius(), 0.0);
         v1 = v1.rotate(-cutter.getUCFAngle() - parent.getTangentAngle());   // minus because + is toward front
-        if (motion.equals(Motion.BOTH)) {
-          p = new Point2D.Double(getX() + perpVectorS.x + v1.x + moveVectorS.x, getZ() + perpVectorS.y + v1.y);
-          drawList.add(cutter.getProfile().getDrawable(p, cutter.getTipWidth(),
-              -cutter.getUCFAngle() - parent.getTangentAngle(), ROSETTE_COLOR2, SOLID_LINE));
-          p = new Point2D.Double(getX() + perpVectorS.x + v1.x, getZ() + perpVectorS.y + v1.y + moveVectorS.y);
+        p = new Point2D.Double(getX() + perpVectorS.x + v1.x + moveVectorS.x, getZ() + perpVectorS.y + v1.y + moveVectorS.y);
+        drawList.add(cutter.getProfile().getDrawable(p, cutter.getTipWidth(),
+            -cutter.getUCFAngle() - parent.getTangentAngle(), ROSETTE_COLOR2, SOLID_LINE));
+        if (motion.usesBoth()) {
+          p = new Point2D.Double(getX() + perpVectorS.x + v1.x + moveVector2S.x, getZ() + perpVectorS.y + v1.y + moveVector2S.y);
           drawList.add(cutter.getProfile().getDrawable(p, cutter.getTipWidth(),
               -cutter.getUCFAngle() - parent.getTangentAngle(), ROSETTE_COLOR3, SOLID_LINE));
-        } else {
-          p = new Point2D.Double(getX() + perpVectorS.x + v1.x + moveVectorS.x, getZ() + perpVectorS.y + v1.y + moveVectorS.y);
-          drawList.add(cutter.getProfile().getDrawable(p, cutter.getTipWidth(),
-              -cutter.getUCFAngle() - parent.getTangentAngle(), ROSETTE_COLOR2, SOLID_LINE));
         }
         p = new Point2D.Double(getX() + perpVectorS.x + v1.x, getZ() + perpVectorS.y + v1.y);
         drawList.add(cutter.getProfile().getDrawable(p, cutter.getTipWidth(),
             -cutter.getUCFAngle() - parent.getTangentAngle(), ROSETTE_COLOR, SOLID_LINE));
 
         v1 = v1.rotate(180.0);
-        if (motion.equals(Motion.BOTH)) {
-          p = new Point2D.Double(getX() + perpVectorS.x + v1.x + moveVectorS.x, getZ() + perpVectorS.y + v1.y);
-          drawList.add(cutter.getProfile().getDrawable(p, cutter.getTipWidth(),
-              -cutter.getUCFAngle() - parent.getTangentAngle(), ROSETTE_COLOR2, SOLID_LINE));
-          p = new Point2D.Double(getX() + perpVectorS.x + v1.x, getZ() + perpVectorS.y + v1.y + moveVectorS.y);
+        p = new Point2D.Double(getX() + perpVectorS.x + v1.x + moveVectorS.x, getZ() + perpVectorS.y + v1.y + moveVectorS.y);
+        drawList.add(cutter.getProfile().getDrawable(p, cutter.getTipWidth(),
+            -cutter.getUCFAngle() - parent.getTangentAngle(), ROSETTE_COLOR2, SOLID_LINE));
+        if (motion.usesBoth()) {
+          p = new Point2D.Double(getX() + perpVectorS.x + v1.x + moveVector2S.x, getZ() + perpVectorS.y + v1.y + moveVector2S.y);
           drawList.add(cutter.getProfile().getDrawable(p, cutter.getTipWidth(),
               -cutter.getUCFAngle() - parent.getTangentAngle(), ROSETTE_COLOR3, SOLID_LINE));
-        } else {
-          p = new Point2D.Double(getX() + perpVectorS.x + v1.x + moveVectorS.x, getZ() + perpVectorS.y + v1.y + moveVectorS.y);
-          drawList.add(cutter.getProfile().getDrawable(p, cutter.getTipWidth(),
-              -cutter.getUCFAngle() - parent.getTangentAngle(), ROSETTE_COLOR2, SOLID_LINE));
         }
         p = new Point2D.Double(getX() + perpVectorS.x + v1.x, getZ() + perpVectorS.y + v1.y);
         drawList.add(cutter.getProfile().getDrawable(p, cutter.getTipWidth(),

@@ -87,20 +87,35 @@ public class RosettePoint extends CutPoint implements ActiveEditorDrop {
     ROCK,
     /** Pumping motion. */
     PUMP,
-    /** Motion perpendicular to the
-     * surface. */
+    /** Motion perpendicular to the surface. */
     PERP,
     /** Motion tangental to the surface. */
     TANGENT,
-    /** Both rocking and pumping motion */
-    BOTH
+    /** Both rocking and pumping motion. */
+    BOTH,
+    /** Both perpendicular and tangental motion */
+    PERPTAN;
+    
+    public boolean usesBoth() {
+      switch (Motion.this) {
+        default:
+        case ROCK:
+        case PUMP:
+        case PERP:
+        case TANGENT:
+          return false;
+        case BOTH:
+        case PERPTAN:
+          return true;
+      }
+    }
   }
 
   /** Motion of the cuts. */
   protected Motion motion = DEFAULT_MOTION;
   /** Primary rosette. */
   protected BasicRosette rosette = null;
-  /** Second rosette used only for Motion.BOTH. */
+  /** Second rosette used only for BOTH and PERPTAN. */
   protected BasicRosette rosette2 = null;
 
   /**
@@ -120,23 +135,23 @@ public class RosettePoint extends CutPoint implements ActiveEditorDrop {
         Element rosElement = (Element) rosNodes.item(i);
         if (rosElement.getTagName().equals("Rosette")) {
           if (rosette == null) {            // first one is rosette
-            rosette = new Rosette(element, patMgr);
+            rosette = new Rosette(rosElement, patMgr);
           } else if (rosette2 == null) {    // if there's a second one it's rosette2
-            rosette2 = new Rosette(element, patMgr);
+            rosette2 = new Rosette(rosElement, patMgr);
           }
         }
         if (rosElement.getTagName().equals("CompoundRosette")) {
           if (rosette == null) {            // first one is rosette
-            rosette = new CompoundRosette(element, patMgr);
+            rosette = new CompoundRosette(rosElement, patMgr);
           } else if (rosette2 == null) {   // if there's a second one it's rosette2
-            rosette2 = new CompoundRosette(element, patMgr);
+            rosette2 = new CompoundRosette(rosElement, patMgr);
           }
         }
       }
     }
     makeDrawables();
     rosette.addPropertyChangeListener(this);
-    if (motion.equals(Motion.BOTH)) {
+    if (motion.usesBoth()) {
       rosette2.addPropertyChangeListener(this);
     }
   }
@@ -152,15 +167,13 @@ public class RosettePoint extends CutPoint implements ActiveEditorDrop {
   public RosettePoint(Point2D.Double pos, RosettePoint cpt) {
     super(pos, cpt);
     this.motion = cpt.getMotion();
-//    this.rosette = new Rosette(cpt.getRosette());
     this.rosette = (cpt.getRosette() instanceof Rosette) ? new Rosette((Rosette) cpt.getRosette()) : new CompoundRosette((CompoundRosette) cpt.getRosette()); 
-    if (motion.equals(Motion.BOTH)) {
-//      this.rosette2 = new Rosette(cpt.getRosette2());
+    if (motion.usesBoth()) {
       this.rosette2 = (cpt.getRosette2() instanceof Rosette) ? new Rosette((Rosette) cpt.getRosette2()) : new CompoundRosette((CompoundRosette) cpt.getRosette2()); 
     }
     makeDrawables();
     rosette.addPropertyChangeListener(this);
-    if (motion.equals(Motion.BOTH)) {
+    if (motion.usesBoth()) {
       rosette2.addPropertyChangeListener(this);
     }
   }
@@ -193,7 +206,7 @@ public class RosettePoint extends CutPoint implements ActiveEditorDrop {
     super.clear();
     rosette.removePropertyChangeListener(this);
     rosette.clear();
-    if (motion.equals(Motion.BOTH)) {
+    if (motion.usesBoth()) {
       rosette2.removePropertyChangeListener(this);
       rosette2.clear();
     }
@@ -218,14 +231,13 @@ public class RosettePoint extends CutPoint implements ActiveEditorDrop {
     if (motion.equals(newDir)) {
       return;
     }
-    if (motion.equals(Motion.BOTH)) {
+    if (motion.usesBoth()) {
       rosette2.removePropertyChangeListener(this);
       rosette2.clear();
     }
     Motion old = this.motion;
     this.motion = newDir;
-    if (motion.equals(Motion.BOTH)) {
-//      rosette2 = new Rosette(rosette);    // copy the Rock rosette for the Pump rosette
+    if (!old.usesBoth() && motion.usesBoth()) {
       rosette2 = (rosette instanceof Rosette) ? new Rosette((Rosette) rosette) : new CompoundRosette((CompoundRosette) rosette); 
       rosette2.addPropertyChangeListener(this);
     }
@@ -286,69 +298,103 @@ public class RosettePoint extends CutPoint implements ActiveEditorDrop {
     }
     pcs.firePropertyChange(PROP_ROSETTE, old, newRosette);
   }
-
-  /**
-   * Get the normalized movement vector for PERP and CONTOUR motion. It is the
-   * direction of movement that will produce the rosette pattern. It will be in
-   * a direction AWAY from the point of deepest cut.
-   *
-   * @return normalized movement vector
+  
+  /** 
+   * Get the move vector for PERP. 
+   * It is the direction of movement that will produce the rosette pattern. 
+   * It will be in a direction AWAY from the point of deepest cut.
+   * 
+   * @return normalized perpendicular vector
    */
-  private Vector2d getMoveVectorN() {
+  private Vector2d perpVectorN() {
     Vector2d perpVectN = getPerpVector(1.0);
-    Vector2d moveN = new Vector2d();
-    if (motion == Motion.PERP) {
-      moveN = new Vector2d(-perpVectN.x, -perpVectN.y);	// Always opposite direction from perpVector
-    } else if (motion == Motion.TANGENT) {			// movement is right angle to perpVector
-      switch (cutter.getLocation()) {
-        case FRONT_INSIDE:
-        default:
-          moveN = new Vector2d(perpVectN.y, -perpVectN.x);	// back toward center and downward
-          break;
-        case BACK_INSIDE:
-          moveN = new Vector2d(-perpVectN.y, perpVectN.x);	// forward toward center and downward
-          break;
-        case FRONT_OUTSIDE:
-          if (isTopOutside()) {			// top of a shape
-            moveN = new Vector2d(-perpVectN.y, perpVectN.x);	// move out to front and downward
-          } else {						// bottom of a shape
-            moveN = new Vector2d(perpVectN.y, -perpVectN.x);	// move out to front and upward
-          }
-          break;
-        case BACK_OUTSIDE:
-          if (isTopOutside()) {			// top of a shape
-            moveN = new Vector2d(perpVectN.y, -perpVectN.x);	// move out to back and downward
-          } else {						// bottom of a shape
-            moveN = new Vector2d(-perpVectN.y, perpVectN.x);	// move out to back and upward
-          }
-          break;
-      }
+    return new Vector2d(-perpVectN.x, -perpVectN.y);	// Always opposite direction from perpVector
+  }
+  
+  /** 
+   * Get the move vector for TANGENT. 
+   * It is the direction of movement that will produce the rosette pattern. 
+   * It will be in a direction AWAY from the point of deepest cut.
+   * 
+   * @return normalized tangent vector
+   */
+  private Vector2d tanVectorN() {
+    Vector2d perpVectN = getPerpVector(1.0);
+    switch (cutter.getLocation()) {
+      case FRONT_INSIDE:
+      default:
+        return new Vector2d(perpVectN.y, -perpVectN.x);	// back toward center and downward
+      case BACK_INSIDE:
+        return new Vector2d(-perpVectN.y, perpVectN.x);	// forward toward center and downward
+      case FRONT_OUTSIDE:
+        if (isTopOutside()) {			// top of a shape
+          return new Vector2d(-perpVectN.y, perpVectN.x);	// move out to front and downward
+        } else {						// bottom of a shape
+          return new Vector2d(perpVectN.y, -perpVectN.x);	// move out to front and upward
+        }
+      case BACK_OUTSIDE:
+        if (isTopOutside()) {			// top of a shape
+          return new Vector2d(perpVectN.y, -perpVectN.x);	// move out to back and downward
+        } else {						// bottom of a shape
+          return new Vector2d(-perpVectN.y, perpVectN.x);	// move out to back and upward
+        }
     }
-    return moveN;
+  }
+  
+  /**
+   * Correct the sign of the motion for the location of the cutter. 
+   * 
+   * @param xMove x-movement
+   * @param zMove z-movement
+   * 
+   * @return corrected vector
+   */
+  private Vector2d correctForCutter(double xMove, double zMove) {
+    switch (cutter.getLocation()) {		// correct the sign of the motion for location of cutter
+      case FRONT_INSIDE:
+      default:
+        return new Vector2d(-xMove, zMove);	// move back to center and/or upward
+      case BACK_INSIDE:
+        return new Vector2d(xMove, zMove);		// move forward to center and/or upward
+      case FRONT_OUTSIDE:
+        if (isTopOutside()) {			// top of a shape
+          return new Vector2d(xMove, zMove);		// move out to front and/or up
+        } else {						// bottom of a shape
+          return new Vector2d(xMove, -zMove);	// move out to front and/or down
+        }
+      case BACK_OUTSIDE:
+        if (isTopOutside()) {			// top of a shape
+          return new Vector2d(-xMove, zMove);	// move out to back and/or up
+        } else {						// bottom of a shape
+          return new Vector2d(-xMove, -zMove);	// move out to back and/or down
+        }
+    }
   }
 
   /**
-   * Get the scaled movement vector. It is the direction of movement that will
-   * produce the rosette pattern. It will be in a direction AWAY from the point
-   * of deepest cut. In the case of BOTH, it is the total movement of both
-   * rosettes together.
+   * Get the scaled movement vector for the rosette. 
+   * It is the direction of movement that will produce the rosette pattern. 
+   * It will be in a direction AWAY from the point of deepest cut. 
+   * In the case of BOTH or PERPTAN, it is the movement of only the first rosette.
    *
    * @return scaled movement vector
    */
   protected Vector2d getMoveVectorS() {
-    Vector2d moveS;
     double xMove = 0.0, zMove = 0.0;
     switch (motion) {
       default:
       case PERP:
+      case PERPTAN:
+        Vector2d perpS = perpVectorN();
+        perpS.scale(rosette.getPToP());
+        return perpS;
       case TANGENT:
-        moveS = getMoveVectorN();
-        moveS.scale(rosette.getPToP());
-        return moveS;
+        Vector2d tanS = tanVectorN();
+        tanS.scale(rosette.getPToP());
+        return tanS;
 
       case BOTH:
-        zMove = rosette2.getPToP();     // get the z movement from rosette2 only when there is both
-        xMove = rosette.getPToP();      // otherwise, always get the motion from the primary rosette
+        xMove = rosette.getPToP();      // only get the motion from the primary rosette
         break;
       case PUMP:
         zMove = rosette.getPToP();
@@ -357,30 +403,36 @@ public class RosettePoint extends CutPoint implements ActiveEditorDrop {
         xMove = rosette.getPToP();
         break;
     }
-    switch (cutter.getLocation()) {		// correct the sign of the motion for location of cutter
-      case FRONT_INSIDE:
-      default:
-        moveS = new Vector2d(-xMove, zMove);	// move back to center and/or upward
-        break;
-      case BACK_INSIDE:
-        moveS = new Vector2d(xMove, zMove);		// move forward to center and/or upward
-        break;
-      case FRONT_OUTSIDE:
-        if (isTopOutside()) {			// top of a shape
-          moveS = new Vector2d(xMove, zMove);		// move out to front and/or up
-        } else {						// bottom of a shape
-          moveS = new Vector2d(xMove, -zMove);	// move out to front and/or down
-        }
-        break;
-      case BACK_OUTSIDE:
-        if (isTopOutside()) {			// top of a shape
-          moveS = new Vector2d(-xMove, zMove);	// move out to back and/or up
-        } else {						// bottom of a shape
-          moveS = new Vector2d(-xMove, -zMove);	// move out to back and/or down
-        }
+    return correctForCutter(xMove, zMove);
+  }
+
+  /**
+   * Get the scaled movement vector for rosette2. 
+   * It is the direction of movement that will produce the rosette pattern. 
+   * It will be in a direction AWAY from the point of deepest cut. 
+   * In the case of BOTH or PERPTAN, it is the movement of only the second rosette.
+   *
+   * @return scaled movement vector
+   */
+  protected Vector2d getMoveVector2S() {
+    double xMove = 0.0, zMove = 0.0;
+    switch (motion) {
+      default:      // should not call this except for BOTH and PERPTAN
+      case PUMP:
+      case ROCK:
+      case PERP:
+      case TANGENT:
+        return new Vector2d();
+      case PERPTAN:
+        Vector2d tan = tanVectorN();
+        tan.scale(rosette2.getPToP());
+        return tan;
+
+      case BOTH:
+        zMove = rosette2.getPToP();     // get the z movement from rosette2 only when there is both
         break;
     }
-    return moveS;
+    return correctForCutter(xMove, zMove);
   }
 
   /**
@@ -409,26 +461,22 @@ public class RosettePoint extends CutPoint implements ActiveEditorDrop {
     }
     
     // cut extent
-    Vector2d moveVectorS = getMoveVectorS();		// scaled movement vector
+    Vector2d moveVectorS = getMoveVectorS();		// scaled movement vector for rosette
+    Vector2d moveVector2S = getMoveVector2S();		// scaled movement vector for rosette2
     switch (cutter.getFrame()) {
       // Arc showing cut depth (for HCF & UCF)
       case HCF:
       case UCF:
         double angle = Math.atan2(perpVectorS.y, perpVectorS.x) * 180.0 / Math.PI;
-        if (motion.equals(Motion.BOTH)) {
-          drawList.add(new Arc(new Point2D.Double(getX() + perpVectorS.x + moveVectorS.x, getZ() + perpVectorS.y),
-              cutter.getRadius(),
-              cutter.getUCFRotate(), cutter.getUCFAngle(),
-              angle, ARC_ANGLE, ROSETTE_COLOR2));
-          drawList.add(new Arc(new Point2D.Double(getX() + perpVectorS.x, getZ() + perpVectorS.y + moveVectorS.y),
+        drawList.add(new Arc(new Point2D.Double(getX() + perpVectorS.x + moveVectorS.x, getZ() + perpVectorS.y + moveVectorS.y),
+            cutter.getRadius(),
+            cutter.getUCFRotate(), cutter.getUCFAngle(),
+            angle, ARC_ANGLE, ROSETTE_COLOR2));
+        if (motion.usesBoth()) {
+          drawList.add(new Arc(new Point2D.Double(getX() + perpVectorS.x + moveVector2S.x, getZ() + perpVectorS.y + moveVector2S.y),
               cutter.getRadius(),
               cutter.getUCFRotate(), cutter.getUCFAngle(),
               angle, ARC_ANGLE, ROSETTE_COLOR3));
-        } else {
-          drawList.add(new Arc(new Point2D.Double(getX() + perpVectorS.x + moveVectorS.x, getZ() + perpVectorS.y + moveVectorS.y),
-              cutter.getRadius(),
-              cutter.getUCFRotate(), cutter.getUCFAngle(),
-              angle, ARC_ANGLE, ROSETTE_COLOR2));
         }
         drawList.add(new Arc(new Point2D.Double(getX() + perpVectorS.x, getZ() + perpVectorS.y),
             cutter.getRadius(),
@@ -437,14 +485,11 @@ public class RosettePoint extends CutPoint implements ActiveEditorDrop {
         break;
       // Profile of drill at cut depth
       case Drill:
-        if (motion.equals(Motion.BOTH)) {
-          drawList.add(cutter.getProfile().getDrawable(new Point2D.Double(getX() + perpVectorS.x + moveVectorS.x, getZ() + perpVectorS.y),
-              cutter.getTipWidth(), -cutter.getUCFAngle(), ROSETTE_COLOR2, SOLID_LINE));
-          drawList.add(cutter.getProfile().getDrawable(new Point2D.Double(getX() + perpVectorS.x, getZ() + perpVectorS.y + moveVectorS.y),
+        drawList.add(cutter.getProfile().getDrawable(new Point2D.Double(getX() + perpVectorS.x + moveVectorS.x, getZ() + perpVectorS.y + moveVectorS.y),
+            cutter.getTipWidth(), -cutter.getUCFAngle(), ROSETTE_COLOR2, SOLID_LINE));
+        if (motion.usesBoth()) {
+          drawList.add(cutter.getProfile().getDrawable(new Point2D.Double(getX() + perpVectorS.x + moveVector2S.x, getZ() + perpVectorS.y + moveVector2S.y),
               cutter.getTipWidth(), -cutter.getUCFAngle(), ROSETTE_COLOR3, SOLID_LINE));
-        } else {
-          drawList.add(cutter.getProfile().getDrawable(new Point2D.Double(getX() + perpVectorS.x + moveVectorS.x, getZ() + perpVectorS.y + moveVectorS.y),
-              cutter.getTipWidth(), -cutter.getUCFAngle(), ROSETTE_COLOR2, SOLID_LINE));
         }
         drawList.add(cutter.getProfile().getDrawable(new Point2D.Double(getX() + perpVectorS.x, getZ() + perpVectorS.y),
             cutter.getTipWidth(), -cutter.getUCFAngle(), ROSETTE_COLOR, SOLID_LINE));
@@ -453,26 +498,20 @@ public class RosettePoint extends CutPoint implements ActiveEditorDrop {
       case ECF:
         Vector2d v1 = new Vector2d(cutter.getRadius(), 0.0);
         v1 = v1.rotate(-cutter.getUCFAngle());   // minus because + is toward front
-        if (motion.equals(Motion.BOTH)) {
-          drawList.add(cutter.getProfile().getDrawable(new Point2D.Double(getX() + perpVectorS.x + v1.x + moveVectorS.x, getZ() + perpVectorS.y + v1.y),
-              cutter.getTipWidth(), -cutter.getUCFAngle(), ROSETTE_COLOR2, SOLID_LINE));
-          drawList.add(cutter.getProfile().getDrawable(new Point2D.Double(getX() + perpVectorS.x + v1.x, getZ() + perpVectorS.y + v1.y + moveVectorS.y),
+        drawList.add(cutter.getProfile().getDrawable(new Point2D.Double(getX() + perpVectorS.x + v1.x + moveVectorS.x, getZ() + perpVectorS.y + v1.y + moveVectorS.y),
+            cutter.getTipWidth(), -cutter.getUCFAngle(), ROSETTE_COLOR2, SOLID_LINE));
+        if (motion.usesBoth()) {
+          drawList.add(cutter.getProfile().getDrawable(new Point2D.Double(getX() + perpVectorS.x + v1.x + moveVector2S.x, getZ() + perpVectorS.y + v1.y + moveVector2S.y),
               cutter.getTipWidth(), -cutter.getUCFAngle(), ROSETTE_COLOR3, SOLID_LINE));
-        } else {
-          drawList.add(cutter.getProfile().getDrawable(new Point2D.Double(getX() + perpVectorS.x + v1.x + moveVectorS.x, getZ() + perpVectorS.y + v1.y + moveVectorS.y),
-              cutter.getTipWidth(), -cutter.getUCFAngle(), ROSETTE_COLOR2, SOLID_LINE));
         }
         drawList.add(cutter.getProfile().getDrawable(new Point2D.Double(getX() + perpVectorS.x + v1.x, getZ() + perpVectorS.y + v1.y),
             cutter.getTipWidth(), -cutter.getUCFAngle(), ROSETTE_COLOR, SOLID_LINE));
         v1 = v1.rotate(180.0);
-        if (motion.equals(Motion.BOTH)) {
-          drawList.add(cutter.getProfile().getDrawable(new Point2D.Double(getX() + perpVectorS.x + v1.x + moveVectorS.x, getZ() + perpVectorS.y + v1.y),
-              cutter.getTipWidth(), -cutter.getUCFAngle(), ROSETTE_COLOR2, SOLID_LINE));
-          drawList.add(cutter.getProfile().getDrawable(new Point2D.Double(getX() + perpVectorS.x + v1.x, getZ() + perpVectorS.y + v1.y + moveVectorS.y),
+        drawList.add(cutter.getProfile().getDrawable(new Point2D.Double(getX() + perpVectorS.x + v1.x + moveVectorS.x, getZ() + perpVectorS.y + v1.y + moveVectorS.y),
+            cutter.getTipWidth(), -cutter.getUCFAngle(), ROSETTE_COLOR2, SOLID_LINE));
+        if (motion.usesBoth()) {
+          drawList.add(cutter.getProfile().getDrawable(new Point2D.Double(getX() + perpVectorS.x + v1.x + moveVector2S.x, getZ() + perpVectorS.y + v1.y + moveVector2S.y),
               cutter.getTipWidth(), -cutter.getUCFAngle(), ROSETTE_COLOR3, SOLID_LINE));
-        } else {
-          drawList.add(cutter.getProfile().getDrawable(new Point2D.Double(getX() + perpVectorS.x + v1.x + moveVectorS.x, getZ() + perpVectorS.y + v1.y + moveVectorS.y),
-              cutter.getTipWidth(), -cutter.getUCFAngle(), ROSETTE_COLOR2, SOLID_LINE));
         }
         drawList.add(cutter.getProfile().getDrawable(new Point2D.Double(getX() + perpVectorS.x + v1.x, getZ() + perpVectorS.y + v1.y),
             cutter.getTipWidth(), -cutter.getUCFAngle(), ROSETTE_COLOR, SOLID_LINE));
@@ -521,7 +560,7 @@ public class RosettePoint extends CutPoint implements ActiveEditorDrop {
     indentMore();
     super.writeXML(out);    // for point
     rosette.writeXML(out);
-    if (motion.equals(Motion.BOTH)) {
+    if (motion.usesBoth()) {
       rosette2.writeXML(out);
     }
     indentLess();
@@ -582,16 +621,24 @@ public class RosettePoint extends CutPoint implements ActiveEditorDrop {
    * @return x,z offset from zero.
    */
   protected Vector2d rosetteMove(double angDeg) {
-    Vector2d moveS;
     double xMove = 0.0, zMove = 0.0;
     switch (motion) {
       default:
       case PERP:
+        Vector2d perpS = perpVectorN();
+        perpS.scale(rosette.getAmplitudeAt(angDeg, cutter.getLocation().isOutside()));
+        return perpS;
       case TANGENT:
-        moveS = getMoveVectorN();
-        moveS.scale(rosette.getAmplitudeAt(angDeg, cutter.getLocation().isOutside()));
-        return moveS;
-
+        Vector2d tanS = tanVectorN();
+        tanS.scale(rosette.getAmplitudeAt(angDeg, cutter.getLocation().isOutside()));
+        return tanS;
+      case PERPTAN:
+        Vector2d perp = perpVectorN();
+        perp.scale(rosette.getAmplitudeAt(angDeg, cutter.getLocation().isOutside()));
+        Vector2d tan = tanVectorN();
+        tan.scale(rosette2.getAmplitudeAt(angDeg, cutter.getLocation().isOutside()));
+        return new Vector2d(perp.x + tan.x, perp.y + tan.y);
+        
       case BOTH:
         // get the z movement from rosette2 only when there is both
         zMove = rosette2.getAmplitudeAt(angDeg, cutter.getLocation().isOutside());
@@ -605,30 +652,7 @@ public class RosettePoint extends CutPoint implements ActiveEditorDrop {
         xMove = rosette.getAmplitudeAt(angDeg, cutter.getLocation().isOutside());
         break;
     }
-    switch (cutter.getLocation()) {	// correct sign for cutter location
-      case FRONT_INSIDE:
-      default:
-        moveS = new Vector2d(-xMove, zMove);	// move back to center and/or upward
-        break;
-      case BACK_INSIDE:
-        moveS = new Vector2d(xMove, zMove);		// move forward to center and/or upward
-        break;
-      case FRONT_OUTSIDE:
-        if (isTopOutside()) {	// cutting down on top of shape
-          moveS = new Vector2d(xMove, zMove);		// move out to front and/or up
-        } else {				// cutting up from bottom of shape
-          moveS = new Vector2d(xMove, -zMove);	// move out to front and/or down
-        }
-        break;
-      case BACK_OUTSIDE:
-        if (isTopOutside()) {	// cutting down on top of shape
-          moveS = new Vector2d(-xMove, zMove);	// move out to back and/or up
-        } else {				// cutting up from bottom of shape
-          moveS = new Vector2d(-xMove, -zMove);	// move out to back and/or down
-        }
-        break;
-    }
-    return moveS;
+    return correctForCutter(xMove, zMove);
   }
 
   /**
@@ -700,7 +724,7 @@ public class RosettePoint extends CutPoint implements ActiveEditorDrop {
     // If custom pattern with STRAIGHT line segments, just use the breakpoints.
     // It runs faster!
     // Can't currently use this if BOTH rosettes are used.
-    if (!motion.equals(Motion.BOTH) && (rosette instanceof Rosette) && (((Rosette)rosette).getPattern() instanceof CustomPattern)) {
+    if (!motion.usesBoth() && (rosette instanceof Rosette) && (((Rosette)rosette).getPattern() instanceof CustomPattern)) {
       CustomPattern pat = (CustomPattern) ((Rosette)rosette).getPattern();
       if (pat.getCustomStyle() == CustomStyle.STRAIGHT) {
         int repeat = rosette.getRepeat();
@@ -890,6 +914,7 @@ public class RosettePoint extends CutPoint implements ActiveEditorDrop {
         }
         break;
       case BOTH:
+      case PERPTAN:
         if (((Rosette)rosette).getPattern().getName().equals("NONE")
             && ((Rosette)rosette2).getPattern().getName().equals("NONE")) {
           return true;

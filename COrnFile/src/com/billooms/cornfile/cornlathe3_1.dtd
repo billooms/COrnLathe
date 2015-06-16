@@ -186,13 +186,13 @@
   >
 
 <!--- RosettePoint  with 1 or 2 Rosette and 1 or 2 CompoundRosette in either order -->
-<!ELEMENT RosettePoint (Pt, Rosette*, CompoundRosette*, Rosette*)>
+<!ELEMENT RosettePoint (Pt, (Rosette*, CompoundRosette*)*)>
 <!ATTLIST RosettePoint
     n CDATA #REQUIRED
     snap CDATA "true"
     cutter CDATA #REQUIRED
     depth CDATA #REQUIRED
-    motion (ROCK|PUMP|PERP|TANGENT|BOTH) "ROCK"
+    motion (ROCK|PUMP|PERP|TANGENT|BOTH|PERPTAN) "ROCK"
   >
 
 <!--- LinePoint -->
