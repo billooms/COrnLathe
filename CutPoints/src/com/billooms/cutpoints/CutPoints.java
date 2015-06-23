@@ -849,11 +849,11 @@ public class CutPoints extends CLclass {
    * @param spiralCutPt SpiralCut to expand
    * @param nInserts number of cuts to insert
    * @param cumLength cumulative length at each point along the curve
-   * @param cumTotal total length along the curve
-   * @param rzc twist at each point is radius, z, c(degrees)
+   * @param totLength total length along the curve
+   * @param rzc twist at each point (on the surface) is radius, z, c(degrees)
    */
-  public void spiralToPoints(SpiralCut spiralCutPt, int nInserts, double[] cumLength, double cumTotal, Point3D[] rzc) {
-    double delta = cumTotal / (double) (nInserts + 1);		// this is the step spacing between each new point
+  public void spiralToPoints(SpiralCut spiralCutPt, int nInserts, double[] cumLength, double totLength, Point3D[] rzc) {
+    double ptSpacing = totLength / (double) (nInserts + 1);		// this is the step spacing between each new point
     int num = spiralCutPt.getNum();
     list.remove(spiralCutPt);		// take the old point out
     if (spiralCutPt instanceof SpiralRosette) {     // For SpiralRosettes
@@ -871,9 +871,10 @@ public class CutPoints extends CLclass {
         deltaRosAmp = endCutDepth - rosStartAmp;
       }
       double rosStartPhase = beginRosPt.getRosette().getPhase();
-      double repeat = beginRosPt.getRosette().getRepeat();
+      int repeat = beginRosPt.getRosette().getRepeat();
       
-      double ros2StartAmp = 0, deltaRos2Amp = 0.0, ros2StartPhase = 0, repeat2 = 0;
+      double ros2StartAmp = 0, deltaRos2Amp = 0.0, ros2StartPhase = 0;
+      int repeat2 = 0;
       if (beginRosPt.getMotion().usesBoth()) {
         ros2StartAmp = beginRosPt.getRosette2().getPToP();
         if (ros2StartAmp == startDepth) {
@@ -892,7 +893,7 @@ public class CutPoints extends CLclass {
         RosettePoint newPt = new RosettePoint(spiralCutPt.getPos2D(), beginRosPt);   // position will be changed later
         newPt.setNum(num);
         newPt.setSnap(true);		// snap back onto cut curve
-        target = (double) i * delta;
+        target = (double) i * ptSpacing;
         for (int j = 0; j < cumLength.length - 1; j++) {
           if (cumLength[j] >= target) {
             x = rzc[j - 1].getX() + (rzc[j].getX() - rzc[j - 1].getX()) * (target - cumLength[j - 1]) / (cumLength[j] - cumLength[j - 1]);
@@ -901,26 +902,22 @@ public class CutPoints extends CLclass {
             break;
           }
         }
-        if ((deltaR != 0.0) && (deltaDepth != 0.0) && (deltaRosAmp != 0.0)) {
+        double scale;
+        if (deltaR != 0.0) {
           // Cut depth (and rosette amplitude) should always scale with radius when deltaR != 0
-          newPt.setDepth(startDepth + (x - rStart) / deltaR * deltaDepth);
-          newPt.getRosette().setPToP(rosStartAmp + (x - rStart) / deltaR * deltaRosAmp);
-          if (beginRosPt.getMotion().usesBoth()) {
-            newPt.getRosette2().setPToP(ros2StartAmp + (x - rStart) / deltaR * deltaRos2Amp);
-          }
+          scale = (x - rStart) / deltaR;
         } else {
           // when deltaR == 0, scale with distance
-          newPt.setDepth(startDepth + target / cumTotal * deltaDepth);
-          newPt.getRosette().setPToP(rosStartAmp + target / cumTotal * deltaRosAmp);
-          if (beginRosPt.getMotion().usesBoth()) {
-            newPt.getRosette2().setPToP(ros2StartAmp + target / cumTotal * deltaRos2Amp);
-          }
+          scale = target / totLength;
         }
-        newPt.getRosette().setPhase(rosStartPhase + c * repeat);
+        newPt.setDepth(startDepth + deltaDepth * scale);
+        newPt.getRosette().setPToP(rosStartAmp + deltaRosAmp * scale);
+        newPt.getRosette().setPhase(rosStartPhase + c * (double) repeat);
         if (beginRosPt.getMotion().usesBoth()) {
-          newPt.getRosette2().setPhase(ros2StartPhase + c * repeat2);
+          newPt.getRosette2().setPToP(ros2StartAmp + deltaRos2Amp * scale);
+          newPt.getRosette2().setPhase(ros2StartPhase + c * (double)repeat2);
         }
-        newPt.move(x, z);
+        newPt.move(x, z);     // this is on the surface, but snapping (below) puts it back on the cutter curve
         list.add(num, newPt);
         num++;
       }
@@ -928,7 +925,7 @@ public class CutPoints extends CLclass {
       RosettePoint endRosPt = new RosettePoint(spiralCutPt.getPos2D(), beginRosPt);	// x,z,snap are at the start
       endRosPt.setSnap(spiralCutPt.isSnap());
       endRosPt.setDepth(endCutDepth);
-      endRosPt.getRosette().setPhase(rosStartPhase + rzc[rzc.length - 1].getZ() * repeat);
+      endRosPt.getRosette().setPhase(rosStartPhase + rzc[rzc.length - 1].getZ() * (double)repeat);
       if (rosStartAmp == startDepth) {   // assume that we should scale amplitude if same as depth
         endRosPt.getRosette().setPToP(endCutDepth);
       }
@@ -936,7 +933,7 @@ public class CutPoints extends CLclass {
         if (ros2StartAmp == startDepth) {
           endRosPt.getRosette2().setPToP(endCutDepth);
         }
-        endRosPt.getRosette2().setPhase(ros2StartPhase + rzc[rzc.length - 1].getZ() * repeat2);
+        endRosPt.getRosette2().setPhase(ros2StartPhase + rzc[rzc.length - 1].getZ() * (double)repeat2);
       }
       list.add(num, endRosPt);				// add the last Rosettepoint at the end
     } else if (spiralCutPt instanceof SpiralIndex) {    // for SpiralIndex
@@ -956,7 +953,7 @@ public class CutPoints extends CLclass {
         IndexPoint newPt = new IndexPoint(spiralCutPt.getPos2D(), i0);   // position will be changed later
         newPt.setNum(num);
         newPt.setSnap(true);		// snap back onto cut curve
-        target = (double) i * delta;
+        target = (double) i * ptSpacing;
         for (int j = 0; j < cumLength.length - 1; j++) {
           if (cumLength[j] >= target) {
             x = rzc[j - 1].getX() + (rzc[j].getX() - rzc[j - 1].getX()) * (target - cumLength[j - 1]) / (cumLength[j] - cumLength[j - 1]);
@@ -965,9 +962,9 @@ public class CutPoints extends CLclass {
             break;
           }
         }
-        newPt.setDepth(depth0 + target / cumTotal * (depth1 - depth0));
+        newPt.setDepth(depth0 + target / totLength * (depth1 - depth0));
         newPt.setPhase(i0.getPhase() + c * i0.getRepeat());
-        newPt.move(x, z);
+        newPt.move(x, z);    // this is on the surface, but snapping (below) puts it back on the cutter curve
         list.add(num, newPt);
         num++;
       }
@@ -976,7 +973,7 @@ public class CutPoints extends CLclass {
       list.add(num, i1);				// add the last IndexPoint at the end
     }
 
-    snapAllCutPoints();
+    snapAllCutPoints();   // snap back to the closest point on the cutter curve
     renumber();
     pcs.firePropertyChange(PROP_ADD, null, null);
   }

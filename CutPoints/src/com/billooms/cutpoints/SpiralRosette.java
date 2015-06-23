@@ -396,11 +396,12 @@ public class SpiralRosette extends SpiralCut {
 
   @Override
   public synchronized void cutSurface(Surface surface, ProgressMonitor monitor) {
-    Point3D[] rzc = getCutterTwist();
+    Point3D[] rzcCutter = getCutterTwist();     // This is on the cutter curve
+    Point3D[] rzc = getSurfaceTwist();           // This is on the surface curve
     ArrayList<Point3D> xyz = toXYZ(rzc);
 
-    double totLength = getTotalDistance(xyz);	// actual length on the spiral
-    if (totLength <= 0.0) {         // so we don't divide by zero further down
+    double totLength = getTotalDistance(xyz);	// actual length on the spiral on the surface
+    if (totLength <= 0.0) {                 // so we don't divide by zero further down
       beginPt.cutSurface(surface, monitor);	// no movement, so just cut this one place
       return;
     }
@@ -415,19 +416,20 @@ public class SpiralRosette extends SpiralCut {
     if (rosStartAmp == startDepth) {
       deltaRosAmp = endCutDepth - rosStartAmp;  // taper the rocking/perp amplitude
     }
-    double rosPhase = modPt.getRosette().getPhase();
+    double rosStartPhase = modPt.getRosette().getPhase();
+    int repeat = modPt.getRosette().getRepeat();
 
     double ros2StartAmp = 0.0, deltaRos2Amp = 0.0, ros2StartPhase = 0.0;
+    int repeat2 = 0;
     if (modPt.getMotion().usesBoth()) {
       ros2StartAmp = modPt.getRosette2().getPToP();
       if (ros2StartAmp == startDepth) {
         deltaRos2Amp = endCutDepth - ros2StartAmp;  // taper the pumping amplitude
       }
       ros2StartPhase = modPt.getRosette2().getPhase();
+      repeat2 = modPt.getRosette2().getRepeat();
     }
 
-    // NOTE: if Motion == BOTH, then pump rosette gets the same repeat!
-    int repeat = modPt.getRosette().getRepeat();
     double cumLength = 0.0;
     
     double rStart = rzc[0].getX();
@@ -436,26 +438,23 @@ public class SpiralRosette extends SpiralCut {
       if (i > 0) {
         cumLength += xyz.get(i).distance(xyz.get(i - 1));
       }
-      // Cut depth (and rosette amplitude) should always scale with radius
-      // unless radius is constant -- then scale with cumLength
+      double scale;
       if (deltaR != 0.0) {
-        modPt.setDepth(startDepth + (rzc[i].getX() - rStart) / deltaR * deltaDepth);
-        modPt.getRosette().setPToP(rosStartAmp + (rzc[i].getX() - rStart) / deltaR * deltaRosAmp);
+        // Cut depth (and rosette amplitude) should always scale with radius when deltaR != 0
+        scale = (rzc[i].getX() - rStart) / deltaR;
       } else {
-        modPt.setDepth(startDepth + cumLength / totLength * deltaDepth);
-        modPt.getRosette().setPToP(rosStartAmp + cumLength / totLength * deltaRosAmp);
+        // when radius is constant, scale with distance
+        scale = cumLength / totLength;
       }
-      modPt.getRosette().setPhase(rosPhase + rzc[i].getZ() * repeat);
+      modPt.setDepth(startDepth + deltaDepth * scale);
+      modPt.getRosette().setPToP(rosStartAmp + deltaRosAmp * scale);
+      modPt.getRosette().setPhase(rosStartPhase + rzc[i].getZ() * (double) repeat);
       if (modPt.getMotion().usesBoth()) {
-        if (deltaR != 0.0) {
-          modPt.getRosette2().setPToP(ros2StartAmp + (rzc[i].getX() - rStart) / deltaR * deltaRos2Amp);
-        } else {
-          modPt.getRosette2().setPToP(ros2StartAmp + cumLength / totLength * deltaRos2Amp);
-        }
-        modPt.getRosette2().setPhase(ros2StartPhase + rzc[i].getZ() * repeat);
+        modPt.getRosette2().setPToP(ros2StartAmp + deltaRos2Amp * scale);
+        modPt.getRosette2().setPhase(ros2StartPhase + rzc[i].getZ() * (double) repeat2);
       }
-      modPt.move(rzc[i].getX(), rzc[i].getY());
-      monitor.setProgress(num+1);
+      modPt.move(rzcCutter[i].getX(), rzcCutter[i].getY());
+      monitor.setProgress(num + 1);
       monitor.setNote("CutPoint " + getNum() + ": " + i + "/" + rzc.length + "\n");
       modPt.cutSurface(surface, monitor);
       if (monitor.isCanceled()) {
@@ -469,7 +468,8 @@ public class SpiralRosette extends SpiralCut {
     cutList.comment("SpiralRosette " + num);
     cutList.comment("Cutter: " + cutter);
 
-    Point3D[] rzc = getCutterTwist();
+    Point3D[] rzcCutter = getCutterTwist();     // This is on the cutter curve
+    Point3D[] rzc = getSurfaceTwist();           // This is on the surface curve
     ArrayList<Point3D> xyz = toXYZ(rzc);
 
     double totLength = getTotalDistance(xyz);	// actual length on the spiral
@@ -489,18 +489,19 @@ public class SpiralRosette extends SpiralCut {
       deltaRosAmp = endCutDepth - rosStartAmp;  // taper the rocking/perp amplitude
     }
     double rosStartPhase = modPt.getRosette().getPhase();
+    int repeat = modPt.getRosette().getRepeat();
 
     double ros2StartAmp = 0.0, deltaRos2Amp = 0.0, ros2StartPhase = 0.0;
+    int repeat2 = 0;
     if (modPt.getMotion().usesBoth()) {
       ros2StartAmp = modPt.getRosette2().getPToP();
       if (ros2StartAmp == startDepth) {
         deltaRos2Amp = endCutDepth - ros2StartAmp;  // taper the pumping amplitude
       }
       ros2StartPhase = modPt.getRosette2().getPhase();
+      repeat2 = modPt.getRosette2().getRepeat();
     }
-
-    // NOTE: if Motion == BOTH, then pump rosette gets the same repeat!
-    int repeat = modPt.getRosette().getRepeat();
+    
     double cumLength = 0.0;
     
     double rStart = rzc[0].getX();
@@ -509,25 +510,22 @@ public class SpiralRosette extends SpiralCut {
       if (i > 0) {
         cumLength += xyz.get(i).distance(xyz.get(i - 1));
       }
-      // Cut depth (and rosette amplitude) should always scale with radius
-      // unless radius is constant -- then scale with cumLength
+      double scale;
       if (deltaR != 0.0) {
-        modPt.setDepth(startDepth + (rzc[i].getX() - rStart) / deltaR * deltaDepth);
-        modPt.getRosette().setPToP(rosStartAmp + (rzc[i].getX() - rStart) / deltaR * deltaRosAmp);
+        // Cut depth (and rosette amplitude) should always scale with radius when deltaR != 0
+        scale = (rzc[i].getX() - rStart) / deltaR;
       } else {
-        modPt.setDepth(startDepth + cumLength / totLength * deltaDepth);
-        modPt.getRosette().setPToP(rosStartAmp + cumLength / totLength * deltaRosAmp);
+        // when radius is constant, scale with distance
+        scale = cumLength / totLength;
       }
-      modPt.getRosette().setPhase(rosStartPhase + rzc[i].getZ() * repeat);
+      modPt.setDepth(startDepth + deltaDepth * scale);
+      modPt.getRosette().setPToP(rosStartAmp + deltaRosAmp * scale);
+      modPt.getRosette().setPhase(rosStartPhase + rzc[i].getZ() * (double)repeat);
       if (modPt.getMotion().usesBoth()) {
-        if (deltaR != 0.0) {
-          modPt.getRosette2().setPToP(ros2StartAmp + (rzc[i].getX() - rStart) / deltaR * deltaRos2Amp);
-        } else {
-          modPt.getRosette2().setPToP(ros2StartAmp + cumLength / totLength * deltaRos2Amp);
-        }
-        modPt.getRosette2().setPhase(ros2StartPhase + rzc[i].getZ() * repeat);
+        modPt.getRosette2().setPToP(ros2StartAmp + deltaRos2Amp * scale);
+        modPt.getRosette2().setPhase(ros2StartPhase + rzc[i].getZ() * (double)repeat2);
       }
-      modPt.move(rzc[i].getX(), rzc[i].getY());
+      modPt.move(rzcCutter[i].getX(), rzcCutter[i].getY());
       modPt.makeInstructions(passDepth, passStep, lastDepth, lastStep, stepsPerRot, rotation);
 //      System.out.println("x:" + rzc[i].getX() + " z:" + rzc[i].getY() + " depth:" + modPt.getDepth() + " amp:" + modPt.getRosette().getPToP());
     }
