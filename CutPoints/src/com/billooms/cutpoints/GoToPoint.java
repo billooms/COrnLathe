@@ -133,9 +133,9 @@ public class GoToPoint extends CutPoint implements ActiveEditorDrop {
   protected void make3DLines() {
     // do nothing for a GoToPoint
   }
-
+  
   @Override
-  public void makeInstructions(double passDepth, int passStep, double lastDepth, int lastStep, int stepsPerRot, CoarseFine.Rotation rotation) {
+  public void makeInstructions(CoarseFine controls, int stepsPerRot) {
     cutList.comment("GoToPoint " + num);
     cutList.spindleWrapCheck();
     cutList.goToXZC(FAST, getX(), getZ(), 0.0);

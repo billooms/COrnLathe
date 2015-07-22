@@ -399,9 +399,9 @@ public class LinePoint extends CutPoint {
     }
     surface.rotateZ(360.0 - lastC);		// bring it back to the starting point
   }
-
+  
   @Override
-  public void makeInstructions(double passDepth, int passStep, double lastDepth, int lastStep, int stepsPerRot, CoarseFine.Rotation rotation) {
+  public void makeInstructions(CoarseFine controls, int stepsPerRot) {
     throw new UnsupportedOperationException("LinePoint.makeInstructions Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }
 

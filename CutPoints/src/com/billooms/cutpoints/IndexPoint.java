@@ -473,15 +473,11 @@ public class IndexPoint extends CutPoint implements ActiveEditorDrop {
   /**
    * Make instructions for this CutPoint
    *
-   * @param passDepth depth per pass (course cut)
-   * @param passStep spindle steps per instruction (course cut)
-   * @param lastDepth depth of final cut
-   * @param lastStep spindle steps per instruction (final cut)
+   * @param controls control panel data
    * @param stepsPerRot steps per rotation
-   * @param rotation Rotation of spindle
    */
   @Override
-  public void makeInstructions(double passDepth, int passStep, double lastDepth, int lastStep, int stepsPerRot, CoarseFine.Rotation rotation) {
+  public void makeInstructions(CoarseFine controls, int stepsPerRot) {
     Vector2d moveVectorN = getMoveVector(1.0);
     cutList.comment("IndexPoint " + num);
     cutList.comment("Cutter: " + cutter);

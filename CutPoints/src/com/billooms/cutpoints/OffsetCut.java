@@ -306,7 +306,7 @@ public abstract class OffsetCut extends CutPoint {
   }
 
   @Override
-  public void makeInstructions(double passDepth, int passStep, double lastDepth, int lastStep, int stepsPerRot, CoarseFine.Rotation rotation) {
+  public void makeInstructions(CoarseFine controls, int stepsPerRot) {
     // Only show comments pertaing to the offset
     cutList.comment("************************");
     cutList.comment("OffsetCut " + num);

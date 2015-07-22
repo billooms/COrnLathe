@@ -277,15 +277,11 @@ public class SpiralIndex extends SpiralCut {
   /**
    * Make instructions for this CutPoint
    *
-   * @param passDepth depth per pass (course cut)
-   * @param passStep spindle steps per instruction (course cut)
-   * @param lastDepth depth of final cut
-   * @param lastStep spindle steps per instruction (final cut)
+   * @param controls control panel data
    * @param stepsPerRot steps per rotation
-   * @param rotation Rotation of spindle
    */
   @Override
-  public void makeInstructions(double passDepth, int passStep, double lastDepth, int lastStep, int stepsPerRot, CoarseFine.Rotation rotation) {
+  public void makeInstructions(CoarseFine controls, int stepsPerRot) {
     cutList.comment("SpiralIndex " + num);
     cutList.comment("Cutter: " + cutter);
     
@@ -294,7 +290,7 @@ public class SpiralIndex extends SpiralCut {
     
     double totLength = getTotalDistance(xyz);	// actual length on the spiral
     if (totLength <= 0.0) {		// so we don't divide by zero further down
-      beginPt.makeInstructions(passDepth, passStep, lastDepth, lastStep, stepsPerRot, rotation);	// no movement, so just cut this one place
+      beginPt.makeInstructions(controls, stepsPerRot);	// no movement, so just cut this one place
       return;
     }
 

@@ -407,9 +407,9 @@ public class SpiralLine extends SpiralCut {
       }
     }
   }
-
+  
   @Override
-  public void makeInstructions(double passDepth, int passStep, double lastDepth, int lastStep, int stepsPerRot, CoarseFine.Rotation rotation) {
+  public void makeInstructions(CoarseFine controls, int stepsPerRot) {
     cutList.comment("SpiralLine " + num);
     cutList.comment("Cutter: " + cutter);
 

@@ -1,7 +1,7 @@
 package com.billooms.cutpoints;
 
 import com.billooms.clclass.CLUtilities;
-import com.billooms.controls.CoarseFine.Rotation;
+import com.billooms.controls.CoarseFine;
 import static com.billooms.controls.CoarseFine.Rotation.*;
 import static com.billooms.cutlist.Speed.*;
 import static com.billooms.cutpoints.CutPoints.NUM_3D_PTS;
@@ -658,15 +658,11 @@ public class RosettePoint extends CutPoint implements ActiveEditorDrop {
   /**
    * Make instructions for this CutPoint
    *
-   * @param passDepth depth per pass (course cut)
-   * @param passStep spindle steps per instruction (course cut)
-   * @param lastDepth depth of final cut
-   * @param lastStep spindle steps per instruction (final cut)
+   * @param controls control panel data
    * @param stepsPerRot steps per rotation
-   * @param rotation Rotation of spindle
    */
   @Override
-  public void makeInstructions(double passDepth, int passStep, double lastDepth, int lastStep, int stepsPerRot, Rotation rotation) {
+  public void makeInstructions(CoarseFine controls, int stepsPerRot) {
     cutList.comment("RosettePoint " + num);
     cutList.comment("Cutter: " + cutter);
     cutList.spindleWrapCheck();
@@ -677,19 +673,63 @@ public class RosettePoint extends CutPoint implements ActiveEditorDrop {
 
     // Increasing cut depth with the coarse depth per cut
     double depth = 0.0;
-    while (depth < (cutDepth - lastDepth)) {
-      depth = Math.min(cutDepth - lastDepth, depth + passDepth);
-      boolean dir = (rotation == NEG_LAST) ? NOT_LAST : ((rotation == PLUS_ALWAYS) ? ROTATE_POS : ROTATE_NEG);
-      followRosette(depth, passStep, dir, stepsPerRot);
+    while (depth < (cutDepth - controls.getLastDepth())) {
+      depth = Math.min(cutDepth - controls.getLastDepth(), depth + controls.getPassDepth());
+      boolean dir = (controls.getRotation() == NEG_LAST) ? NOT_LAST : ((controls.getRotation() == PLUS_ALWAYS) ? ROTATE_POS : ROTATE_NEG);
+      followRosette(depth, controls.getPassStep(), dir, stepsPerRot);
     }
-    if (lastDepth > 0.0) {
-      boolean dir = (rotation == NEG_LAST) ? LAST : ((rotation == PLUS_ALWAYS) ? ROTATE_POS : ROTATE_NEG);
-      followRosette(cutDepth, lastStep, dir, stepsPerRot);
+    if (controls.getLastDepth() > 0.0) {
+      boolean dir = (controls.getRotation() == NEG_LAST) ? LAST : ((controls.getRotation() == PLUS_ALWAYS) ? ROTATE_POS : ROTATE_NEG);
+      followRosette(cutDepth, controls.getLastStep(), dir, stepsPerRot);
+    }
+    if (controls.isCleanup()) {
+      boolean dir = (controls.getRotation() == NEG_LAST) ? LAST : ((controls.getRotation() == PLUS_ALWAYS) ? ROTATE_POS : ROTATE_NEG);
+      followRosette(cutDepth, controls.getCleanupStep(), dir, stepsPerRot);
+    }
+    if (controls.isSoftLift()) {
+      boolean dir = (controls.getRotation() == NEG_LAST) ? LAST : ((controls.getRotation() == PLUS_ALWAYS) ? ROTATE_POS : ROTATE_NEG);
+      followRosetteLift(cutDepth, controls, dir, stepsPerRot);
     }
 
     // back to the starting position
     cutList.spindleWrapCheck();
     cutList.goToXZC(FAST, start.x, start.y, 0.0);
+  }
+
+  /**
+   * Add instructions to the cutList for following rosettes.
+   *
+   * @param depth the depth of this cut
+   * @param controls control panel data
+   * @param negRotate true=rotate negative; false=rotate positive
+   * @param stepsPerRot steps per rotation
+   */
+  private void followRosetteLift(double depth, CoarseFine controls, boolean negRotate, int stepsPerRot) {
+    int step = (controls.isCleanup() ? controls.getCleanupStep() : controls.getLastStep());
+    double liftHeight = controls.getSoftLiftHeight();
+    double liftDeg = controls.getSoftLiftDeg();
+    int stepLift = (int)((double)stepsPerRot * (liftDeg / 360.0));
+    
+    Vector2d perpVectorN = getPerpVector(1.0);
+    
+    cutList.spindleWrapCheck();
+    
+    double c = 0.0, x0, z0;
+    for (int i = 0; i <= stepLift; i = i + step) {
+      c = 360.0 * (double) i / (double) stepsPerRot;
+      double lift = liftHeight * c / liftDeg;
+      x0 = getX() + (depth - lift) * perpVectorN.x;
+      z0 = getZ() + (depth - lift) * perpVectorN.y;
+      if (negRotate) {
+        c = -c;     // negative rotation
+      }
+      if (i == 0) {
+        cutList.goToXZC(VELOCITY, rosetteMove(c, x0, z0), c);	// first point at velocity
+      } else {
+        cutList.goToXZC(RPM, rosetteMove(c, x0, z0), c);	// and other points at RPM
+      }
+    }
+    cutList.goToXZC(VELOCITY, rosetteMove(c, getX(), getZ()), c);	// first point at velocity
   }
 
   /**

@@ -805,25 +805,21 @@ public class CutPoints extends CLclass {
    *
    * @param cPt Output for a single OffsetCutPoint (do all if this is null)
    * @param cutter selected cutter
-   * @param passDepth depth per pass (course cut)
-   * @param passStep spindle steps per instruction (course cut)
-   * @param lastDepth depth of final cut
-   * @param lastStep spindle steps per instruction (final cut)
+   * @param controls control panel data
    * @param stepsPerRot steps per rotation
-   * @param rotation Rotation of spindle
    */
-  public void makeInstructions(OffsetCut cPt, Cutter cutter, double passDepth, int passStep, double lastDepth, int lastStep, int stepsPerRot, CoarseFine.Rotation rotation) {
+  public void makeInstructions(OffsetCut cPt, Cutter cutter, CoarseFine controls, int stepsPerRot) {
     if (list.isEmpty()) {
       return;
     }
     if (cPt == null) {
       for (CutPoint cp : getAll(cutter)) {
         if (!(cp instanceof OffsetCut)) {			// no reason to ever generate code for multiple OffsetCutPoint
-          cp.makeInstructions(passDepth, passStep, lastDepth, lastStep, stepsPerRot, rotation);
+          cp.makeInstructions(controls, stepsPerRot);
         }
       }
     } else {
-      cPt.makeInstructions(passDepth, passStep, lastDepth, lastStep, stepsPerRot, rotation);
+      cPt.makeInstructions(controls, stepsPerRot);
     }
   }
 

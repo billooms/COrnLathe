@@ -4,6 +4,7 @@ import com.billooms.clclass.CLUtilities;
 import static com.billooms.clclass.CLclass.indent;
 import static com.billooms.clclass.CLclass.indentLess;
 import static com.billooms.clclass.CLclass.indentMore;
+import com.billooms.controls.CoarseFine;
 import com.billooms.controls.CoarseFine.Rotation;
 import static com.billooms.controls.CoarseFine.Rotation.NEG_LAST;
 import static com.billooms.controls.CoarseFine.Rotation.PLUS_ALWAYS;
@@ -526,16 +527,12 @@ public class PatternPoint extends OffsetCut {
   /**
    * Make instructions for this CutPoint
    *
-   * @param passDepth depth per pass (course cut)
-   * @param passStep spindle steps per instruction (course cut)
-   * @param lastDepth depth of final cut
-   * @param lastStep spindle steps per instruction (final cut)
+   * @param controls control panel data
    * @param stepsPerRot steps per rotation
-   * @param rotation Rotation of spindle
    */
   @Override
-  public void makeInstructions(double passDepth, int passStep, double lastDepth, int lastStep, int stepsPerRot, Rotation rotation) {
-    super.makeInstructions(passDepth, passStep, lastDepth, lastStep, stepsPerRot, rotation);	// writes comments only
+  public void makeInstructions(CoarseFine controls, int stepsPerRot) {
+    super.makeInstructions(controls, stepsPerRot);	// writes comments only
     cutList.comment("PatternPoint " + num);
     cutList.comment("Cutter: " + cutter);
     cutList.spindleWrapCheck();
@@ -547,14 +544,14 @@ public class PatternPoint extends OffsetCut {
 
     // Increasing cut depth with the coarse depth per cut
     double depth = 0.0;
-    while (depth < (cutDepth - lastDepth)) {		// this is not the last cut
-      depth = Math.min(cutDepth - lastDepth, depth + passDepth);
-      boolean dir = (rotation == NEG_LAST) ? NOT_LAST : ((rotation == PLUS_ALWAYS) ? ROTATE_POS : ROTATE_NEG);
-      followPattern(depth, passStep, dir, stepsPerRot);
+    while (depth < (cutDepth - controls.getLastDepth())) {		// this is not the last cut
+      depth = Math.min(cutDepth - controls.getLastDepth(), depth + controls.getPassDepth());
+      boolean dir = (controls.getRotation() == NEG_LAST) ? NOT_LAST : ((controls.getRotation() == PLUS_ALWAYS) ? ROTATE_POS : ROTATE_NEG);
+      followPattern(depth, controls.getPassStep(), dir, stepsPerRot);
     }
-    if (lastDepth > 0.0) {		// this is the last cut
-      boolean dir = (rotation == NEG_LAST) ? LAST : ((rotation == PLUS_ALWAYS) ? ROTATE_POS : ROTATE_NEG);
-      followPattern(cutDepth, lastStep, dir, stepsPerRot);
+    if (controls.getLastDepth() > 0.0) {		// this is the last cut
+      boolean dir = (controls.getRotation() == NEG_LAST) ? LAST : ((controls.getRotation() == PLUS_ALWAYS) ? ROTATE_POS : ROTATE_NEG);
+      followPattern(cutDepth, controls.getLastStep(), dir, stepsPerRot);
     }
 
     // back to the starting position

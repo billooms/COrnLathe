@@ -464,7 +464,7 @@ public class SpiralRosette extends SpiralCut {
   }
 
   @Override
-  public void makeInstructions(double passDepth, int passStep, double lastDepth, int lastStep, int stepsPerRot, CoarseFine.Rotation rotation) {
+  public void makeInstructions(CoarseFine controls, int stepsPerRot) {
     cutList.comment("SpiralRosette " + num);
     cutList.comment("Cutter: " + cutter);
 
@@ -474,7 +474,7 @@ public class SpiralRosette extends SpiralCut {
 
     double totLength = getTotalDistance(xyz);	// actual length on the spiral
     if (totLength <= 0.0) {         // so we don't divide by zero further down
-      beginPt.makeInstructions(passDepth, passStep, lastDepth, lastStep, stepsPerRot, rotation);	// no movement, so just cut this one place
+      beginPt.makeInstructions(controls, stepsPerRot);	// no movement, so just cut this one place
       return;
     }
 
@@ -526,7 +526,7 @@ public class SpiralRosette extends SpiralCut {
         modPt.getRosette2().setPhase(ros2StartPhase + rzc[i].getZ() * (double)repeat2);
       }
       modPt.move(rzcCutter[i].getX(), rzcCutter[i].getY());
-      modPt.makeInstructions(passDepth, passStep, lastDepth, lastStep, stepsPerRot, rotation);
+      modPt.makeInstructions(controls, stepsPerRot);
 //      System.out.println("x:" + rzc[i].getX() + " z:" + rzc[i].getY() + " depth:" + modPt.getDepth() + " amp:" + modPt.getRosette().getPToP());
     }
   }

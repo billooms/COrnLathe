@@ -35,14 +35,10 @@ public interface OffPoint {
   /**
    * Make instructions for this CutPoint
    *
-   * @param passDepth depth per pass (course cut)
-   * @param passStep spindle steps per instruction (course cut)
-   * @param lastDepth depth of final cut
-   * @param lastStep spindle steps per instruction (final cut)
+   * @param controls control panel data
    * @param stepsPerRot steps per rotation
-   * @param rotation Rotation of spindle
    * @param x new x-coordinate
    * @param z new z-coordinate
    */
-  void makeInstructions(double passDepth, int passStep, double lastDepth, int lastStep, int stepsPerRot, CoarseFine.Rotation rotation, double x, double z);
+  void makeInstructions(CoarseFine controls, int stepsPerRot, double x, double z);
 }

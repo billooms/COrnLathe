@@ -379,14 +379,14 @@ public class OffsetGroup extends OffsetCut {
     indentLess();
     out.println(indent + "</OffsetGroup>");
   }
-
+  
   @Override
-  public void makeInstructions(double passDepth, int passStep, double lastDepth, int lastStep, int stepsPerRot, CoarseFine.Rotation rotation) {
-    super.makeInstructions(passDepth, passStep, lastDepth, lastStep, stepsPerRot, rotation);	// writes comments only
+  public void makeInstructions(CoarseFine controls, int stepsPerRot) {
+    super.makeInstructions(controls, stepsPerRot);	// writes comments only
     for (CutPoint cPt : cpList) {
       if (cPt instanceof OffRosettePoint) {
         Vector2d offsetPt = offsetForCutPoint(cPt);
-        ((OffRosettePoint) cPt).makeInstructions(passDepth, passStep, lastDepth, lastStep, stepsPerRot, rotation, offsetPt.x, offsetPt.y);
+        ((OffRosettePoint) cPt).makeInstructions(controls, stepsPerRot, offsetPt.x, offsetPt.y);
       }
     }
   }

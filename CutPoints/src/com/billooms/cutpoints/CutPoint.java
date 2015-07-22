@@ -2,6 +2,7 @@ package com.billooms.cutpoints;
 
 import com.billooms.clclass.CLUtilities;
 import com.billooms.clclass.CLclass;
+import com.billooms.controls.CoarseFine;
 import com.billooms.controls.CoarseFine.Rotation;
 import com.billooms.cutlist.CutList;
 import com.billooms.cutpoints.surface.Line3D;
@@ -516,14 +517,10 @@ public abstract class CutPoint extends CLclass {
   /**
    * Make instructions for this CutPoint
    *
-   * @param passDepth depth per pass (course cut)
-   * @param passStep spindle steps per instruction (course cut)
-   * @param lastDepth depth of final cut
-   * @param lastStep spindle steps per instruction (final cut)
+   * @param controls control panel data
    * @param stepsPerRot steps per rotation
-   * @param rotation Rotation of spindle
    */
-  public abstract void makeInstructions(double passDepth, int passStep, double lastDepth, int lastStep, int stepsPerRot, Rotation rotation);
+  public abstract void makeInstructions(CoarseFine controls, int stepsPerRot);
 
   /**
    * Make a line to display on the shape (like a pen chuck). This can be done

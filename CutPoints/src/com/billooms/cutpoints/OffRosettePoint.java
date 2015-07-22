@@ -353,7 +353,7 @@ public class OffRosettePoint extends RosettePoint implements OffPoint {
   }
 
   @Override
-  public void makeInstructions(double passDepth, int passStep, double lastDepth, int lastStep, int stepsPerRot, CoarseFine.Rotation rotation, double x, double z) {
+  public void makeInstructions(CoarseFine controls, int stepsPerRot, double x, double z) {
     cutList.comment("OffRosettePoint " + num);
     cutList.comment("Cutter: " + cutter);
     cutList.spindleWrapCheck();
@@ -364,14 +364,14 @@ public class OffRosettePoint extends RosettePoint implements OffPoint {
 
     // Increasing cut depth with the coarse depth per cut
     double depth = 0.0;
-    while (depth < (cutDepth - lastDepth)) {		// this is not the last cut
-      depth = Math.min(cutDepth - lastDepth, depth + passDepth);
-      boolean dir = (rotation == NEG_LAST) ? NOT_LAST : ((rotation == PLUS_ALWAYS) ? ROTATE_POS : ROTATE_NEG);
-      followRosette(depth, passStep, dir, stepsPerRot, x, z);
+    while (depth < (cutDepth - controls.getLastDepth())) {		// this is not the last cut
+      depth = Math.min(cutDepth - controls.getLastDepth(), depth + controls.getPassDepth());
+      boolean dir = (controls.getRotation() == NEG_LAST) ? NOT_LAST : ((controls.getRotation() == PLUS_ALWAYS) ? ROTATE_POS : ROTATE_NEG);
+      followRosette(depth, controls.getPassStep(), dir, stepsPerRot, x, z);
     }
-    if (lastDepth > 0.0) {		// this is the last cut
-      boolean dir = (rotation == NEG_LAST) ? LAST : ((rotation == PLUS_ALWAYS) ? ROTATE_POS : ROTATE_NEG);
-      followRosette(cutDepth, lastStep, dir, stepsPerRot, x, z);
+    if (controls.getLastDepth() > 0.0) {		// this is the last cut
+      boolean dir = (controls.getRotation() == NEG_LAST) ? LAST : ((controls.getRotation() == PLUS_ALWAYS) ? ROTATE_POS : ROTATE_NEG);
+      followRosette(cutDepth, controls.getLastStep(), dir, stepsPerRot, x, z);
     }
 
     // back to the starting position
