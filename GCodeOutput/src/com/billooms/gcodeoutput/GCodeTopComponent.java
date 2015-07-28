@@ -135,11 +135,7 @@ public final class GCodeTopComponent extends TopComponent implements PropertyCha
       return;
     }
     if (controlPanel.cutRosetteButton.isSelected()) {
-      cutMgr.makeInstructions(cPt, cutter,
-          controlPanel.cfPanel.getPassDepth(), controlPanel.cfPanel.getPassStep(),
-          controlPanel.cfPanel.getLastDepth(), controlPanel.cfPanel.getLastStep(),
-          prefs.getStepsPerRotation(),
-          controlPanel.cfPanel.getRotation());
+      cutMgr.makeInstructions(cPt, cutter, controlPanel.cfPanel.getCoarseFine(), prefs.getStepsPerRotation());
     } else if (controlPanel.cutCurveButton.isSelected()) {
       controlPanel.cutCurvePanel.makeInstructions(cutList, cutter, outline);
     } else {      // threads
@@ -173,7 +169,7 @@ public final class GCodeTopComponent extends TopComponent implements PropertyCha
     out.println("g20 (units are inches)");
     out.println("g90 (absolute distance mode)");
 
-    int maxInvF = 60 * prefs.getMaxGPerSec();       // Max inverse time speed based on max instructions per second
+//    int maxInvF = 60 * prefs.getMaxGPerSec();       // Max inverse time speed based on max instructions per second
     int stepsPerRot = prefs.getStepsPerRotation();
     int stepsPerInch = prefs.getStepsPerInch();
     double rpm = controlPanel.feedPanel.getRpm();	// rotations per minute
@@ -291,7 +287,8 @@ public final class GCodeTopComponent extends TopComponent implements PropertyCha
                 + " x" + F5.format(xx)
                 + " z" + F5.format(zz)
                 + " c" + F2.format(cc)
-                + " f" + F2.format(Math.min(1.0 / time, maxInvF)));
+//                + " f" + F2.format(Math.min(1.0 / time, maxInvF)));
+                + " f" + F2.format(1.0 / time));
           } else {				// c isn't moving, so x or z must be moving
             // Inches per minute mode limited by velocity
             out.println("g94 g1"

@@ -74,6 +74,31 @@ public class CoarseFineNode extends AbstractNode implements PropertyChangeListen
       lastStepProp.setShortDescription("Number of micro-steps per movement on last pass");
       set.put(lastStepProp);
 
+      Property<Boolean> cleanupProp = new PropertySupport.Reflection<>(coarseFine, boolean.class, "Cleanup");
+      cleanupProp.setName("Cleanup");
+      cleanupProp.setShortDescription("Optional cleanup rotation");
+      set.put(cleanupProp);
+
+      Property<Integer> cleanupStep = new PropertySupport.Reflection<>(coarseFine, int.class, "CleanupStep");
+      cleanupStep.setName("Cleanup Step");
+      cleanupStep.setShortDescription("Number of micro-steps per movement on cleanup pass");
+      set.put(cleanupStep);
+
+      Property<Boolean> softLiftProp = new PropertySupport.Reflection<>(coarseFine, boolean.class, "SoftLift");
+      softLiftProp.setName("SoftLift");
+      softLiftProp.setShortDescription("Optional soft lift-off");
+      set.put(softLiftProp);
+
+      Property<Double> softLiftHeightProp = new PropertySupport.Reflection<>(coarseFine, double.class, "SoftLiftHeight");
+      softLiftHeightProp.setName("Soft Lift Height");
+      softLiftHeightProp.setShortDescription("Height of soft lift-off.");
+      set.put(softLiftHeightProp);
+
+      Property<Double> softLiftDegProp = new PropertySupport.Reflection<>(coarseFine, double.class, "SoftLiftDeg");
+      softLiftDegProp.setName("Soft Lift Rotation");
+      softLiftDegProp.setShortDescription("Rotation of soft lift-off in degrees.");
+      set.put(softLiftDegProp);
+
       Property<Rotation> rotProp = new PropertySupport.Reflection<>(coarseFine, Rotation.class, "Rotation");
       rotProp.setName("Rotation");
       rotProp.setShortDescription("Direction of spindle rotation");

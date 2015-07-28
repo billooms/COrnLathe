@@ -71,15 +71,15 @@ public class HardwarePrefs {
     return stepsPerInch;
   }
 
-  /**
-   * Get the maximum number of g-code instructions per second. This is a
-   * function of the CPU speed on the machine running the g-code.
-   *
-   * @return maximum g-code instructions per second
-   */
-  public int getMaxGPerSec() {
-    return NbPreferences.forModule(HardwarePrefPanel.class).getInt("maxG", 100);
-  }
+//  /**
+//   * Get the maximum number of g-code instructions per second. This is a
+//   * function of the CPU speed on the machine running the g-code.
+//   *
+//   * @return maximum g-code instructions per second
+//   */
+//  public int getMaxGPerSec() {
+//    return NbPreferences.forModule(HardwarePrefPanel.class).getInt("maxG", 100);
+//  }
 
   /**
    * Update all values from the last saved preferences

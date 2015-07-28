@@ -65,8 +65,6 @@ final class HardwarePrefPanel extends JPanel {
     browseButton = new javax.swing.JButton();
     filePathLabel = new javax.swing.JLabel();
     jLabel4 = new javax.swing.JLabel();
-    jLabel10 = new javax.swing.JLabel();
-    maxGField = new javax.swing.JFormattedTextField();
     IPPanel = new javax.swing.JPanel();
     emcCheck = new javax.swing.JCheckBox();
     jLabel9 = new javax.swing.JLabel();
@@ -212,20 +210,12 @@ final class HardwarePrefPanel extends JPanel {
 
     org.openide.awt.Mnemonics.setLocalizedText(jLabel4, org.openide.util.NbBundle.getMessage(HardwarePrefPanel.class, "HardwarePrefPanel.jLabel4.text")); // NOI18N
 
-    org.openide.awt.Mnemonics.setLocalizedText(jLabel10, org.openide.util.NbBundle.getMessage(HardwarePrefPanel.class, "HardwarePrefPanel.jLabel10.text")); // NOI18N
-
-    maxGField.setColumns(3);
-    maxGField.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(java.text.NumberFormat.getIntegerInstance())));
-    maxGField.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-    maxGField.setText(org.openide.util.NbBundle.getMessage(HardwarePrefPanel.class, "HardwarePrefPanel.maxGField.text")); // NOI18N
-    maxGField.setFocusLostBehavior(javax.swing.JFormattedTextField.COMMIT);
-
     javax.swing.GroupLayout GCodePanelLayout = new javax.swing.GroupLayout(GCodePanel);
     GCodePanel.setLayout(GCodePanelLayout);
     GCodePanelLayout.setHorizontalGroup(
       GCodePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
       .addGroup(GCodePanelLayout.createSequentialGroup()
-        .addContainerGap()
+        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         .addGroup(GCodePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
           .addComponent(sameAsXMLCheck)
           .addGroup(GCodePanelLayout.createSequentialGroup()
@@ -234,13 +224,7 @@ final class HardwarePrefPanel extends JPanel {
             .addComponent(filePathLabel))
           .addGroup(GCodePanelLayout.createSequentialGroup()
             .addGap(6, 6, 6)
-            .addGroup(GCodePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-              .addGroup(GCodePanelLayout.createSequentialGroup()
-                .addComponent(jLabel10)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(maxGField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-              .addComponent(jLabel4))))
-        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addComponent(jLabel4))))
     );
     GCodePanelLayout.setVerticalGroup(
       GCodePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -252,10 +236,7 @@ final class HardwarePrefPanel extends JPanel {
           .addComponent(filePathLabel))
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
         .addComponent(jLabel4)
-        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-        .addGroup(GCodePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-          .addComponent(jLabel10)
-          .addComponent(maxGField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
     );
 
     IPPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(HardwarePrefPanel.class, "HardwarePrefPanel.IPPanel.border.title"))); // NOI18N
@@ -371,7 +352,7 @@ final class HardwarePrefPanel extends JPanel {
     sameAsXMLCheck.setSelected(NbPreferences.forModule(HardwarePrefPanel.class).getBoolean("gSame", true));
     filePathLabel.setText(NbPreferences.forModule(HardwarePrefPanel.class).get("gpath", ""));
     browseButton.setEnabled(!sameAsXMLCheck.isSelected());
-    maxGField.setValue(NbPreferences.forModule(HardwarePrefPanel.class).getInt("maxG", 100));
+//    maxGField.setValue(NbPreferences.forModule(HardwarePrefPanel.class).getInt("maxG", 100));
 
     emcCheck.setSelected(NbPreferences.forModule(HardwarePrefPanel.class).getBoolean("emc", false));
     ipTextField1.setText(NbPreferences.forModule(HardwarePrefPanel.class).get("ip", "127.000.000.001"));
@@ -391,7 +372,7 @@ final class HardwarePrefPanel extends JPanel {
     NbPreferences.forModule(HardwarePrefPanel.class).putBoolean("gSame", sameAsXMLCheck.isSelected());
     NbPreferences.forModule(HardwarePrefPanel.class).put("gpath", filePathLabel.getText());
     browseButton.setEnabled(!sameAsXMLCheck.isSelected());
-    NbPreferences.forModule(HardwarePrefPanel.class).putInt("maxG", ((Number) maxGField.getValue()).intValue());
+//    NbPreferences.forModule(HardwarePrefPanel.class).putInt("maxG", ((Number) maxGField.getValue()).intValue());
 
     NbPreferences.forModule(HardwarePrefPanel.class).putBoolean("emc", emcCheck.isSelected());
     NbPreferences.forModule(HardwarePrefPanel.class).put("ip", ipTextField1.getText());
@@ -420,7 +401,6 @@ final class HardwarePrefPanel extends JPanel {
   private javax.swing.JLabel filePathLabel;
   private javax.swing.JFormattedTextField ipTextField1;
   private javax.swing.JLabel jLabel1;
-  private javax.swing.JLabel jLabel10;
   private javax.swing.JLabel jLabel2;
   private javax.swing.JLabel jLabel3;
   private javax.swing.JLabel jLabel4;
@@ -430,7 +410,6 @@ final class HardwarePrefPanel extends JPanel {
   private javax.swing.JLabel jLabel8;
   private javax.swing.JLabel jLabel9;
   private javax.swing.JFormattedTextField largeField;
-  private javax.swing.JFormattedTextField maxGField;
   private javax.swing.JComboBox microCombo;
   private javax.swing.JCheckBox sameAsXMLCheck;
   private javax.swing.JFormattedTextField smallField;
