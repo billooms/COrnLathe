@@ -101,7 +101,7 @@ public class LinePoint extends CutPoint {
     this.repeat = cpt.getRepeat();
     this.phase = cpt.getPhase();
     this.mask = cpt.getMask();
-    this.patternBar = cpt.getPatternBar();
+    this.patternBar = new PatternBar(cpt.getPatternBar());
     makeDrawables();
     patternBar.addPropertyChangeListener(this);
   }
