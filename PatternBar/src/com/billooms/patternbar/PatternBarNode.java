@@ -122,7 +122,11 @@ public class PatternBarNode extends AbstractNode implements PropertyChangeListen
 
   @Override
   public void propertyChange(PropertyChangeEvent evt) {
+//    System.out.println("PatternBarNode.propertyChange:" + evt.getPropertyName() + " " + evt.getOldValue() + " " + evt.getNewValue());
     this.setDisplayName(pBar.toString());		// update the display name
+    if (set == null) {    // TODO: I don't know why, but sometimes a PatternBar node is created without createSheet()
+      return;
+    }
     if (pBar.getPattern().needsN2()) {
       if (set.get("n2") == null) {
         set.put(n2Prop);

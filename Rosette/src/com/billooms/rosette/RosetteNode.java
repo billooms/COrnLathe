@@ -154,6 +154,7 @@ public class RosetteNode extends AbstractNode implements PropertyChangeListener 
 
   @Override
   public void propertyChange(PropertyChangeEvent evt) {
+//    System.out.println("RosetteNode.propertyChange:" + evt.getPropertyName() + " " + evt.getOldValue() + " " + evt.getNewValue());
     this.setDisplayName(ros.toString());		// update the display name
     if (ros.getPattern().needsN2()) {
       if (set.get("N2") == null) {

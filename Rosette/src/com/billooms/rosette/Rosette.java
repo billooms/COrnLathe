@@ -114,6 +114,9 @@ public class Rosette extends BasicRosette {
     this.n2 = rosette.getN2();
     this.symmetryAmp = new DoubleArray(rosette.getSymmetryAmp());
     this.symmetryWid = new DoubleArray(rosette.getSymmetryWid());
+    if (pattern instanceof CustomPattern) {   // listen to customs for changes
+      ((CustomPattern) pattern).addPropertyChangeListener(this);
+    }
   }
 
   /**
@@ -133,6 +136,9 @@ public class Rosette extends BasicRosette {
     amp2 = CLUtilities.getDouble(element, "amp2", DEFAULT_AMP2);
     symmetryAmp.setData(CLUtilities.getString(element, "symmetryAmp", DEFAULT_SYMAMP));
     symmetryWid.setData(CLUtilities.getString(element, "symmetryWid", DEFAULT_SYMWID));
+    if (pattern instanceof CustomPattern) {   // listen to customs for changes
+      ((CustomPattern) pattern).addPropertyChangeListener(this);
+    }
   }
 
   @Override
