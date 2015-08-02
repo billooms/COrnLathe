@@ -36,10 +36,6 @@ public class CoarseFine extends CLclass {
   public final static String PROP_PASSSTEP = PROP_PREFIX + "PassStep";
   /** Property name used for changing the last step */
   public final static String PROP_LASTSTEP = PROP_PREFIX + "LastStep";
-  /** Property name used for changing the optional cleanup */
-  public final static String PROP_CLEANUP = PROP_PREFIX + "Cleanup";
-  /** Property name used for changing the cleanup step */
-  public final static String PROP_CLEANUPSTEP = PROP_PREFIX + "CleanupStep";
   /** Property name used for changing the optional soft lift */
   public final static String PROP_SOFTLIFT = PROP_PREFIX + "SoftLift";
   /** Property name used for changing the optional soft lift */
@@ -61,8 +57,6 @@ public class CoarseFine extends CLclass {
   public final static int DEFAULT_PASS_STEP = 5;
   /** Default step size on final pass. */
   public final static int DEFAULT_LAST_STEP = 1;
-  /** Default step size on cleanup pass. */
-  public final static int DEFAULT_CLEANUP_STEP = 1;
   /** Default distance for soft lift. */
   public final static double DEFAULT_SOFT_LIFT = 0.001;
   /** Minimum distance for soft lift. */
@@ -103,8 +97,6 @@ public class CoarseFine extends CLclass {
   private int lastStep = DEFAULT_LAST_STEP;
   /** Optional cleanup rotation. */
   private boolean cleanup = false;
-  /** Step size on cleanup rotation. */
-  private int cleanupStep = DEFAULT_CLEANUP_STEP;
   /** Optional soft lift at end of rotation. */
   private boolean softLift = false;
   /** Height of soft lift. */
@@ -132,8 +124,6 @@ public class CoarseFine extends CLclass {
     this.lastDepth = CLUtilities.getDouble(element, "lastDepth", DEFAULT_LAST_DEPTH);
     this.lastStep = CLUtilities.getInteger(element, "lastStep", DEFAULT_LAST_STEP);
     this.rotation = CLUtilities.getEnum(element, "rotation", Rotation.class, DEFAULT_ROTATION);
-    this.cleanup = CLUtilities.getBoolean(element, "cleanup", false);
-    this.cleanupStep = CLUtilities.getInteger(element, "cleanupStep", DEFAULT_CLEANUP_STEP);
     this.softLift = CLUtilities.getBoolean(element, "softLift", false);
     this.softLiftHeight = CLUtilities.getDouble(element, "softLiftHeight", DEFAULT_SOFT_LIFT);
     this.softLiftDeg = CLUtilities.getDouble(element, "softLiftDeg", DEFAULT_SOFT_DEG);
@@ -225,46 +215,6 @@ public class CoarseFine extends CLclass {
   }
 
   /**
-   * Is the optional cleanup rotation selected?
-   * 
-   * @return true: do the optional cleanup rotation
-   */
-  public boolean isCleanup() {
-    return cleanup;
-  }
-
-  /**
-   * Set the optional cleanup rotation. 
-   * 
-   * @param cleanup true: enable the optional cleanup rotation
-   */
-  public void setCleanup(boolean cleanup) {
-    boolean old = this.cleanup;
-    this.cleanup = cleanup;
-    pcs.firePropertyChange(PROP_CLEANUP, old, cleanup);
-  }
-
-  /**
-   * Get the number of micro-steps per movement of cleanup pass.
-   * 
-   * @return number of micro-steps
-   */
-  public int getCleanupStep() {
-    return cleanupStep;
-  }
-
-  /**
-   * Set the number of micro-steps per movement of last pass.
-   * 
-   * @param cleanupStep number of micro-steps
-   */
-  public void setCleanupStep(int cleanupStep) {
-    int old = this.cleanupStep;
-    this.cleanupStep = cleanupStep;
-    pcs.firePropertyChange(PROP_CLEANUPSTEP, old, cleanupStep);
-  }
-
-  /**
    * Is the optional soft lift selected?
    * 
    * @return true: optional soft lift is selected
@@ -347,10 +297,6 @@ public class CoarseFine extends CLclass {
   @Override
   public void writeXML(PrintWriter out) {
     String optional = "";
-    if (cleanup) {
-      optional += " cleanup='" + cleanup + "'"
-          + " cleanupStep='" + cleanupStep + "'";
-    }
     if (softLift) {
       optional += " softLift='" + softLift + "'"
           + " softLiftHeight='" + F4.format(softLiftHeight) + "'"

@@ -91,8 +91,6 @@ public class CoarseFinePanel extends JPanel implements PropertyChangeListener {
     lastDepthField.setEnabled(en);
     passStepSpin.setEnabled(en);
     lastStepSpin.setEnabled(en);
-    cleanupCheck.setEnabled(en);
-    cleanupSpin.setEnabled(en && isCleanup());
     softLiftCheck.setEnabled(en);
     softLiftField.setEnabled(en && isSoftLift());
     softLiftSpin.setEnabled(en && isSoftLift());
@@ -153,32 +151,6 @@ public class CoarseFinePanel extends JPanel implements PropertyChangeListener {
       return coarseFine.getLastStep();
     } else {
       return CoarseFine.DEFAULT_LAST_STEP;
-    }
-  }
-
-  /**
-   * Is the optional cleanup rotation selected?
-   * 
-   * @return true: do the optional cleanup rotation
-   */
-  public boolean isCleanup() {
-    if (coarseFine != null) {
-      return coarseFine.isCleanup();
-    } else {
-      return false;
-    }
-  }
-
-  /**
-   * Get the number of micro-steps per movement of cleanup pass.
-   * 
-   * @return number of micro-steps
-   */
-  public int getCleanupStep() {
-    if (coarseFine != null) {
-      return coarseFine.getCleanupStep();
-    } else {
-      return CoarseFine.DEFAULT_CLEANUP_STEP;
     }
   }
 
@@ -246,11 +218,6 @@ public class CoarseFinePanel extends JPanel implements PropertyChangeListener {
     lastStepSpin.setValue(getLastStep());
     deg = 360.0 * (double) getLastStep() / (double) prefs.getStepsPerRotation();
     lastDegreeLabel.setText(F2.format(deg) + " Deg/step");
-    cleanupCheck.setSelected(isCleanup());
-    cleanupSpin.setEnabled(cleanupCheck.isSelected());
-    cleanupSpin.setValue(getCleanupStep());
-    deg = 360.0 * (double) getCleanupStep() / (double) prefs.getStepsPerRotation();
-    cleanupDegreeLabel.setText(F2.format(deg) + " Deg/step");
     softLiftCheck.setSelected(isSoftLift());
     softLiftField.setEnabled(softLiftCheck.isSelected());
     softLiftField.setValue(getSoftLiftHeight());
@@ -280,9 +247,6 @@ public class CoarseFinePanel extends JPanel implements PropertyChangeListener {
     lastDepthField = new javax.swing.JFormattedTextField();
     lastStepSpin = new javax.swing.JSpinner();
     lastDegreeLabel = new javax.swing.JLabel();
-    cleanupCheck = new javax.swing.JCheckBox();
-    cleanupSpin = new javax.swing.JSpinner();
-    cleanupDegreeLabel = new javax.swing.JLabel();
     softLiftCheck = new javax.swing.JCheckBox();
     softLiftField = new javax.swing.JFormattedTextField();
     softLiftSpin = new javax.swing.JSpinner();
@@ -347,24 +311,6 @@ public class CoarseFinePanel extends JPanel implements PropertyChangeListener {
 
     lastDegreeLabel.setText(org.openide.util.NbBundle.getMessage(CoarseFinePanel.class, "CoarseFinePanel.lastDegreeLabel.text")); // NOI18N
 
-    cleanupCheck.setText(org.openide.util.NbBundle.getMessage(CoarseFinePanel.class, "CoarseFinePanel.cleanupCheck.text")); // NOI18N
-    cleanupCheck.setToolTipText(org.openide.util.NbBundle.getMessage(CoarseFinePanel.class, "CoarseFinePanel.cleanupCheck.toolTipText")); // NOI18N
-    cleanupCheck.addActionListener(new java.awt.event.ActionListener() {
-      public void actionPerformed(java.awt.event.ActionEvent evt) {
-        changeCleanup(evt);
-      }
-    });
-
-    cleanupSpin.setModel(new javax.swing.SpinnerNumberModel(1, 1, 20, 1));
-    cleanupSpin.setToolTipText(org.openide.util.NbBundle.getMessage(CoarseFinePanel.class, "CoarseFinePanel.cleanupSpin.toolTipText")); // NOI18N
-    cleanupSpin.addChangeListener(new javax.swing.event.ChangeListener() {
-      public void stateChanged(javax.swing.event.ChangeEvent evt) {
-        changeCleanupStep(evt);
-      }
-    });
-
-    cleanupDegreeLabel.setText(org.openide.util.NbBundle.getMessage(CoarseFinePanel.class, "CoarseFinePanel.cleanupDegreeLabel.text")); // NOI18N
-
     softLiftCheck.setText(org.openide.util.NbBundle.getMessage(CoarseFinePanel.class, "CoarseFinePanel.softLiftCheck.text")); // NOI18N
     softLiftCheck.setToolTipText(org.openide.util.NbBundle.getMessage(CoarseFinePanel.class, "CoarseFinePanel.softLiftCheck.toolTipText")); // NOI18N
     softLiftCheck.addActionListener(new java.awt.event.ActionListener() {
@@ -423,9 +369,8 @@ public class CoarseFinePanel extends JPanel implements PropertyChangeListener {
               .addComponent(lastDepthField, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
               .addComponent(passDepthField, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
           .addGroup(layout.createSequentialGroup()
-            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-              .addComponent(softLiftCheck)
-              .addComponent(cleanupCheck))
+            .addGap(1, 1, 1)
+            .addComponent(softLiftCheck)
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(softLiftField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -441,11 +386,7 @@ public class CoarseFinePanel extends JPanel implements PropertyChangeListener {
           .addGroup(layout.createSequentialGroup()
             .addComponent(lastStepSpin, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(lastDegreeLabel))
-          .addGroup(layout.createSequentialGroup()
-            .addComponent(cleanupSpin, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(cleanupDegreeLabel))))
+            .addComponent(lastDegreeLabel))))
     );
     layout.setVerticalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -461,11 +402,6 @@ public class CoarseFinePanel extends JPanel implements PropertyChangeListener {
           .addComponent(lastDepthField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
           .addComponent(lastStepSpin, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
           .addComponent(lastDegreeLabel))
-        .addGap(0, 0, 0)
-        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-          .addComponent(cleanupCheck)
-          .addComponent(cleanupSpin, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-          .addComponent(cleanupDegreeLabel))
         .addGap(0, 0, 0)
         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
           .addComponent(softLiftCheck)
@@ -519,12 +455,6 @@ public class CoarseFinePanel extends JPanel implements PropertyChangeListener {
     }
   }//GEN-LAST:event_dirComboActionPerformed
 
-  private void changeCleanupStep(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_changeCleanupStep
-    if (coarseFine != null) {
-        coarseFine.setCleanupStep(((Number) cleanupSpin.getValue()).intValue());
-      }
-  }//GEN-LAST:event_changeCleanupStep
-
   private void scrollSoftLift(java.awt.event.MouseWheelEvent evt) {//GEN-FIRST:event_scrollSoftLift
     if (softLiftField.isFocusOwner() && (coarseFine != null)) {
         coarseFine.setSoftLiftHeight(((Number) softLiftField.getValue()).doubleValue() + 0.001 * evt.getWheelRotation());
@@ -543,13 +473,6 @@ public class CoarseFinePanel extends JPanel implements PropertyChangeListener {
       }
   }//GEN-LAST:event_changeSoftLiftHeight
 
-  private void changeCleanup(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_changeCleanup
-    if (coarseFine != null) {
-      coarseFine.setCleanup(cleanupCheck.isSelected());
-      cleanupSpin.setEnabled(cleanupCheck.isSelected());
-    }
-  }//GEN-LAST:event_changeCleanup
-
   private void changeSoftCheck(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_changeSoftCheck
     if (coarseFine != null) {
       coarseFine.setSoftLift(softLiftCheck.isSelected());
@@ -559,9 +482,6 @@ public class CoarseFinePanel extends JPanel implements PropertyChangeListener {
   }//GEN-LAST:event_changeSoftCheck
 
   // Variables declaration - do not modify//GEN-BEGIN:variables
-  private javax.swing.JCheckBox cleanupCheck;
-  private javax.swing.JLabel cleanupDegreeLabel;
-  private javax.swing.JSpinner cleanupSpin;
   private javax.swing.JComboBox dirCombo;
   private javax.swing.JLabel jLabel1;
   private javax.swing.JLabel jLabel19;

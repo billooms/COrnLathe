@@ -682,10 +682,6 @@ public class RosettePoint extends CutPoint implements ActiveEditorDrop {
       boolean dir = (controls.getRotation() == NEG_LAST) ? LAST : ((controls.getRotation() == PLUS_ALWAYS) ? ROTATE_POS : ROTATE_NEG);
       followRosette(cutDepth, controls.getLastStep(), dir, stepsPerRot);
     }
-    if (controls.isCleanup()) {
-      boolean dir = (controls.getRotation() == NEG_LAST) ? LAST : ((controls.getRotation() == PLUS_ALWAYS) ? ROTATE_POS : ROTATE_NEG);
-      followRosette(cutDepth, controls.getCleanupStep(), dir, stepsPerRot);
-    }
     if (controls.isSoftLift()) {
       boolean dir = (controls.getRotation() == NEG_LAST) ? LAST : ((controls.getRotation() == PLUS_ALWAYS) ? ROTATE_POS : ROTATE_NEG);
       followRosetteLift(cutDepth, controls, dir, stepsPerRot);
@@ -705,7 +701,7 @@ public class RosettePoint extends CutPoint implements ActiveEditorDrop {
    * @param stepsPerRot steps per rotation
    */
   private void followRosetteLift(double depth, CoarseFine controls, boolean negRotate, int stepsPerRot) {
-    int step = (controls.isCleanup() ? controls.getCleanupStep() : controls.getLastStep());
+    int step = controls.getLastStep();
     double liftHeight = controls.getSoftLiftHeight();
     double liftDeg = controls.getSoftLiftDeg();
     int stepLift = (int)((double)stepsPerRot * (liftDeg / 360.0));

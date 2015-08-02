@@ -48,8 +48,6 @@
 	passStep CDATA "5"
 	lastDepth CDATA "0.005"
 	lastStep CDATA "1"
-    cleanup CDATA "false"
-	cleanupStep CDATA "1"
     softLift CDATA "false"
     softLiftHeight CDATA "0.001"
     softLiftDeg CDATA "10.0"
