@@ -126,7 +126,7 @@
 <!ATTLIST Cutter
     name CDATA #REQUIRED
     displayName CDATA #REQUIRED
-    frame (HCF|UCF|Drill|ECF) #REQUIRED
+    frame (HCF|UCF|Drill|ECF|Fixed) #REQUIRED
     location (FRONT_INSIDE|BACK_INSIDE|FRONT_OUTSIDE|BACK_OUTSIDE) #REQUIRED
     profile CDATA #REQUIRED
     tipWidth CDATA #REQUIRED

@@ -231,7 +231,8 @@ public class OffRosettePoint extends RosettePoint implements OffPoint {
         drawList.add(new Arc(mirrorPt(p), cutter.getRadius(), cutter.getUCFRotate(), cutter.getUCFAngle(),
             angle, ARC_ANGLE, ROSETTE_COLOR));
         break;
-      // Profile of drill at cut depth
+      // Profile of drill & Fixed at cut depth
+      case Fixed:
       case Drill:
         p = new Point2D.Double(getX() + perpVectorS.x + moveVectorS.x, getZ() + perpVectorS.y + moveVectorS.y);
         drawList.add(cutter.getProfile().getDrawable(p, cutter.getTipWidth(),

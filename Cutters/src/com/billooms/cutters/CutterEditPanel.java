@@ -191,6 +191,7 @@ public class CutterEditPanel extends JPanel implements PropertyChangeListener {
         rotUCFField.setEnabled(true);
         break;
       case Drill:
+      case Fixed:
         radiusField.setEnabled(false);
         angleUCFField.setEnabled(true);
         rotUCFField.setEnabled(false);

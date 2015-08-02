@@ -285,7 +285,8 @@ public class SpiralLine extends SpiralCut {
             cutter.getUCFRotate(), cutter.getUCFAngle(),
             angle, ARC_ANGLE, LINEPT_COLOR2));
         break;
-      // Profile of drill at cut depth
+      // Profile of drill & Fixed at cut depth
+      case Fixed:
       case Drill:
         drawList.add(cutter.getProfile().getDrawable(new Point2D.Double(getX() + endMoveVectorS.x, getZ() + endMoveVectorS.y),
             cutter.getTipWidth(), -cutter.getUCFAngle(), LINEPT_COLOR2, SOLID_LINE));

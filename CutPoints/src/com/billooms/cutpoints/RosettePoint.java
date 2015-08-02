@@ -483,7 +483,8 @@ public class RosettePoint extends CutPoint implements ActiveEditorDrop {
             cutter.getUCFRotate(), cutter.getUCFAngle(),
             angle, ARC_ANGLE, ROSETTE_COLOR));
         break;
-      // Profile of drill at cut depth
+      // Profile of drill & Fixed at cut depth
+      case Fixed:
       case Drill:
         drawList.add(cutter.getProfile().getDrawable(new Point2D.Double(getX() + perpVectorS.x + moveVectorS.x, getZ() + perpVectorS.y + moveVectorS.y),
             cutter.getTipWidth(), -cutter.getUCFAngle(), ROSETTE_COLOR2, SOLID_LINE));
@@ -588,7 +589,7 @@ public class RosettePoint extends CutPoint implements ActiveEditorDrop {
     for (count = 0, spindleC = 0.0; count < nSectors; count++, spindleC += dAngle) {
       cutXZ = rosetteMove(spindleC, x0, z0);
       surface.rotateZ(spindleC - lastC);		// incremental rotate the surface
-      if (cutter.isIdealHCF()) {
+      if (cutter.canFastRender()) {
         surface.cutSurface(cutter, cutXZ.x, cutXZ.y, spindleC);
       } else {
         surface.cutSurface(cutter, cutXZ.x, cutXZ.y);

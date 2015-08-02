@@ -151,6 +151,9 @@ public class Cutter extends CLclass {
       case Drill:
         str += " Dia=" + F3.format(tipWidth);
         break;
+      case Fixed:
+        str += " Fixed " + getProfile().getDisplayName();
+        break;
     }
     return str;
   }
@@ -289,14 +292,18 @@ public class Cutter extends CLclass {
   }
   
   /**
-   * Determine if the cutter is HCF (or UCF at angle 0) with IDEAL cutter. 
+   * Determine if the cutter can use the faster rendering.
+   * This is for HCF (or UCF at angle 0) with IDEAL cutter or a Fixed cutter. 
    * This indicates a faster algorithm for rendering can be used.
    * 
    * @return true if cutter is HCF (or UCF at angle 0) with IDEAL cutter
    */
-  public boolean isIdealHCF() {
+  public boolean canFastRender() {
     if (profile.getName().equals("IDEAL") && 
         (frame.equals(Frame.HCF) || (frame.equals(Frame.UCF) && (ucfRotate == 0.0)))) {
+      return true;
+    }
+    if (frame.equals(Frame.Fixed)) {
       return true;
     }
     return false;
@@ -319,6 +326,7 @@ public class Cutter extends CLclass {
       case UCF:
         break;
       case Drill:
+      case Fixed:
         setUCFRotate(0.0);	// not used for Drill
         setRadius(0.0);
         break;
@@ -458,6 +466,7 @@ public class Cutter extends CLclass {
         }
       case Drill:
       case ECF:
+      case Fixed:
       default:
         return profile.widthAtDepth(d, tipWidth);
     }
@@ -479,6 +488,7 @@ public class Cutter extends CLclass {
         break;
       case Drill:
       case ECF:
+      case Fixed:
         d = profile.getDrawable(pos, tipWidth, -ucfAngle, c, LIGHT_DOT);
         break;
     }
@@ -498,6 +508,7 @@ public class Cutter extends CLclass {
             + " ucfRotate='" + F1.format(ucfRotate) + "'";
         break;
       case Drill:
+      case Fixed:
         opt = opt + " ucfAngle='" + F1.format(ucfAngle) + "'";
         break;
       case ECF:

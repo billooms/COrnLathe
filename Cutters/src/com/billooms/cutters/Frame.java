@@ -27,5 +27,7 @@ public enum Frame {
   /** Drill Frame */
   Drill,
   /** Eccentric Cutting Frame */
-  ECF
+  ECF,
+  /** Fixed cutter */
+  Fixed
 }

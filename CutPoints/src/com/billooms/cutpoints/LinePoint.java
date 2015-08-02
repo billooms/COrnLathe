@@ -297,7 +297,8 @@ public class LinePoint extends CutPoint {
             cutter.getUCFRotate(), cutter.getUCFAngle(),
             angle, ARC_ANGLE, LINEPT_COLOR2));
         break;
-      // Profile of drill at cut depth
+      // Profile of drill & Fixed at cut depth
+      case Fixed:
       case Drill:
         drawList.add(cutter.getProfile().getDrawable(new Point2D.Double(getX() + moveVectorS.x, getZ() + moveVectorS.y),
             cutter.getTipWidth(), -cutter.getUCFAngle(), LINEPT_COLOR2, SOLID_LINE));
@@ -389,7 +390,7 @@ public class LinePoint extends CutPoint {
       if (mask.isEmpty() || (fullMask.charAt(i) != '0')) {
         spindleC = 360.0 * (double) i / (double) getRepeat() - getPhase() / (double) getRepeat();	// minus to match rosette phase
         surface.rotateZ(spindleC - lastC);		// incremental rotate the surface
-        if (cutter.isIdealHCF()) {
+        if (cutter.canFastRender()) {
           surface.cutSurface(cutter, cutX, cutZ, spindleC); // fast cut rendering only for IDEAL HCF
         } else {
           surface.cutSurface(cutter, cutX, cutZ);

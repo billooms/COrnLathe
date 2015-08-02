@@ -411,6 +411,7 @@ public class Surface implements PropertyChangeListener {
         }
         break;
       case Drill:
+      case Fixed:
         for (Point3D[] pt1 : pts) {
           for (int a = 0; a < sectors; a++) {
             final Point3D p = new Point3D(pt1[a].getX() - cutX, pt1[a].getZ() - cutZ, -pt1[a].getY());	// actual xyz relative to cutter
@@ -489,6 +490,7 @@ public class Surface implements PropertyChangeListener {
         }
         break;
       case Drill:
+      case Fixed:
         RotMatrix angleMat = new RotMatrix(Axis.Z, -cutter.getUCFAngle());
         RotMatrix angleMatI = new RotMatrix(Axis.Z, cutter.getUCFAngle());
         for (Point3D[] pt1 : pts) {

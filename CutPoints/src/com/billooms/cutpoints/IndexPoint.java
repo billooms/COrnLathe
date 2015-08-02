@@ -349,7 +349,8 @@ public class IndexPoint extends CutPoint implements ActiveEditorDrop {
             cutter.getUCFRotate(), cutter.getUCFAngle(),
             angle, ARC_ANGLE, INDEX_COLOR2));
         break;
-      // Profile of drill at cut depth
+      // Profile of drill & Fixed at cut depth
+      case Fixed:
       case Drill:
         drawList.add(cutter.getProfile().getDrawable(new Point2D.Double(getX() + moveVectorS.x, getZ() + moveVectorS.y),
             cutter.getTipWidth(), -cutter.getUCFAngle(), INDEX_COLOR2, SOLID_LINE));
@@ -412,6 +413,7 @@ public class IndexPoint extends CutPoint implements ActiveEditorDrop {
         break;
       case UCF:
       case Drill:
+      case Fixed:
       default:
         break;
     }
@@ -459,7 +461,7 @@ public class IndexPoint extends CutPoint implements ActiveEditorDrop {
       if (mask.isEmpty() || (fullMask.charAt(i) != '0')) {
         spindleC = 360.0 * (double) i / (double) getRepeat() - getPhase() / (double) getRepeat();	// minus to match rosette phase
         surface.rotateZ(spindleC - lastC);		// incremental rotate the surface
-        if (cutter.isIdealHCF()) {
+        if (cutter.canFastRender()) {
           surface.cutSurface(cutter, cutX, cutZ, spindleC); // fast cut rendering only for IDEAL HCF
         } else {
           surface.cutSurface(cutter, cutX, cutZ);

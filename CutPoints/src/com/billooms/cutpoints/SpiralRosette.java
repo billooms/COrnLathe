@@ -311,7 +311,8 @@ public class SpiralRosette extends SpiralCut {
             cutter.getUCFRotate(), cutter.getUCFAngle(),
             angle, ARC_ANGLE, ROSETTE_COLOR));
         break;
-      // Profile of drill at cut depth
+      // Profile of drill & Fixed at cut depth
+      case Fixed:
       case Drill:
         drawList.add(cutter.getProfile().getDrawable(new Point2D.Double(getX() + endPerpVectorS.x + endMoveVectorS.x, getZ() + endPerpVectorS.y + endMoveVectorS.y),
             cutter.getTipWidth(), -cutter.getUCFAngle(), ROSETTE_COLOR2, SOLID_LINE));

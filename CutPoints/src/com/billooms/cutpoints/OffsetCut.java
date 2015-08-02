@@ -279,6 +279,7 @@ public abstract class OffsetCut extends CutPoint {
       case UCF:
         tanVector.scale(cutter.getRadius());
         break;
+      case Fixed:
       case Drill:
       case ECF:
         tanVector.scale(0.3);   // arbitrary so that we have something to see

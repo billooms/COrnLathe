@@ -98,7 +98,7 @@ public class CutterNode extends AbstractNode implements PropertyChangeListener {
 
       Property<Double> rodProp = new PropertySupport.Reflection<>(cutter, double.class, "tipWidth");
       rodProp.setName("Tip width");
-      rodProp.setShortDescription("Width of the cutter tip (diameter for Drill)");
+      rodProp.setShortDescription("Width of the cutter tip (diameter for Drill or width for Fixed)");
       set.put(rodProp);
 
       Property<Double> angProp = new PropertySupport.Reflection<>(cutter, double.class, "UCFAngle");

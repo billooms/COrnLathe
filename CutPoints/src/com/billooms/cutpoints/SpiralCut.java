@@ -379,6 +379,7 @@ public abstract class SpiralCut extends CutPoint {
       return null;
     }
     switch (cutter.getFrame()) {
+      case Fixed:
       case Drill:
       case ECF:
         return rzc;     // for Drill adn ECF the cut path is on the surface

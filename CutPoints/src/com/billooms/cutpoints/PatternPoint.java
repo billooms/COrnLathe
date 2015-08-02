@@ -453,7 +453,8 @@ public class PatternPoint extends OffsetCut {
             cutter.getRadius(), cutter.getUCFRotate(), cutter.getUCFAngle(),
             angle, ARC_ANGLE, OFFSET_COLOR));
         break;
-      // PatternPoint doesn't work for Drill or ECF
+      // PatternPoint doesn't work for Drill, Fixed or ECF
+      case Fixed:
       case Drill:
       case ECF:
         break;

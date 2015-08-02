@@ -214,7 +214,8 @@ public class PiercePoint extends CutPoint implements ActiveEditorDrop {
             cutter.getUCFRotate(), cutter.getUCFAngle(),
             angle, ARC_ANGLE, PIERCE_COLOR2));
         break;
-      // Profile of drill at cut depth
+      // Profile of drill & Fixed at cut depth
+      case Fixed:
       case Drill:
         drawList.add(cutter.getProfile().getDrawable(new Point2D.Double(getX() + moveVectorS.x, getZ() + moveVectorS.y),
             cutter.getTipWidth(), -cutter.getUCFAngle(), PIERCE_COLOR2, SOLID_LINE));

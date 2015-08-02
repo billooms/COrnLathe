@@ -214,6 +214,7 @@ public class Outline extends CLclass {
         break;
       case Drill:
       case ECF:
+      case Fixed:
         if (dotLocation.isInside() != ct.getLocation().isInside()) {
           offset = thickness;
         }
@@ -746,11 +747,12 @@ public class Outline extends CLclass {
 
   /**
    * Offset the curve after probing to compensate for the diameter of the
-   * cutter. Note that nothing is done for Drill or ECF.
+   * cutter. Note that nothing is done for Drill, Fixed, or ECF.
    */
   public synchronized void offsetForCutter() {
     switch (cutter.getFrame()) {
       default:
+      case Fixed:
       case Drill:
       case ECF:
         return;
