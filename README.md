@@ -9,6 +9,8 @@ INSTALLATION:
 This software was developed on a Mac computer running OSX 10.9.5 with NetBeans IDE and requires Java8.
 It has not been tested on any version of Windows.
 
+An introductory video to the software can be viewed at https://www.youtube.com/watch?v=CIrmx5xQgz8
+
 LICENSE: 
 
 This program is free software: you can redistribute it and/or modify it under the terms 
