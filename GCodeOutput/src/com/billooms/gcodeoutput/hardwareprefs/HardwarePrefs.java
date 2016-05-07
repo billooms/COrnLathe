@@ -34,16 +34,15 @@ public class HardwarePrefs {
   /** Micro-stepping choices. */
   int[] microSteps = {1, 2, 4, 8, 10, 16};
 
-  private int stepper;	// Stepper motor steps per rotation
+  private int stepper;      // Stepper motor steps per rotation
   private int micro;		// Driver micro-stepping (2 = 1/2 microstepping)
   private int small;		// Number of teeth on small pulley (on motor)
   private int large;		// Number of teeth on large pulley (on spindle)
   private int stepsPerRotation;	// stepper microsteps per spindle rotation
 
   private int xzStepper;	// Stepper motor steps per rotation
-  private int xzMicro;	// Driver micro-stepping (2 = 1/2 microstepping)
-  private int xzTPI;		// lead screw turns per inch
-  private int stepsPerInch;	// stepper microsteps per inch
+  private int xzMicro;      // Driver micro-stepping (2 = 1/2 microstepping)
+  private double stepsPerInch;	// stepper microsteps per inch
   private final PropertyChangeSupport pcs;
 
   public HardwarePrefs() {
@@ -67,7 +66,7 @@ public class HardwarePrefs {
    *
    * @return micro-steps per inch
    */
-  public int getStepsPerInch() {
+  public double getStepsPerInch() {
     return stepsPerInch;
   }
 
@@ -111,10 +110,14 @@ public class HardwarePrefs {
         break;
     }
     xzMicro = microSteps[NbPreferences.forModule(HardwarePrefPanel.class).getInt("XZMicro", 1)];
-    xzTPI = NbPreferences.forModule(HardwarePrefPanel.class).getInt("tpi", 10);
-    old = stepsPerInch;
-    stepsPerInch = xzStepper * xzMicro * xzTPI;
-    pcs.firePropertyChange(PROP_STEPSPERINCH, old, stepsPerInch);
+    int pitch = NbPreferences.forModule(HardwarePrefPanel.class).getInt("tpi", 10); // TPI or mm
+    double old2 = stepsPerInch;
+    if (NbPreferences.forModule(HardwarePrefPanel.class).getInt("TPImm", 0) == 0) {
+      stepsPerInch = xzStepper * xzMicro * pitch;
+    } else {
+      stepsPerInch = xzStepper * xzMicro * 25.4/pitch;
+    }
+    pcs.firePropertyChange(PROP_STEPSPERINCH, old2, stepsPerInch);
   }
 
   /*

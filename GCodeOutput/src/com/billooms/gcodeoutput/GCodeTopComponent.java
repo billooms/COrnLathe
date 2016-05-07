@@ -171,7 +171,7 @@ public final class GCodeTopComponent extends TopComponent implements PropertyCha
 
 //    int maxInvF = 60 * prefs.getMaxGPerSec();       // Max inverse time speed based on max instructions per second
     int stepsPerRot = prefs.getStepsPerRotation();
-    int stepsPerInch = prefs.getStepsPerInch();
+    double stepsPerInch = prefs.getStepsPerInch();
     double rpm = controlPanel.feedPanel.getRpm();	// rotations per minute
     double vel = controlPanel.feedPanel.getVelocity();	// inches per minute
 
@@ -185,15 +185,15 @@ public final class GCodeTopComponent extends TopComponent implements PropertyCha
       x = i.getX();
       z = i.getZ();
       c = i.getC();	// reminder: degrees (not rotation)
-      lx = Math.round((x * (double) stepsPerInch));
-      lz = Math.round((z * (double) stepsPerInch));
+      lx = Math.round((x * stepsPerInch));
+      lz = Math.round((z * stepsPerInch));
       lc = Math.round(c / 360.0 * (double) stepsPerRot);	// reminder: steps
-      xx = lx / (double) stepsPerInch;
-      zz = lz / (double) stepsPerInch;
+      xx = lx / stepsPerInch;
+      zz = lz / stepsPerInch;
       cc = lc * 360.0 / (double) stepsPerRot;
-      dx = Math.abs((double) (lx - lastX) / (double) stepsPerInch);
-      dz = Math.abs((double) (lz - lastZ) / (double) stepsPerInch);
-      dc = Math.abs((double) (lc - lastC) / (double) stepsPerRot);	// reminder: rotation (not degrees)
+      dx = Math.abs((double) (lx - lastX) / stepsPerInch);
+      dz = Math.abs((double) (lz - lastZ) / stepsPerInch);
+      dc = Math.abs((double) (lc - lastC) / stepsPerRot);	// reminder: rotation (not degrees)
       switch (i.getType()) {
         case COMMENT:
           out.println("; " + i.getText());

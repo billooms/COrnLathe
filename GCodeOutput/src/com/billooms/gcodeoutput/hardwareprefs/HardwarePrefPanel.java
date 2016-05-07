@@ -51,6 +51,7 @@ final class HardwarePrefPanel extends JPanel {
     xzMicroCombo = new javax.swing.JComboBox();
     jLabel3 = new javax.swing.JLabel();
     tpiField = new javax.swing.JFormattedTextField();
+    tpimm = new javax.swing.JComboBox<>();
     SpindlePanel = new javax.swing.JPanel();
     largeField = new javax.swing.JFormattedTextField();
     stepperCombo = new javax.swing.JComboBox();
@@ -82,11 +83,13 @@ final class HardwarePrefPanel extends JPanel {
 
     org.openide.awt.Mnemonics.setLocalizedText(jLabel3, org.openide.util.NbBundle.getMessage(HardwarePrefPanel.class, "HardwarePrefPanel.jLabel3.text")); // NOI18N
 
-    tpiField.setColumns(5);
+    tpiField.setColumns(3);
     tpiField.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(java.text.NumberFormat.getIntegerInstance())));
     tpiField.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
     tpiField.setText(org.openide.util.NbBundle.getMessage(HardwarePrefPanel.class, "HardwarePrefPanel.tpiField.text")); // NOI18N
     tpiField.setFocusLostBehavior(javax.swing.JFormattedTextField.COMMIT);
+
+    tpimm.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "TPI", "mm" }));
 
     javax.swing.GroupLayout XZPanelLayout = new javax.swing.GroupLayout(XZPanel);
     XZPanel.setLayout(XZPanelLayout);
@@ -102,7 +105,10 @@ final class HardwarePrefPanel extends JPanel {
           .addComponent(jLabel3))
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
         .addGroup(XZPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-          .addComponent(tpiField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+          .addGroup(XZPanelLayout.createSequentialGroup()
+            .addComponent(tpiField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+            .addComponent(tpimm, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
           .addComponent(xzMicroCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
     );
     XZPanelLayout.setVerticalGroup(
@@ -118,7 +124,8 @@ final class HardwarePrefPanel extends JPanel {
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
         .addGroup(XZPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
           .addComponent(jLabel3)
-          .addComponent(tpiField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+          .addComponent(tpiField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+          .addComponent(tpimm, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
     );
 
     SpindlePanel.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(HardwarePrefPanel.class, "HardwarePrefPanel.SpindlePanel.border.title"))); // NOI18N
@@ -348,6 +355,7 @@ final class HardwarePrefPanel extends JPanel {
     xzStepperCombo.setSelectedIndex(NbPreferences.forModule(HardwarePrefPanel.class).getInt("XZStepper", 0));
     xzMicroCombo.setSelectedIndex(NbPreferences.forModule(HardwarePrefPanel.class).getInt("XZMicro", 1));
     tpiField.setValue(NbPreferences.forModule(HardwarePrefPanel.class).getInt("tpi", 10));
+    tpimm.setSelectedIndex(NbPreferences.forModule(HardwarePrefPanel.class).getInt("TPImm", 0));
 
     sameAsXMLCheck.setSelected(NbPreferences.forModule(HardwarePrefPanel.class).getBoolean("gSame", true));
     filePathLabel.setText(NbPreferences.forModule(HardwarePrefPanel.class).get("gpath", ""));
@@ -368,6 +376,7 @@ final class HardwarePrefPanel extends JPanel {
     NbPreferences.forModule(HardwarePrefPanel.class).putInt("XZStepper", xzStepperCombo.getSelectedIndex());
     NbPreferences.forModule(HardwarePrefPanel.class).putInt("XZMicro", xzMicroCombo.getSelectedIndex());
     NbPreferences.forModule(HardwarePrefPanel.class).putInt("tpi", ((Number) tpiField.getValue()).intValue());
+    NbPreferences.forModule(HardwarePrefPanel.class).putInt("TPImm", tpimm.getSelectedIndex());
 
     NbPreferences.forModule(HardwarePrefPanel.class).putBoolean("gSame", sameAsXMLCheck.isSelected());
     NbPreferences.forModule(HardwarePrefPanel.class).put("gpath", filePathLabel.getText());
@@ -386,7 +395,7 @@ final class HardwarePrefPanel extends JPanel {
     if (((Number) largeField.getValue()).intValue() < 10) {
       return false;
     }
-    if (((Number) tpiField.getValue()).intValue() < 2) {
+    if (((Number) tpiField.getValue()).intValue() < 1) {
       return false;
     }
     return true;
@@ -415,6 +424,7 @@ final class HardwarePrefPanel extends JPanel {
   private javax.swing.JFormattedTextField smallField;
   private javax.swing.JComboBox stepperCombo;
   private javax.swing.JFormattedTextField tpiField;
+  private javax.swing.JComboBox<String> tpimm;
   private javax.swing.JComboBox xzMicroCombo;
   private javax.swing.JComboBox xzStepperCombo;
   // End of variables declaration//GEN-END:variables
