@@ -3,7 +3,6 @@ package com.billooms.cutpoints;
 import com.billooms.clclass.CLUtilities;
 import com.billooms.clclass.CLclass;
 import com.billooms.controls.CoarseFine;
-import com.billooms.controls.CoarseFine.Rotation;
 import com.billooms.cutlist.CutList;
 import com.billooms.cutpoints.surface.Line3D;
 import com.billooms.cutpoints.surface.Surface;

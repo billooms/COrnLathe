@@ -621,7 +621,7 @@ public class CutPoints extends CLclass {
     OffsetGroup closest = null;
     double sep;
     for (CutPoint cc : list) {
-      if (cc instanceof OffsetGroup) {		// Look for just SpiralCutPoints
+      if (cc instanceof OffsetGroup) {		// Look for just OffsetGroup
         sep = cc.separation(pt);
         if (sep < dist) {
           dist = sep;

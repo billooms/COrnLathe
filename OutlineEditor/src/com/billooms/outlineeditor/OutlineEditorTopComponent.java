@@ -808,7 +808,8 @@ public final class OutlineEditorTopComponent extends TopComponent implements Pro
           return;
         }
       } else if (!(grabbed instanceof OffsetGroup)) {		// Are we dropping a CutPoint onto a OffsetGroup?
-        OffsetGroup nearest = cutPtMgr.closestOffsetGroup(pt, (double) CLOSEST / dpi);
+//        OffsetGroup nearest = cutPtMgr.closestOffsetGroup(pt, (double) CLOSEST / dpi);
+        OffsetGroup nearest = cutPtMgr.closestOffsetGroup(new Point2D.Double(grabbed.getX(), grabbed.getZ()), (double) CLOSEST / dpi);
         if (nearest != null) {
           grabbed.move(savedPos);					// put it back where it was
           cutPtMgr.dropOffPoint(grabbed, nearest);  // drop the OffPoint onto the OffsetGroup
