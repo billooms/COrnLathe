@@ -5,7 +5,6 @@ import static com.billooms.clclass.CLclass.indent;
 import static com.billooms.clclass.CLclass.indentLess;
 import static com.billooms.clclass.CLclass.indentMore;
 import com.billooms.controls.CoarseFine;
-import com.billooms.controls.CoarseFine.Rotation;
 import static com.billooms.controls.CoarseFine.Rotation.NEG_LAST;
 import static com.billooms.controls.CoarseFine.Rotation.PLUS_ALWAYS;
 import static com.billooms.cutlist.Speed.*;
@@ -570,55 +569,57 @@ public class PatternPoint extends OffsetCut {
    * @param stepsPerRot steps per rotation
    */
   private void followPattern(double depth, int step, boolean last, int stepsPerRot) {
-    // If custom pattern with STRAIGHT line segments, just use the breakpoints.
+    cutList.spindleWrapCheck();
+
+    // Pattern is always a CustomPattern for a PatternPoint.
+    // If the CustomPattern has STRAIGHT line segments, just use the breakpoints.
     // It runs faster!
-    if (pattern instanceof CustomPattern) {
-      if (pattern.getCustomStyle() == CustomPattern.CustomStyle.STRAIGHT) {
-        ArrayList<Double> angles = new ArrayList<>();		// a list of the angles
-        for (int i = 0; i < patternRepeat; i++) {
-          double cc = (double) i / (double) patternRepeat * 360.0;
-          for (Pt pt : pattern.getAllPoints()) {
-            double c = pt.getX() * 360.0 / (double) patternRepeat + cc - phase / patternRepeat;	// angle including phase
-            if (c < 0.0) {				// make sure all angles are 0.0 <= c <= 360.0
-              c = c + 360.0;
-            } else if (c > 360.0) {
-              c = c - 360.0;
-            }
-            angles.add(c);
+    double fracDepth = depth / cutDepth;    // fraction of depth in case of multiple passes
+    if (pattern.getCustomStyle() == CustomPattern.CustomStyle.STRAIGHT) {
+      ArrayList<Double> angles = new ArrayList<>();		// a list of the angles
+      for (int i = 0; i < patternRepeat; i++) {
+        double cc = (double) i / (double) patternRepeat * 360.0;
+        for (Pt pt : pattern.getAllPoints()) {
+          double c = pt.getX() * 360.0 / (double) patternRepeat + cc - phase / patternRepeat;	// angle including phase
+          if (c < 0.0) {				// make sure all angles are 0.0 <= c <= 360.0
+            c = c + 360.0;
+          } else if (c > 360.0) {
+            c = c - 360.0;
           }
+          angles.add(c);
         }
-        angles.add(0.0);			// make sure we include 0.0 and 360.0
-        angles.add(360.0);
-        // reminder: line2 has same x coordinates as the first line
-        Collections.sort(angles);	// sorted order 0.0 to 360.0
-        for (int i = angles.size() - 1; i > 0; i--) {	// delete any duplicates
-          if (aboutEqual(angles.get(i), angles.get(i - 1))) {
-            angles.remove(i);
-          }
-        }
-        boolean firstPt = true;
-        if (last) {			// go in reverse the last time
-          for (int i = angles.size() - 1; i >= 0; i--) {
-            double a = angles.get(i) - 360.0;
-            if (firstPt) {
-              cutList.goToXZC(VELOCITY, patternMove(a, optimize), a);	// first point at velocity
-              firstPt = false;
-            } else {
-              cutList.goToXZC(RPM, patternMove(a, optimize), a);	// go to this point at rpm
-            }
-          }
-        } else {			// other passes go forward
-          for (Double a : angles) {
-            if (firstPt) {
-              cutList.goToXZC(VELOCITY, patternMove(a, optimize), a);	// first point at velocity
-              firstPt = false;
-            } else {
-              cutList.goToXZC(RPM, patternMove(a, optimize), a);	// go to this point at rpm
-            }
-          }
-        }
-        return;
       }
+      angles.add(0.0);			// make sure we include 0.0 and 360.0
+      angles.add(360.0);
+      // reminder: line2 has same x coordinates as the first line
+      Collections.sort(angles);	// sorted order 0.0 to 360.0
+      for (int i = angles.size() - 1; i > 0; i--) {	// delete any duplicates
+        if (aboutEqual(angles.get(i), angles.get(i - 1))) {
+          angles.remove(i);
+        }
+      }
+      boolean firstPt = true;
+      if (last) {			// go in reverse the last time
+        for (int i = angles.size() - 1; i >= 0; i--) {
+          double a = angles.get(i) - 360.0;
+          if (firstPt) {
+            cutList.goToXZC(VELOCITY, patternMove(a, optimize, fracDepth), a);	// first point at velocity
+            firstPt = false;
+          } else {
+            cutList.goToXZC(RPM, patternMove(a, optimize, fracDepth), a);	// go to this point at rpm
+          }
+        }
+      } else {			// other passes go forward
+        for (Double a : angles) {
+          if (firstPt) {
+            cutList.goToXZC(VELOCITY, patternMove(a, optimize, fracDepth), a);	// first point at velocity
+            firstPt = false;
+          } else {
+            cutList.goToXZC(RPM, patternMove(a, optimize, fracDepth), a);	// go to this point at rpm
+          }
+        }
+      }
+      return;
     }
 
     // This is the regular way of cutting a pattern (i.e. not straight lines)
@@ -628,18 +629,18 @@ public class PatternPoint extends OffsetCut {
         c = -c;	// other direction last time
       }
       if (i == 0) {
-        cutList.goToXZC(VELOCITY, patternMove(c, optimize), c);	// first point at velocity
+        cutList.goToXZC(VELOCITY, patternMove(c, optimize, fracDepth), c);	// first point at velocity
       } else {
-        cutList.goToXZC(RPM, patternMove(c, optimize), c);	// and other points at RPM
+        cutList.goToXZC(RPM, patternMove(c, optimize, fracDepth), c);	// and other points at RPM
       }
     }
     // When step is not a submultiple of stepsPerRot, 
     // then we might not be back at +/- 360.0
     if ((stepsPerRot % step) != 0) {
       if (last) {
-        cutList.goToXZC(RPM, patternMove(-360, optimize), -360.0);
+        cutList.goToXZC(RPM, patternMove(-360, optimize, fracDepth), -360.0);
       } else {
-        cutList.goToXZC(RPM, patternMove(360, optimize), 360.0);
+        cutList.goToXZC(RPM, patternMove(360, optimize, fracDepth), 360.0);
       }
     }
   }
@@ -679,6 +680,20 @@ public class PatternPoint extends OffsetCut {
    * @return x,y offset from zero.
    */
   private Vector2d patternMove(double angDeg, boolean compensate) {
+    return patternMove(angDeg, compensate, 1.0);
+  }
+
+  /**
+   * Determine the offset caused by a pattern at a given angle. The x value is
+   * the offset from the PatternPoint and the y value is the cut depth (always a
+   * negative number).
+   *
+   * @param angDeg angle in degrees
+   * @param compensate true = compensate for the curvature of the shape
+   * @param fracDepth the y value is scaled by this fraction (usually between 0.0 and 1.0).
+   * @return x,y offset from zero.
+   */
+  private Vector2d patternMove(double angDeg, boolean compensate, double fracDepth) {
     double fracX = fractional(angleCheck(angDeg + phase / patternRepeat) / (360.0 / patternRepeat));	// remainder in the range 0 to 1
     double fracYMax = pattern.getValue(fracX);				// also in the range 0 to 1
     double fracYMin = 0.0;
@@ -740,6 +755,7 @@ public class PatternPoint extends OffsetCut {
         yMove = cutter.getRadius() - v3.x;
       }
     }
+    yMove = yMove * fracDepth;    // scale depth for making multiple passes at different depths
 
     switch (cutter.getLocation()) {	// correct sign for cutter location
       case FRONT_INSIDE:
