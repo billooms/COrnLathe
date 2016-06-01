@@ -661,7 +661,12 @@ public abstract class CutPoint extends CLclass {
     } else {
       final Point2D.Double nearest = outline.getCutCurve().nearestPoint(getPos2D());
       perp = new Vector2d(nearest.x - getX(), nearest.y - getZ());
-      perp.normalize();
+      if ((perp.x == 0.0) && (perp.y == 0.0)) {
+        // can't normalize 0,0 or you get NaN, so fall back to perp to curve
+        perp = outline.getCutterPathCurve(cutter).perpendicular(getPos2D(), cutter.getLocation().isFrontInOrBackOut());
+      } else {
+        perp.normalize();
+      }
     }
     if (perp == null) {
       return null;		// must be less than 2 points on the curve
