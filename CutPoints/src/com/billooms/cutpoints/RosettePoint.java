@@ -76,9 +76,10 @@ public class RosettePoint extends CutPoint implements ActiveEditorDrop {
   protected final static Color ROSETTE_COLOR2 = Color.GREEN;
   /** Color used for the maximum movement of the cut with rosette2. */
   protected final static Color ROSETTE_COLOR3 = Color.BLUE;
-  /** Margin to turn a solid circle if not yet at a depth where pToP makes a
-   * difference. */
+  /** Margin to turn a solid circle if not yet at a depth where pToP makes a difference. */
   private final static double CUT_MARGIN = 0.0049;
+  /** Safety margin for determining if a point is in the air and can be skipped. */
+  private final static double AIR_SAFETY = 0.0049;
 
   /** Directions for rosette motion. */
   public enum Motion {
@@ -841,10 +842,10 @@ public class RosettePoint extends CutPoint implements ActiveEditorDrop {
       }
       // For PUMP and strictly vertical cut
       if ((perpVectorN.x == 0.0) && (motion == Motion.PUMP)) {
-        if (depth < (-perpVectorN.y * rosetteMove(c).y)) {		// this point is in the air
+        if ((depth + AIR_SAFETY) < (-perpVectorN.y * rosetteMove(c).y)) {		// this point is in the air
           saveXZ = rosetteMove(c, x0, z0);
           saveC = c;
-//		  System.out.println("Air: " + saveX + " " + saveZ + " " + c0);
+//		  System.out.println("Air: " + saveXZ.x + " " + saveXZ.y + " " + saveC);
           if (!inAir) {		// this is the first point in the air
             cutList.goToXZC(FAST, rosetteMove(c, x0, z0), c);	// so must go there
           }
@@ -864,10 +865,10 @@ public class RosettePoint extends CutPoint implements ActiveEditorDrop {
       }
       // for ROCK and strictly horizontal cut
       if ((perpVectorN.y == 0.0) && (motion == Motion.ROCK)) {
-        if (depth < (-perpVectorN.x * rosetteMove(c).x)) {		// this point is in the air
+        if ((depth + AIR_SAFETY) < (-perpVectorN.x * rosetteMove(c).x)) {		// this point is in the air
           saveXZ = rosetteMove(c, x0, z0);
           saveC = c;
-//		  System.out.println("Air: " + saveX + " " + saveZ + " " + c0);
+//		  System.out.println("Air: " + saveXZ.x + " " + saveXZ.y + " " + saveC);
           if (!inAir) {		// this is the first point in the air
             cutList.goToXZC(FAST, rosetteMove(c, x0, z0), c);	// so must go there
           }
@@ -887,10 +888,10 @@ public class RosettePoint extends CutPoint implements ActiveEditorDrop {
       }
       // for PERP motion
       if ((motion == Motion.PERP)) {		// perpendicular cut, rocking rosette
-        if (depth < Math.hypot(rosetteMove(c).x, rosetteMove(c).y)) {	// this point is in the air
+        if ((depth + AIR_SAFETY) < Math.hypot(rosetteMove(c).x, rosetteMove(c).y)) {	// this point is in the air
           saveXZ = rosetteMove(c, x0, z0);
           saveC = c;
-//		  System.out.println("Air: " + saveX + " " + saveZ + " " + c0);
+//		  System.out.println("Air: " + saveXZ.x + " " + saveXZ.y + " " + saveC);
           if (!inAir) {		// this is the first point in the air
             cutList.goToXZC(FAST, rosetteMove(c, x0, z0), c);	// so must go there
           }
