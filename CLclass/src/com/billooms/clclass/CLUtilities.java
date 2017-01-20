@@ -1,6 +1,8 @@
 package com.billooms.clclass;
 
 import java.awt.Color;
+import java.text.NumberFormat;
+import java.text.ParseException;
 import org.w3c.dom.Element;
 
 /**
@@ -22,6 +24,9 @@ import org.w3c.dom.Element;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 public class CLUtilities {
+    
+    /** NumberFormat for parsing decimal numbers with locale. */
+    protected final static NumberFormat NF = NumberFormat.getNumberInstance();
 
   /**
    * Utility to get a String attribute from the given DOM Element.
@@ -85,8 +90,9 @@ public class CLUtilities {
       return def;
     }
     try {
-      return Double.parseDouble(element.getAttribute(name));
-    } catch (NumberFormatException ex) {
+      Number num = NF.parse(element.getAttribute(name));
+      return num.doubleValue();
+    } catch (ParseException ex) {
       return def;
     }
   }
