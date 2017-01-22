@@ -13,7 +13,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
+import java.util.Locale;
 import org.netbeans.core.spi.multiview.MultiViewElement;
 import org.netbeans.core.spi.multiview.text.MultiViewEditorElement;
 import org.netbeans.spi.actions.AbstractSavable;
@@ -300,6 +303,19 @@ public class COrnFileDataObject extends MultiDataObject implements PropertyChang
 
       // Get the topElement and look for first layer of elements.
       Element topElement = doc.getDocumentElement();
+      
+      // Check to see that the decimal character matches the locale
+      char localeSep = ((DecimalFormat)DecimalFormat.getInstance()).getDecimalFormatSymbols().getDecimalSeparator();
+      String version = topElement.getAttribute("version");    // version should have a decimal separator
+      if (!version.contains(Character.valueOf(localeSep).toString())) {
+        NotifyDescriptor d = new NotifyDescriptor.Message(
+            "Incorrect decimal delimeter: locale requires '" + localeSep + "' character",
+            ERROR_MESSAGE);
+        DialogDisplayer.getDefault().notify(d);
+        doc = null;
+        return;	  // the finally below will close inputStream
+      }
+      
       double fileVersion = CLUtilities.getDouble(topElement, "version", 99.0);
 
       double thisVersion = Double.parseDouble(NbBundle.getMessage(COrnFileDataObject.class, "COrnLathe_Version"));
