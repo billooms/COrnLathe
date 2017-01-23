@@ -16,6 +16,8 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.PrintWriter;
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Locale;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
@@ -67,8 +69,9 @@ import org.openide.windows.WindowManager;
 })
 public final class GCodeTopComponent extends TopComponent implements PropertyChangeListener {
 
-  private final static DecimalFormat F2 = new DecimalFormat("0.00");
-  private final static DecimalFormat F5 = new DecimalFormat("0.00000");
+  /** G-code always uses a period decimal separator, even in locales that would otherwise use a comma. */
+  private final static DecimalFormat F2 = new DecimalFormat("0.00", DecimalFormatSymbols.getInstance(Locale.US));
+  private final static DecimalFormat F5 = new DecimalFormat("0.00000", DecimalFormatSymbols.getInstance(Locale.US));
   
   private final HardwarePrefs prefs = Lookup.getDefault().lookup(HardwarePrefs.class);
   private static ExplorerManager em = null;   // all instances share one ExplorerManager
