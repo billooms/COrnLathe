@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<!DOCTYPE COrnLathe PUBLIC "-//IDN billooms.com//DTD COrnLathe file format 3.1//EN" "http://www.billooms.com/dtds/cornlathe3_1.dtd">
+<COrnLathe version='3,0'>
+  <Controls active='NORMAL'>
+    <FeedRate rpm='3,00' velocity='4,00'/>
+    <CoarseFine  passDepth='0,0250' passStep='5' lastDepth='0,0050' lastStep='1' rotation='NEG_LAST'/>
+  </Controls>
+  <Cutters>
+    <Cutter name='HCF1' displayName='HCF with R=0.512' frame='HCF' location='FRONT_INSIDE' profile='IDEAL' tipWidth='0,1875' radius='0,512'/>
+  </Cutters>
+  <Outline dotLocation='FRONT_INSIDE' thickness='0,100' resolution='0,020' color='rgb(186, 99, 18)' layer1='0,030' color1='rgb(249, 225, 202)' layer2='0,020' color2='rgb(0, 0, 0)'>
+    <Pt x='0,0000' y='0,0000'/>
+    <Pt x='1,0000' y='0,2000'/>
+    <Pt x='2,0000' y='1,0000'/>
+  </Outline>
+  <CutPoints>
+    <RosettePoint n='0' cutter='HCF1' depth='0,0750' motion='PERP'>
+      <Pt x='0,2447' z='0,5229'/>
+      <Rosette pattern='TRIANGLE' repeat='12' amp='0,075' phase='0,0'/>
+    </RosettePoint>
+    <RosettePoint n='1' cutter='HCF1' depth='0,0750' motion='PERP'>
+      <Pt x='0,4809' z='0,5639'/>
+      <Rosette pattern='TRIANGLE' repeat='12' amp='0,075' phase='180,0'/>
+    </RosettePoint>
+    <RosettePoint n='2' cutter='HCF1' depth='0,0750' motion='PERP'>
+      <Pt x='0,7099' z='0,6347'/>
+      <Rosette pattern='TRIANGLE' repeat='12' amp='0,075' phase='0,0'/>
+    </RosettePoint>
+    <RosettePoint n='3' cutter='HCF1' depth='0,0750' motion='PERP'>
+      <Pt x='0,9109' z='0,7236'/>
+      <Rosette pattern='TRIANGLE' repeat='12' amp='0,075' phase='180,0'/>
+    </RosettePoint>
+    <RosettePoint n='4' cutter='HCF1' depth='0,0750' motion='PERP'>
+      <Pt x='1,1339' z='0,8567'/>
+      <Rosette pattern='TRIANGLE' repeat='12' amp='0,075' phase='0,0'/>
+    </RosettePoint>
+  </CutPoints>
+</COrnLathe>

@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<!DOCTYPE COrnLathe PUBLIC "-//IDN billooms.com//DTD COrnLathe file format 3.1//EN" "http://www.billooms.com/dtds/cornlathe3_1.dtd">
+<COrnLathe version='3,0'>
+  <Controls active='NORMAL'>
+    <FeedRate rpm='3,00' velocity='4,00'/>
+    <CoarseFine  passDepth='0,0250' passStep='5' lastDepth='0,0050' lastStep='1' rotation='NEG_LAST'/>
+  </Controls>
+  <Cutters>
+    <Cutter name='HCF1' displayName='HCF with R=0.512' frame='HCF' location='FRONT_OUTSIDE' profile='IDEAL' tipWidth='0,1875' radius='0,500'/>
+  </Cutters>
+  <Outline dotLocation='FRONT_OUTSIDE' thickness='0,100' resolution='0,010' color='rgb(186, 99, 18)'>
+    <Pt x='1,0000' y='0,0000'/>
+    <Pt x='1,0000' y='2,0000'/>
+  </Outline>
+  <CutPoints>
+    <RosettePoint n='0' cutter='HCF1' depth='0,0500' motion='ROCK'>
+      <Pt x='1,5000' z='1,7500'/>
+      <Rosette pattern='NSIDE' repeat='16' amp='0,050' phase='0,0'/>
+    </RosettePoint>
+    <RosettePoint n='1' cutter='HCF1' depth='0,0500' motion='PUMP'>
+      <Pt x='1,5000' z='1,3500'/>
+      <Rosette pattern='SINE' repeat='8' amp='0,250' phase='45,0'/>
+    </RosettePoint>
+    <RosettePoint n='2' cutter='HCF1' depth='0,0500' motion='BOTH'>
+      <Pt x='1,5000' z='0,8900'/>
+      <Rosette pattern='NSIDE' repeat='16' amp='0,050' phase='0,0'/>
+      <Rosette pattern='SINE' repeat='8' amp='0,250' phase='45,0'/>
+    </RosettePoint>
+    <RosettePoint n='3' cutter='HCF1' depth='0,0500' motion='BOTH'>
+      <Pt x='1,5000' z='0,4800'/>
+      <Rosette pattern='NSIDE' repeat='16' amp='0,050' phase='180,0'/>
+      <Rosette pattern='SINE' repeat='8' amp='0,250' phase='45,0'/>
+    </RosettePoint>
+  </CutPoints>
+</COrnLathe>

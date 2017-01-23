@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!DOCTYPE COrnLathe PUBLIC "-//IDN billooms.com//DTD COrnLathe file format 3.1//EN" "http://www.billooms.com/dtds/cornlathe3_1.dtd">
+<COrnLathe version='3,0'>
+  <Controls active='NORMAL'>
+    <FeedRate rpm='3,00' velocity='4,00'/>
+    <CoarseFine  passDepth='0,0250' passStep='5' lastDepth='0,1000' lastStep='20' rotation='PLUS_ALWAYS'/>
+  </Controls>
+  <Cutters>
+    <Cutter name='UCF1' displayName='UCF with R=0.512' frame='UCF' location='FRONT_OUTSIDE' profile='POINT60' tipWidth='0,1875' radius='0,512' ucfAngle='90,0' ucfRotate='-32,1'/>
+  </Cutters>
+  <Outline dotLocation='FRONT_OUTSIDE' thickness='0,100' resolution='0,050' color='rgb(186, 99, 18)'>
+    <Pt x='0,4000' y='0,0000'/>
+    <Pt x='0,4000' y='1,0000'/>
+  </Outline>
+  <CutPoints>
+    <SpiralRosette n='0' cutter='UCF1' endDepth='0,0500'>
+      <Pt x='0,9120' z='1,0000'/>
+      <RosettePoint n='0' cutter='UCF1' depth='0,0500' motion='ROCK'>
+        <Pt x='0,9120' z='0,0000'/>
+        <Rosette pattern='SINE' repeat='10' amp='0,050' phase='0,0'/>
+      </RosettePoint>
+      <Spiral style='UNIFORMD' twist='90,00'/>
+    </SpiralRosette>
+  </CutPoints>
+</COrnLathe>

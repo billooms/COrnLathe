@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<!DOCTYPE COrnLathe PUBLIC "-//IDN billooms.com//DTD COrnLathe file format 3.1//EN" "http://www.billooms.com/dtds/cornlathe3_1.dtd">
+<COrnLathe version='3,0'>
+  <Controls active='NORMAL'>
+    <FeedRate rpm='3,00' velocity='4,00'/>
+    <CoarseFine  passDepth='0,0250' passStep='5' lastDepth='0,0050' lastStep='2' rotation='NEG_LAST'/>
+  </Controls>
+  <Patterns>
+    <CustomPattern name='BLUEBUTTERFLY' displayName='BlueButterfly' style='STRAIGHT' dual='true'>
+      <Pt x='0,0000' y='0,5640' y2='-0,2820'/>
+      <Pt x='0,0140' y='0,5080' y2='-0,2530'/>
+      <Pt x='0,0280' y='0,0000' y2='0,0000'/>
+      <Pt x='0,0420' y='0,0000' y2='0,0000'/>
+      <Pt x='0,0830' y='0,5780' y2='0,0000'/>
+      <Pt x='0,1470' y='0,7910' y2='0,0000'/>
+      <Pt x='0,1750' y='0,8310' y2='0,0000'/>
+      <Pt x='0,2060' y='0,8120' y2='0,0000'/>
+      <Pt x='0,2310' y='0,7090' y2='0,0000'/>
+      <Pt x='0,2810' y='0,9200' y2='0,0000'/>
+      <Pt x='0,3140' y='0,9950' y2='0,0000'/>
+      <Pt x='0,3420' y='1,0000' y2='0,0000'/>
+      <Pt x='0,3940' y='0,4500' y2='0,0000'/>
+      <Pt x='0,4280' y='0,0000' y2='0,0000'/>
+      <Pt x='0,4720' y='0,2240' y2='0,0000'/>
+      <Pt x='0,5000' y='0,2360' y2='0,0000'/>
+      <Pt x='0,5280' y='0,2240' y2='0,0000'/>
+      <Pt x='0,5720' y='0,0000' y2='0,0000'/>
+      <Pt x='0,6060' y='0,4500' y2='0,0000'/>
+      <Pt x='0,6580' y='1,0000' y2='0,0000'/>
+      <Pt x='0,6860' y='0,9950' y2='0,0000'/>
+      <Pt x='0,7190' y='0,9200' y2='0,0000'/>
+      <Pt x='0,7690' y='0,7090' y2='0,0000'/>
+      <Pt x='0,7940' y='0,8120' y2='0,0000'/>
+      <Pt x='0,8250' y='0,8310' y2='0,0000'/>
+      <Pt x='0,8530' y='0,7910' y2='0,0000'/>
+      <Pt x='0,9170' y='0,5780' y2='0,0000'/>
+      <Pt x='0,9580' y='0,0000' y2='0,0000'/>
+      <Pt x='0,9720' y='0,0000' y2='0,0000'/>
+      <Pt x='0,9860' y='0,5080' y2='-0,2530'/>
+      <Pt x='1,0000' y='0,5640' y2='-0,2820'/>
+    </CustomPattern>
+  </Patterns>
+  <Cutters>
+    <Cutter name='HCF1' displayName='HCF with R=0.512' frame='HCF' location='FRONT_OUTSIDE' profile='POINT60' tipWidth='0,1875' radius='0,500'/>
+  </Cutters>
+  <Outline dotLocation='FRONT_OUTSIDE' thickness='0,100' resolution='0,020' color='rgb(186, 99, 18)'>
+    <Pt x='2,0000' y='-1,5002'/>
+    <Pt x='1,0000' y='-0,7002'/>
+    <Pt x='0,0000' y='-0,5002'/>
+  </Outline>
+  <CutPoints>
+    <PatternPoint n='0' cutter='HCF1' depth='0,0500' repeat='3' indexOffset='1' pattern='BLUEBUTTERFLY' phase='90,0'>
+      <Pt x='1,2003' z='-0,2421'/>
+    </PatternPoint>
+  </CutPoints>
+</COrnLathe>
