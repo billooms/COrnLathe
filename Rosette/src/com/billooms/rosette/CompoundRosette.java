@@ -46,7 +46,7 @@ public class CompoundRosette extends BasicRosette {
   /** An array of ways to combine adjacent rosettes. */
   private Combine[] combiners;
   /** Maximum deflection of the combination of the rosettes. */
-  double maxDeflection = -1.0;
+  private double maxDeflection = -1.0;
   
   /**
    * Construct a new CompoundRosette. 
@@ -251,6 +251,15 @@ public class CompoundRosette extends BasicRosette {
     for (Rosette rosette : rosettes) {
       rosette.clear();
     }
+  }
+  
+  /**
+   * Get the maximum deflection (peak-to-peak) of the compound rosette.
+   * 
+   * @return maximum deflection (peak-to-peak) 
+   */
+  public double getMaxDeflection() {
+    return maxDeflection;
   }
 
   /**

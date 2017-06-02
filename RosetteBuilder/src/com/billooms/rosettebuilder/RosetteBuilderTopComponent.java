@@ -74,7 +74,9 @@ import org.openide.windows.WindowManager;
 public final class RosetteBuilderTopComponent extends TopComponent implements PropertyChangeListener {
 
   private final static String EXTENSION = "txt";
+  private final static DecimalFormat F3 = new DecimalFormat("0.000");
   private final static DecimalFormat F4 = new DecimalFormat("0.0000");
+  private final static String MAXDEF = "max deflection: ";
 
   private CompoundRosette cRosette = null;
   private final DisplayPanel display;
@@ -124,7 +126,9 @@ public final class RosetteBuilderTopComponent extends TopComponent implements Pr
       rosetteEditPanel0.setRosette(cRosette.getRosette(0));   // then set rosette so it's shared with cRosette
       rosetteEditPanel1.setRosette(cRosette.getRosette(1));
       rosetteEditPanel2.setRosette(cRosette.getRosette(2));
+      maxDefLabel.setText(MAXDEF + F3.format(cRosette.getMaxDeflection()));
       cRosette.addPropertyChangeListener(display);
+      cRosette.addPropertyChangeListener(this);
     }
   }
   
@@ -132,6 +136,7 @@ public final class RosetteBuilderTopComponent extends TopComponent implements Pr
     if (cRos.size() == 3) {
       if (this.cRosette != null) {
         cRosette.removePropertyChangeListener(display);
+        cRosette.removePropertyChangeListener(this);
       }
       this.cRosette = cRos;
       if (cRosette != null) {
@@ -140,7 +145,9 @@ public final class RosetteBuilderTopComponent extends TopComponent implements Pr
         rosetteEditPanel2.setRosette(cRosette.getRosette(2));
         comboBox12.setSelectedIndex(cRosette.getCombineType(0).ordinal());
         comboBox123.setSelectedIndex(cRosette.getCombineType(1).ordinal());
+        maxDefLabel.setText(MAXDEF + F3.format(cRosette.getMaxDeflection()));
         cRosette.addPropertyChangeListener(display);
+        cRosette.addPropertyChangeListener(this);
       }
     } else {
       JOptionPane.showMessageDialog(this,
@@ -220,6 +227,9 @@ public final class RosetteBuilderTopComponent extends TopComponent implements Pr
 //    System.out.println("RosetteBuilderTopComponent.propertyChange: " + evt.getSource().getClass().getName()
 //	    + " " + evt.getPropertyName() + " " + evt.getOldValue() + " " + evt.getNewValue());
 
+    if (cRosette != null) {
+      maxDefLabel.setText(MAXDEF + F3.format(cRosette.getMaxDeflection()));
+    }
     // Refresh the patternMgr when rootContext changes on the ExplorerManager
     if (evt.getPropertyName().equals(ExplorerManager.PROP_ROOT_CONTEXT)) {
       updatePatternMgr();
@@ -246,6 +256,7 @@ public final class RosetteBuilderTopComponent extends TopComponent implements Pr
     label3 = new javax.swing.JLabel();
     getButton = new javax.swing.JButton();
     writeButton = new javax.swing.JButton();
+    maxDefLabel = new javax.swing.JLabel();
 
     setLayout(new java.awt.BorderLayout());
 
@@ -299,6 +310,8 @@ public final class RosetteBuilderTopComponent extends TopComponent implements Pr
       }
     });
 
+    org.openide.awt.Mnemonics.setLocalizedText(maxDefLabel, org.openide.util.NbBundle.getMessage(RosetteBuilderTopComponent.class, "RosetteBuilderTopComponent.maxDefLabel.text")); // NOI18N
+
     javax.swing.GroupLayout contolPanelLayout = new javax.swing.GroupLayout(contolPanel);
     contolPanel.setLayout(contolPanelLayout);
     contolPanelLayout.setHorizontalGroup(
@@ -315,11 +328,15 @@ public final class RosetteBuilderTopComponent extends TopComponent implements Pr
             .addComponent(getButton))))
       .addGroup(contolPanelLayout.createSequentialGroup()
         .addGroup(contolPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-          .addComponent(comboBox123, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+          .addGroup(contolPanelLayout.createSequentialGroup()
+            .addComponent(comboBox123, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addGap(0, 0, Short.MAX_VALUE))
           .addGroup(contolPanelLayout.createSequentialGroup()
             .addContainerGap()
-            .addComponent(label2)))
-        .addGap(0, 0, Short.MAX_VALUE))
+            .addComponent(label2)
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(maxDefLabel)))
+        .addContainerGap())
       .addGroup(contolPanelLayout.createSequentialGroup()
         .addComponent(comboBox12, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -337,12 +354,14 @@ public final class RosetteBuilderTopComponent extends TopComponent implements Pr
           .addComponent(comboBox12, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
           .addComponent(writeButton, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-        .addComponent(label2)
+        .addGroup(contolPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+          .addComponent(label2)
+          .addComponent(maxDefLabel))
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
         .addComponent(comboBox123, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
         .addComponent(label3)
-        .addContainerGap(43, Short.MAX_VALUE))
+        .addContainerGap(37, Short.MAX_VALUE))
     );
 
     centerPanel.add(contolPanel, java.awt.BorderLayout.LINE_START);
@@ -411,6 +430,7 @@ public final class RosetteBuilderTopComponent extends TopComponent implements Pr
   private javax.swing.JLabel label1;
   private javax.swing.JLabel label2;
   private javax.swing.JLabel label3;
+  private javax.swing.JLabel maxDefLabel;
   private com.billooms.rosette.RosetteEditPanel rosetteEditPanel0;
   private com.billooms.rosette.RosetteEditPanel rosetteEditPanel1;
   private com.billooms.rosette.RosetteEditPanel rosetteEditPanel2;
