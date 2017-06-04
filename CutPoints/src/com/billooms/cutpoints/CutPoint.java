@@ -659,7 +659,7 @@ public abstract class CutPoint extends CLclass {
     if (snap) {
       perp = outline.getCutterPathCurve(cutter).perpendicular(getPos2D(), cutter.getLocation().isFrontInOrBackOut());
     } else {
-      final Point2D.Double nearest = outline.getCutCurve().nearestPoint(getPos2D());
+      final Point2D.Double nearest = outline.getCutSurfaceCurve().nearestPoint(getPos2D());
       perp = new Vector2d(nearest.x - getX(), nearest.y - getZ());
       if ((perp.x == 0.0) && (perp.y == 0.0)) {
         // can't normalize 0,0 or you get NaN, so fall back to perp to curve

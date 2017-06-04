@@ -383,7 +383,7 @@ public class IndexPoint extends CutPoint implements ActiveEditorDrop {
       case HCF:
         Vector2d moveVectorS = getMoveVector(cutDepth);
         CircleGeom cutAtMax = new CircleGeom(new Point2D.Double(getX() + moveVectorS.x, getZ() + moveVectorS.y), cutter.getRadius());
-        Point2D.Double[] pts = findIntersect(cutAtMax, outline.getCutCurve());
+        Point2D.Double[] pts = findIntersect(cutAtMax, outline.getCutSurfaceCurve());
         if (pts == null) {
           return;
         }

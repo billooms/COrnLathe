@@ -346,8 +346,9 @@ public abstract class SpiralCut extends CutPoint {
   }
 
   /**
-   * Get an array of numbers representing the twist at each point on the cut
-   * surface. Note: Twist starts at zero, so the twist is relative. You must add
+   * Get an array of numbers representing the twist at each point on the cut surface. 
+   * The points are a function of curve resolution. 
+   * Note: Twist starts at zero, so the twist is relative. You must add
    * the phase of the initial point to these numbers!
    *
    * @return an array of Point3D with x,y from the original pts and z=twist in
@@ -355,17 +356,21 @@ public abstract class SpiralCut extends CutPoint {
    * this is actually radius, z, c(degrees).
    */
   public Point3D[] getSurfaceTwist() {
-    Curve cutCurve = outline.getCutCurve();
-    if (cutCurve == null) {
+    Curve cutSurfaceCurve = outline.getCutSurfaceCurve();
+    if (cutSurfaceCurve == null) {
       return null;
     }
-    return spiral.getStyle().makeSpiral(cutCurve.subsetPoints(cutCurve.nearestPoint(beginPt.getPos2D()), cutCurve.nearestPoint(getPos2D())), spiral.getTwist(), spiral.getAmp());
+    return spiral.getStyle()
+      .makeSpiral(cutSurfaceCurve.subsetPoints(cutSurfaceCurve.nearestPoint(beginPt.getPos2D()), cutSurfaceCurve.nearestPoint(getPos2D())),
+        spiral.getTwist(), spiral.getAmp());
   }
 
   /**
    * Get an array of numbers representing the twist at each point on the cut
-   * surface reflected back to the nearest points on the cutter curve. Note:
-   * Twist starts at zero, so the twist is relative. You must add the phase of
+   * surface reflected back to the nearest points on the cutter curve. 
+   * The points are different that the points on the CutterCurve because they
+   * are based on a finer resolution than the curve resolution.
+   * Note: Twist starts at zero, so the twist is relative. You must add the phase of
    * the initial point to these numbers!
    *
    * @return an array of Point3d with x,y from the original pts and z=twist in
@@ -400,7 +405,8 @@ public abstract class SpiralCut extends CutPoint {
 
   /**
    * Get an array of numbers representing the 3D position of spiral points on
-   * the surface. Note: Twist starts at zero, so the twist is relative. You must
+   * the surface. 
+   * Note: Twist starts at zero, so the twist is relative. You must
    * rotate the points as needed for proper rotation!
    *
    * @return a list of Point3D with XYZ (lathe coordinates) for the spiral
@@ -443,6 +449,15 @@ public abstract class SpiralCut extends CutPoint {
       }
     }
     return dist;
+  }
+
+  /**
+   * Calculate the total distance of the spiral on the surface.
+   *
+   * @return total distance on the surface
+   */
+  public double getTotalDistance() {
+    return getTotalDistance(getPointsForLine());	// actual length on the spiral on the surface
   }
 
   @Override

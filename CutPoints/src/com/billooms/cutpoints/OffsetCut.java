@@ -205,7 +205,7 @@ public abstract class OffsetCut extends CutPoint {
    * @return tangent point
    */
   public Point2D.Double getTangentPoint() {
-    return (outline.getCutCurve()).nearestPoint(getPos2D());
+    return (outline.getCutSurfaceCurve()).nearestPoint(getPos2D());
   }
 
   /**

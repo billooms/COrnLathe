@@ -10,6 +10,7 @@ import com.billooms.cutpoints.surface.Line3D;
 import com.billooms.cutters.Cutter;
 import com.billooms.cutters.Cutters;
 import com.billooms.drawables.Pt;
+import com.billooms.drawables.simple.Curve;
 import com.billooms.outline.Outline;
 import com.billooms.patterns.Patterns;
 import java.awt.Graphics2D;
@@ -837,18 +838,33 @@ public class CutPoints extends CLclass {
       removeCut(cp);
     }
   }
-
+  
   /**
    * Convert a SpiralCut to a series of individual CutPoints. This fires a
    * PROP_ADD property change.
    *
    * @param spiralCutPt SpiralCut to expand
    * @param nInserts number of cuts to insert
-   * @param cumLength cumulative length at each point along the curve
-   * @param totLength total length along the curve
-   * @param rzc twist at each point (on the surface) is radius, z, c(degrees)
    */
-  public void spiralToPoints(SpiralCut spiralCutPt, int nInserts, double[] cumLength, double totLength, Point3D[] rzc) {
+  public void spiralToPoints(SpiralCut spiralCutPt, int nInserts) {
+    Point3D[] rzcSurface = spiralCutPt.getSurfaceTwist();
+    ArrayList<Point3D> xyzSurface = spiralCutPt.toXYZ(rzcSurface);
+    // use a much finer resolution cutterPathCurve for smoothness
+    Curve fineCut = outline.getCutterPathCurve(spiralCutPt.getCutter());
+    fineCut.reSample(outline.getResolution() / 10.0);
+    
+    // cumLength[] is an array  of cummulative length at each point for interpolation
+    double[] cumLength = new double[rzcSurface.length];
+    cumLength[0] = 0.0;
+    double totLength = 0.0;
+    if (xyzSurface.size() >= 2) {
+      for (int i = 1; i < xyzSurface.size(); i++) {
+        totLength += xyzSurface.get(i).distance(xyzSurface.get(i - 1));
+        cumLength[i] = totLength;
+      }
+    }
+    System.out.println("spiralToPoints totLength=" + F3.format(totLength));
+    
     double ptSpacing = totLength / (double) (nInserts + 1);		// this is the step spacing between each new point
     int num = spiralCutPt.getNum();
     list.remove(spiralCutPt);		// take the old point out
@@ -880,21 +896,21 @@ public class CutPoints extends CLclass {
         repeat2 = beginRosPt.getRosette2().getRepeat();
       }
 
-
       double target;
       double x = 0.0, z = 0.0, c = 0.0;
-      double rStart = rzc[0].getX();
-      double deltaR = rzc[rzc.length-1].getX() - rStart;
+      double rStart = rzcSurface[0].getX();
+      double deltaR = rzcSurface[rzcSurface.length-1].getX() - rStart;
       for (int i = 1; i <= nInserts; i++) {
         RosettePoint newPt = new RosettePoint(spiralCutPt.getPos2D(), beginRosPt);   // position will be changed later
+        newPt.setSnap(false);  // don't snap because we want points to fall on a finer resolution
         newPt.setNum(num);
-        newPt.setSnap(true);		// snap back onto cut curve
         target = (double) i * ptSpacing;
         for (int j = 0; j < cumLength.length - 1; j++) {
-          if (cumLength[j] >= target) {
-            x = rzc[j - 1].getX() + (rzc[j].getX() - rzc[j - 1].getX()) * (target - cumLength[j - 1]) / (cumLength[j] - cumLength[j - 1]);
-            z = rzc[j - 1].getY() + (rzc[j].getY() - rzc[j - 1].getY()) * (target - cumLength[j - 1]) / (cumLength[j] - cumLength[j - 1]);
-            c = rzc[j - 1].getZ() + (rzc[j].getZ() - rzc[j - 1].getZ()) * (target - cumLength[j - 1]) / (cumLength[j] - cumLength[j - 1]);
+          if (cumLength[j] >= target) {   // look for the first cumLength that is >= the target
+            // Interpolate values for x, z, c
+            x = rzcSurface[j-1].getX() + (rzcSurface[j].getX() - rzcSurface[j-1].getX()) * (target - cumLength[j-1]) / (cumLength[j] - cumLength[j-1]);
+            z = rzcSurface[j-1].getY() + (rzcSurface[j].getY() - rzcSurface[j-1].getY()) * (target - cumLength[j-1]) / (cumLength[j] - cumLength[j-1]);
+            c = rzcSurface[j-1].getZ() + (rzcSurface[j].getZ() - rzcSurface[j-1].getZ()) * (target - cumLength[j-1]) / (cumLength[j] - cumLength[j-1]);
             break;
           }
         }
@@ -913,15 +929,19 @@ public class CutPoints extends CLclass {
           newPt.getRosette2().setPToP(ros2StartAmp + deltaRos2Amp * scale);
           newPt.getRosette2().setPhase(ros2StartPhase + c * (double)repeat2);
         }
-        newPt.move(x, z);     // this is on the surface, but snapping (below) puts it back on the cutter curve
+        Point2D.Double near = fineCut.nearestPoint(new Point2D.Double(x, z));
+        newPt.move(near);     // this is on the the finer cutter curve -- not snapped
         list.add(num, newPt);
+        System.out.println("x:" + F3.format(x) + " -> " + F3.format(newPt.getX())
+          + " z:" + F3.format(z) + " -> " + F3.format(newPt.getZ())
+          + " depth:" + F3.format(newPt.getDepth()) + " amp:" + F3.format(newPt.getRosette().getPToP()));
         num++;
       }
       
       RosettePoint endRosPt = new RosettePoint(spiralCutPt.getPos2D(), beginRosPt);	// x,z,snap are at the start
-      endRosPt.setSnap(spiralCutPt.isSnap());
+      endRosPt.setSnap(spiralCutPt.isSnap());   // snap is based on original SpiralRosette
       endRosPt.setDepth(endCutDepth);
-      endRosPt.getRosette().setPhase(rosStartPhase + rzc[rzc.length - 1].getZ() * (double)repeat);
+      endRosPt.getRosette().setPhase(rosStartPhase + rzcSurface[rzcSurface.length - 1].getZ() * (double)repeat);
       if (rosStartAmp == startDepth) {   // assume that we should scale amplitude if same as depth
         endRosPt.getRosette().setPToP(endCutDepth);
       }
@@ -929,7 +949,7 @@ public class CutPoints extends CLclass {
         if (ros2StartAmp == startDepth) {
           endRosPt.getRosette2().setPToP(endCutDepth);
         }
-        endRosPt.getRosette2().setPhase(ros2StartPhase + rzc[rzc.length - 1].getZ() * (double)repeat2);
+        endRosPt.getRosette2().setPhase(ros2StartPhase + rzcSurface[rzcSurface.length - 1].getZ() * (double)repeat2);
       }
       list.add(num, endRosPt);				// add the last Rosettepoint at the end
     } else if (spiralCutPt instanceof SpiralIndex) {    // for SpiralIndex
@@ -952,9 +972,9 @@ public class CutPoints extends CLclass {
         target = (double) i * ptSpacing;
         for (int j = 0; j < cumLength.length - 1; j++) {
           if (cumLength[j] >= target) {
-            x = rzc[j - 1].getX() + (rzc[j].getX() - rzc[j - 1].getX()) * (target - cumLength[j - 1]) / (cumLength[j] - cumLength[j - 1]);
-            z = rzc[j - 1].getY() + (rzc[j].getY() - rzc[j - 1].getY()) * (target - cumLength[j - 1]) / (cumLength[j] - cumLength[j - 1]);
-            c = rzc[j - 1].getZ() + (rzc[j].getZ() - rzc[j - 1].getZ()) * (target - cumLength[j - 1]) / (cumLength[j] - cumLength[j - 1]);
+            x = rzcSurface[j - 1].getX() + (rzcSurface[j].getX() - rzcSurface[j - 1].getX()) * (target - cumLength[j - 1]) / (cumLength[j] - cumLength[j - 1]);
+            z = rzcSurface[j - 1].getY() + (rzcSurface[j].getY() - rzcSurface[j - 1].getY()) * (target - cumLength[j - 1]) / (cumLength[j] - cumLength[j - 1]);
+            c = rzcSurface[j - 1].getZ() + (rzcSurface[j].getZ() - rzcSurface[j - 1].getZ()) * (target - cumLength[j - 1]) / (cumLength[j] - cumLength[j - 1]);
             break;
           }
         }
@@ -965,11 +985,12 @@ public class CutPoints extends CLclass {
         num++;
       }
 
-      i1.setPhase(i0.getPhase() + rzc[rzc.length - 1].getZ() * i0.getRepeat());
+      i1.setPhase(i0.getPhase() + rzcSurface[rzcSurface.length - 1].getZ() * i0.getRepeat());
       list.add(num, i1);				// add the last IndexPoint at the end
     }
 
-    snapAllCutPoints();   // snap back to the closest point on the cutter curve
+    // snap back to the closest point on the cutter curve (only snappable points)
+    snapAllCutPoints();   
     renumber();
     pcs.firePropertyChange(PROP_ADD, null, null);
   }

@@ -505,12 +505,12 @@ public class Outline extends CLclass {
   }
 
   /**
-   * Get the curve to cut, which is either the insideCurve or the outsideCurve
+   * Get the curve surface to cut, which is either the insideCurve or the outsideCurve
    * (depending on the cutter location).
    *
    * @return curve to cut (or null if cutter has not been set)
    */
-  public Curve getCutCurve() {
+  public Curve getCutSurfaceCurve() {
     if (cutter == null) {
       return insideCurve;   // arbitrary
     }

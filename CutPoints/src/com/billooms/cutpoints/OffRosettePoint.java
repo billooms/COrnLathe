@@ -292,7 +292,7 @@ public class OffRosettePoint extends RosettePoint implements OffPoint {
    * @return offset vector
    */
   private Vector2d offsetFromParent() {
-    Point2D.Double tangentPoint = outline.getCutCurve().nearestPoint(getPos2D());
+    Point2D.Double tangentPoint = outline.getCutSurfaceCurve().nearestPoint(getPos2D());
     Vector2d offset = new Vector2d(tangentPoint.x - parent.getTangentPointX(),
         tangentPoint.y - parent.getTangentPointY());
     return offset.rotate(parent.getTangentAngle());
