@@ -863,7 +863,7 @@ public class CutPoints extends CLclass {
         cumLength[i] = totLength;
       }
     }
-    System.out.println("spiralToPoints totLength=" + F3.format(totLength));
+//    System.out.println("spiralToPoints totLength=" + F3.format(totLength));
     
     double ptSpacing = totLength / (double) (nInserts + 1);		// this is the step spacing between each new point
     int num = spiralCutPt.getNum();
@@ -932,9 +932,9 @@ public class CutPoints extends CLclass {
         Point2D.Double near = fineCut.nearestPoint(new Point2D.Double(x, z));
         newPt.move(near);     // this is on the the finer cutter curve -- not snapped
         list.add(num, newPt);
-        System.out.println("x:" + F3.format(x) + " -> " + F3.format(newPt.getX())
-          + " z:" + F3.format(z) + " -> " + F3.format(newPt.getZ())
-          + " depth:" + F3.format(newPt.getDepth()) + " amp:" + F3.format(newPt.getRosette().getPToP()));
+//        System.out.println("x:" + F3.format(x) + " -> " + F3.format(newPt.getX())
+//          + " z:" + F3.format(z) + " -> " + F3.format(newPt.getZ())
+//          + " depth:" + F3.format(newPt.getDepth()) + " amp:" + F3.format(newPt.getRosette().getPToP()));
         num++;
       }
       
