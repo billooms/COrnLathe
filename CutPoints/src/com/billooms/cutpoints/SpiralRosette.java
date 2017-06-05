@@ -401,7 +401,7 @@ public class SpiralRosette extends SpiralCut {
    * 
    * @return ArrayList of RosettePoints
    */
-  public ArrayList<CutPoint> makeListOfPoints() {       //TODO: Make this an Override and require it for SpiralCuts
+  private ArrayList<CutPoint> makeListOfPoints() {       //TODO: Make this an Override and require it for SpiralCuts
     ArrayList<CutPoint> list = new ArrayList<>();
     
     Point3D[] rzcCutter = getCutterTwist();     // This is on the cutter curve
