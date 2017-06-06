@@ -3,6 +3,8 @@ package com.billooms.outlineeditor;
 import com.billooms.cutpoints.CutPoint;
 import com.billooms.cutpoints.CutPoints;
 import com.billooms.cutpoints.SpiralCut;
+import com.billooms.cutpoints.SpiralIndex;
+import com.billooms.cutpoints.SpiralRosette;
 import javax.swing.JPanel;
 import org.openide.explorer.ExplorerManager;
 import org.openide.nodes.Node;
@@ -60,7 +62,7 @@ public class MacroSpiralPanel extends JPanel {
     cutPtMgr = rootNode.getLookup().lookup(CutPoints.class);
 
     for (CutPoint cc : cutPtMgr.getAll()) {
-      if (cc instanceof SpiralCut) {
+      if ((cc instanceof SpiralRosette) || (cc instanceof SpiralIndex)) {
         numberCombo.addItem(cc.getNum());
       }
     }

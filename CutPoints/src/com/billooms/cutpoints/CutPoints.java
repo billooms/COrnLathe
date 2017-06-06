@@ -5,7 +5,6 @@ import static com.billooms.clclass.CLclass.indent;
 import static com.billooms.clclass.CLclass.indentLess;
 import static com.billooms.clclass.CLclass.indentMore;
 import com.billooms.controls.CoarseFine;
-import com.billooms.cutpoints.RosettePoint.Motion;
 import com.billooms.cutpoints.surface.Line3D;
 import com.billooms.cutters.Cutter;
 import com.billooms.cutters.Cutters;
@@ -866,16 +865,15 @@ public class CutPoints extends CLclass {
 //    System.out.println("spiralToPoints totLength=" + F3.format(totLength));
     
     double ptSpacing = totLength / (double) (nInserts + 1);		// this is the step spacing between each new point
+    double startDepth = spiralCutPt.getBeginPoint().getDepth();
+    double endCutDepth = spiralCutPt.getEndDepth();
+    double deltaDepth = endCutDepth - startDepth;
     int num = spiralCutPt.getNum();
     list.remove(spiralCutPt);		// take the old point out
     if (spiralCutPt instanceof SpiralRosette) {     // For SpiralRosettes
       RosettePoint beginRosPt = (RosettePoint) spiralCutPt.getBeginPoint();
       list.add(num, beginRosPt);		// and replace it with a new start
       num++;
-      
-      double startDepth = beginRosPt.getDepth();
-      double endCutDepth = spiralCutPt.getEndDepth();
-      double deltaDepth = endCutDepth - startDepth;
       
       double rosStartAmp = beginRosPt.getRosette().getPToP();
       double deltaRosAmp = 0.0;
@@ -902,7 +900,11 @@ public class CutPoints extends CLclass {
       double deltaR = rzcSurface[rzcSurface.length-1].getX() - rStart;
       for (int i = 1; i <= nInserts; i++) {
         RosettePoint newPt = new RosettePoint(spiralCutPt.getPos2D(), beginRosPt);   // position will be changed later
-        newPt.setSnap(false);  // don't snap because we want points to fall on a finer resolution
+        switch (spiralCutPt.getCutter().getFrame()) {
+          case HCF:
+          case UCF:
+            newPt.setSnap(false);  // don't snap because we want points to fall on a finer resolution
+        }
         newPt.setNum(num);
         target = (double) i * ptSpacing;
         for (int j = 0; j < cumLength.length - 1; j++) {
@@ -939,7 +941,6 @@ public class CutPoints extends CLclass {
       }
       
       RosettePoint endRosPt = new RosettePoint(spiralCutPt.getPos2D(), beginRosPt);	// x,z,snap are at the start
-      endRosPt.setSnap(spiralCutPt.isSnap());   // snap is based on original SpiralRosette
       endRosPt.setDepth(endCutDepth);
       endRosPt.getRosette().setPhase(rosStartPhase + rzcSurface[rzcSurface.length - 1].getZ() * (double)repeat);
       if (rosStartAmp == startDepth) {   // assume that we should scale amplitude if same as depth
@@ -953,40 +954,46 @@ public class CutPoints extends CLclass {
       }
       list.add(num, endRosPt);				// add the last Rosettepoint at the end
     } else if (spiralCutPt instanceof SpiralIndex) {    // for SpiralIndex
-      IndexPoint i0 = (IndexPoint) spiralCutPt.getBeginPoint();
-      list.add(num, i0);	// and replace it with the SpiralCut begin point
+      IndexPoint beginIdxPt = (IndexPoint) spiralCutPt.getBeginPoint();
+      list.add(num, beginIdxPt);	// and replace it with a new start
       num++;
-
-      IndexPoint i1 = new IndexPoint(spiralCutPt.getPos2D(), i0);	// x,z,snap are at the start
-      i1.setSnap(spiralCutPt.isSnap());
-      i1.setDepth(spiralCutPt.getEndDepth());
-
-      double depth0 = i0.getDepth();
-      double depth1 = i1.getDepth();
+      
       double target;
       double x = 0.0, z = 0.0, c = 0.0;
       for (int i = 1; i <= nInserts; i++) {
-        IndexPoint newPt = new IndexPoint(spiralCutPt.getPos2D(), i0);   // position will be changed later
+        IndexPoint newPt = new IndexPoint(spiralCutPt.getPos2D(), beginIdxPt);   // position will be changed later
+        switch (spiralCutPt.getCutter().getFrame()) {
+          case HCF:
+          case UCF:
+            newPt.setSnap(false);  // don't snap because we want points to fall on a finer resolution
+        }
         newPt.setNum(num);
-        newPt.setSnap(true);		// snap back onto cut curve
         target = (double) i * ptSpacing;
         for (int j = 0; j < cumLength.length - 1; j++) {
-          if (cumLength[j] >= target) {
+          if (cumLength[j] >= target) {   // look for the first cumLength that is >= the target
+            // Interpolate values for x, z, c
             x = rzcSurface[j - 1].getX() + (rzcSurface[j].getX() - rzcSurface[j - 1].getX()) * (target - cumLength[j - 1]) / (cumLength[j] - cumLength[j - 1]);
             z = rzcSurface[j - 1].getY() + (rzcSurface[j].getY() - rzcSurface[j - 1].getY()) * (target - cumLength[j - 1]) / (cumLength[j] - cumLength[j - 1]);
             c = rzcSurface[j - 1].getZ() + (rzcSurface[j].getZ() - rzcSurface[j - 1].getZ()) * (target - cumLength[j - 1]) / (cumLength[j] - cumLength[j - 1]);
             break;
           }
         }
-        newPt.setDepth(depth0 + target / totLength * (depth1 - depth0));
-        newPt.setPhase(i0.getPhase() + c * i0.getRepeat());
-        newPt.move(x, z);    // this is on the surface, but snapping (below) puts it back on the cutter curve
+        newPt.setDepth(startDepth + deltaDepth * target / totLength);
+        newPt.setPhase(beginIdxPt.getPhase() + c * beginIdxPt.getRepeat());
+        Point2D.Double near = fineCut.nearestPoint(new Point2D.Double(x, z));
+        // must snap inserted points so that the direction is calculated correctly
+        newPt.move(near);     // this is on the the finer cutter curve -- will be snapped later
         list.add(num, newPt);
+//        System.out.println("x:" + F3.format(x) + " -> " + F3.format(newPt.getX())
+//          + " z:" + F3.format(z) + " -> " + F3.format(newPt.getZ())
+//          + " depth:" + F3.format(newPt.getDepth()));
         num++;
       }
 
-      i1.setPhase(i0.getPhase() + rzcSurface[rzcSurface.length - 1].getZ() * i0.getRepeat());
-      list.add(num, i1);				// add the last IndexPoint at the end
+      IndexPoint endIdxPt = new IndexPoint(spiralCutPt.getPos2D(), beginIdxPt);	// x,z,snap are at the start
+      endIdxPt.setDepth(spiralCutPt.getEndDepth());
+      endIdxPt.setPhase(beginIdxPt.getPhase() + rzcSurface[rzcSurface.length - 1].getZ() * beginIdxPt.getRepeat());
+      list.add(num, endIdxPt);				// add the last IndexPoint at the end
     }
 
     // snap back to the closest point on the cutter curve (only snappable points)

@@ -369,46 +369,56 @@ public class SpiralLine extends SpiralCut {
     super.propertyChange(evt);    // will pass the info on up the line
     makeDrawables();    // but we still need to make drawables here
   }
-
+  
   @Override
-  public synchronized void cutSurface(Surface surface, ProgressMonitor monitor) {
-    Point3D[] rzc = getCutterTwist();
-    ArrayList<Point3D> xyz = toXYZ(rzc);
+  protected ArrayList<CutPoint> makeListOfPoints() { 
+    ArrayList<CutPoint> list = new ArrayList<>();
+    
+    Point3D[] rzcCutter = getCutterTwist();     // This is on the cutter curve
+    Point3D[] rzcSurface = getSurfaceTwist();   // This is on the surface curve
+    ArrayList<Point3D> xyzSurface = toXYZ(rzcSurface);
 
-    double totLength = getTotalDistance(xyz);	// actual length on the spiral
+    double totLength = getTotalDistance(xyzSurface);	// actual length on the spiral
     if (totLength <= 0.0) {         // so we don't divide by zero further down
 //      beginPt.cutSurface(surface);	// no movement, so just cut this one place
-      return;
+      return list;
     }
 
     double[] addTwist = makePatternTwist(getSurfaceTwist());
 
-    LinePoint modPt = new LinePoint(beginPt.getPos2D(), (LinePoint) beginPt);	// this is modified along the length of the spiral
     double startDepth = beginPt.getDepth();
     double deltaDepth = endCutDepth - startDepth;
     double beginPhase = ((LinePoint) beginPt).getPhase();
     double repeat = ((LinePoint) beginPt).getRepeat();
+    
     double cumLength = 0.0;
-    for (int i = 0; i < rzc.length; i++) {  // xyz is the same length as tw
+    for (int i = 0; i < rzcSurface.length; i++) {  // xyz is the same length as tw
       if (i > 0) {
-        cumLength += xyz.get(i).distance(xyz.get(i - 1));
+        // This uses the same calculation as within getTotalDistance()
+        cumLength += xyzSurface.get(i).distance(xyzSurface.get(i - 1));
       }
-      modPt.setPhase(beginPhase + (rzc[i].getZ() + addTwist[i]) * repeat);
-      modPt.move(rzc[i].getX(), rzc[i].getY());
+      // newPt starts out as a copy of the beginPt then is modified along the length of the spiral
+      LinePoint newPt = new LinePoint(beginPt.getPos2D(), (LinePoint) beginPt);	// this is modified along the length of the spiral
+      newPt.setPhase(beginPhase + (rzcSurface[i].getZ() + addTwist[i]) * repeat);
+      newPt.move(rzcCutter[i].getX(), rzcCutter[i].getY());
       if (scaleDepth) {
-        modPt.setDepth(startDepth * modPt.getX() / getBeginPoint().getX());
+        newPt.setDepth(startDepth * newPt.getX() / getBeginPoint().getX());
       } else {
-        modPt.setDepth(startDepth + cumLength / totLength * deltaDepth);
+        newPt.setDepth(startDepth + cumLength / totLength * deltaDepth);
       }
-      monitor.setProgress(num+1);
-      monitor.setNote("CutPoint " + getNum() + ": " + i + "/" + rzc.length + "\n");
-      modPt.cutSurface(surface, monitor);
-      if (monitor.isCanceled()) {
-        break;
-      }
+      list.add(newPt);
     }
+    return list;
   }
   
+  /**
+   * Make instructions for this CutPoint.
+   * Note: This doesn't use makeListOfPoints() because we want to cut long
+   * lines rather than lots of individual IndexPoints
+   *
+   * @param controls control panel data
+   * @param stepsPerRot steps per rotation
+   */
   @Override
   public void makeInstructions(CoarseFine controls, int stepsPerRot) {
     cutList.comment("SpiralLine " + num);

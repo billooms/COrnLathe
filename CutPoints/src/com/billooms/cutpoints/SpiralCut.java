@@ -1,6 +1,7 @@
 package com.billooms.cutpoints;
 
 import com.billooms.clclass.CLUtilities;
+import com.billooms.cutpoints.surface.Surface;
 import com.billooms.cutters.Cutter;
 import com.billooms.cutters.Cutters;
 import com.billooms.drawables.Drawable;
@@ -16,6 +17,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import javafx.geometry.Point3D;
+import javax.swing.ProgressMonitor;
 import org.openide.util.Lookup;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -477,4 +479,25 @@ public abstract class SpiralCut extends CutPoint {
     super.propertyChange(evt);    // will pass the info on up the line
     makeDrawables();    // but we still need to make drawables here
   }
+  
+  /**
+   * Make a list of CutPoints along the curve of the spiral.
+   * 
+   * @return ArrayList of RosettePoints
+   */
+   protected abstract ArrayList<CutPoint> makeListOfPoints();
+
+  @Override
+  public synchronized void cutSurface(Surface surface, ProgressMonitor monitor) {
+    ArrayList<CutPoint> list = makeListOfPoints();
+    for (int i = 0; i < list.size(); i++) {
+      monitor.setProgress(num + 1);
+      monitor.setNote("CutPoint " + getNum() + ": " + i + "/" + list.size() + "\n");
+      list.get(i).cutSurface(surface, monitor);
+      if (monitor.isCanceled()) {
+        break;
+      }
+    }
+  }
+   
 }

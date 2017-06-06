@@ -10,10 +10,8 @@ import static com.billooms.cutpoints.RosettePoint.ROSETTE_COLOR2;
 import static com.billooms.cutpoints.RosettePoint.ROSETTE_COLOR3;
 import com.billooms.cutpoints.surface.Line3D;
 import com.billooms.cutpoints.surface.RotMatrix;
-import com.billooms.cutpoints.surface.Surface;
 import com.billooms.cutters.Cutter;
 import com.billooms.cutters.Cutters;
-import com.billooms.drawables.Drawable;
 import static com.billooms.drawables.Drawable.SOLID_LINE;
 import com.billooms.drawables.simple.Arc;
 import com.billooms.drawables.simple.Line;
@@ -26,7 +24,6 @@ import java.beans.PropertyChangeEvent;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import javafx.geometry.Point3D;
-import javax.swing.ProgressMonitor;
 import org.netbeans.spi.palette.PaletteItemRegistration;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -396,12 +393,8 @@ public class SpiralRosette extends SpiralCut {
     makeDrawables();    // but we still need to make drawables here
   }
   
-  /**
-   * Make a list of RosettePoints along the curve of the spiral.
-   * 
-   * @return ArrayList of RosettePoints
-   */
-  private ArrayList<CutPoint> makeListOfPoints() {       //TODO: Make this an Override and require it for SpiralCuts
+  @Override
+  protected ArrayList<CutPoint> makeListOfPoints() { 
     ArrayList<CutPoint> list = new ArrayList<>();
     
     Point3D[] rzcCutter = getCutterTwist();     // This is on the cutter curve
@@ -442,7 +435,6 @@ public class SpiralRosette extends SpiralCut {
     for (int i = 0; i < rzcSurface.length; i++) {
       if (i > 0) {
         // This uses the same calculation as within getTotalDistance()
-        // TODO: if re-sampling, but calculate total distance on the resampled data
         cumLength += xyzSurface.get(i).distance(xyzSurface.get(i - 1));
       }
       double scale;
@@ -469,19 +461,6 @@ public class SpiralRosette extends SpiralCut {
 //        + " depth:" + F3.format(newPt.getDepth()) + " amp:" + F3.format(newPt.getRosette().getPToP()));
     }
     return list;
-  }
-
-  @Override
-  public synchronized void cutSurface(Surface surface, ProgressMonitor monitor) {
-    ArrayList<CutPoint> list = makeListOfPoints();
-    for (int i = 0; i < list.size(); i++) {
-      monitor.setProgress(num + 1);
-      monitor.setNote("CutPoint " + getNum() + ": " + i + "/" + list.size() + "\n");
-      list.get(i).cutSurface(surface, monitor);
-      if (monitor.isCanceled()) {
-        break;
-      }
-    }
   }
 
   @Override

@@ -8,7 +8,6 @@ import static com.billooms.cutpoints.IndexPoint.INDEX_COLOR2;
 import static com.billooms.cutpoints.IndexPoint.INDEX_SAFETY;
 import com.billooms.cutpoints.surface.Line3D;
 import com.billooms.cutpoints.surface.RotMatrix;
-import com.billooms.cutpoints.surface.Surface;
 import com.billooms.cutters.Cutter;
 import com.billooms.cutters.Cutters;
 import static com.billooms.drawables.Drawable.SOLID_LINE;
@@ -22,7 +21,6 @@ import java.beans.PropertyChangeEvent;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import javafx.geometry.Point3D;
-import javax.swing.ProgressMonitor;
 import org.netbeans.spi.palette.PaletteItemRegistration;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -243,40 +241,47 @@ public class SpiralIndex extends SpiralCut {
   }
   
   @Override
-  public synchronized void cutSurface(Surface surface, ProgressMonitor monitor) {
-    Point3D[] rzc = getCutterTwist();
-    ArrayList<Point3D> xyz = toXYZ(rzc);
+  protected ArrayList<CutPoint> makeListOfPoints() {
+    ArrayList<CutPoint> list = new ArrayList<>();
     
-    double totLength = getTotalDistance(xyz);	// actual length on the spiral
+    Point3D[] rzcCutter = getCutterTwist();     // This is on the cutter curve
+    Point3D[] rzcSurface = getSurfaceTwist();   // This is on the surface curve
+    ArrayList<Point3D> xyzSurface = toXYZ(rzcSurface);
+
+    double totLength = getTotalDistance(xyzSurface);	// actual length on the spiral on the surface
     if (totLength <= 0.0) {         // so we don't divide by zero further down
-      beginPt.cutSurface(surface, monitor);	// no movement, so just cut this one place
-      return;
+      list.add((IndexPoint) beginPt);
+      return list;
     }
     
-    IndexPoint modPt = new IndexPoint(beginPt.getPos2D(), (IndexPoint) beginPt);	// this is modified along the length of the spiral
-    double startDepth = ((IndexPoint) beginPt).getDepth();
+    double startDepth = beginPt.getDepth();
     double deltaDepth = endCutDepth - startDepth;
     double beginPhase = ((IndexPoint) beginPt).getPhase();
     double repeat = ((IndexPoint) beginPt).getRepeat();
+    
     double cumLength = 0.0;
-    for (int i = 0; i < rzc.length; i++) {  // xyz is the same length as tw
+    for (int i = 0; i < rzcSurface.length; i++) { 
       if (i > 0) {
-        cumLength += xyz.get(i).distance(xyz.get(i - 1));
+        // This uses the same calculation as within getTotalDistance()
+        cumLength += xyzSurface.get(i).distance(xyzSurface.get(i - 1));
       }
-      modPt.setDepth(startDepth + cumLength / totLength * deltaDepth);
-      modPt.setPhase(beginPhase + rzc[i].getZ() * repeat);
-      modPt.move(rzc[i].getX(), rzc[i].getY());
-      monitor.setProgress(num+1);
-      monitor.setNote("CutPoint " + getNum() + ": " + i + "/" + rzc.length + "\n");
-      modPt.cutSurface(surface, monitor);
-      if (monitor.isCanceled()) {
-        break;
-      }
+    // newPt starts out as a copy of the beginPt then is modified along the length of the spiral
+      IndexPoint newPt = new IndexPoint(beginPt.getPos2D(), (IndexPoint) beginPt);
+      newPt.setDepth(startDepth + deltaDepth * cumLength / totLength);
+      newPt.setPhase(beginPhase + rzcSurface[i].getZ() * repeat);
+      newPt.move(rzcCutter[i].getX(), rzcCutter[i].getY());
+      list.add(newPt);
+//      System.out.println("x:" + F3.format(rzcSurface[i].getX())  + " -> " + F3.format(newPt.getX())
+//        + " z:" + F3.format(rzcSurface[i].getY()) + " -> " + F3.format(newPt.getZ())
+//        + " depth:" + F3.format(newPt.getDepth()));
     }
+    return list;
   }
 
   /**
-   * Make instructions for this CutPoint
+   * Make instructions for this CutPoint.
+   * Note: This doesn't use makeListOfPoints() because we want to cut long
+   * lines rather than lots of individual IndexPoints
    *
    * @param controls control panel data
    * @param stepsPerRot steps per rotation
