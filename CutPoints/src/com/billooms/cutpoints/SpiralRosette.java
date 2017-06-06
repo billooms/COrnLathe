@@ -468,8 +468,8 @@ public class SpiralRosette extends SpiralCut {
     cutList.comment("SpiralRosette " + num);
     cutList.comment("Cutter: " + cutter);
 
-    for (CutPoint pt : makeListOfPoints()) {
-      pt.makeInstructions(controls, stepsPerRot);
+    for (CutPoint cPt : makeListOfPoints()) {
+      cPt.makeInstructions(controls, stepsPerRot);
     }
   }
 
