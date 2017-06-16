@@ -59,9 +59,13 @@ public class SpiralLine extends SpiralCut {
 
   /** Property name used when changing the ScaleDepth flag */
   String PROP_SCALEDEPTH = PROP_PREFIX + "ScaleDepth";
+  /** Property name used when changing the ScaleAmplitude flag */
+  String PROP_SCALEAMPLITUDE = PROP_PREFIX + "ScaleAmplitude";
 
   /** Flag indicating that the depth should be scaled with diameter. */
   private boolean scaleDepth = false;
+  /** Flag indicating that the amplitude should be scaled with diameter. */
+  private boolean scaleAmplitude = false;
 
   /**
    * Construct a new SpiralLine from the given DOM Element.
@@ -74,6 +78,7 @@ public class SpiralLine extends SpiralCut {
   public SpiralLine(Element element, Cutters cutMgr, Outline outline, Patterns patMgr) {
     super(element, cutMgr, outline);
     this.scaleDepth = CLUtilities.getBoolean(element, "scaleDepth", false);
+    this.scaleAmplitude = CLUtilities.getBoolean(element, "scaleAmplitude", false);
     NodeList ipNodes = element.getElementsByTagName("LinePoint");
     beginPt = new LinePoint((Element) ipNodes.item(0), cutMgr, outline, patMgr);
     beginPt.setCutter(this.cutter);   // make sure beginPt uses same cutter
@@ -90,6 +95,7 @@ public class SpiralLine extends SpiralCut {
   public SpiralLine(Point2D.Double pos, SpiralLine cpt) {
     super(pos, cpt);
     this.scaleDepth = cpt.getScaleDepth();
+    this.scaleAmplitude = cpt.getScaleAmplitude();
     beginPt = new LinePoint(cpt.getBeginPoint().getPos2D(), (LinePoint) cpt.getBeginPoint());
     beginPt.addPropertyChangeListener(this);
     makeDrawables();
@@ -142,6 +148,30 @@ public class SpiralLine extends SpiralCut {
     this.scaleDepth = scale;
     makeDrawables();
     pcs.firePropertyChange(PROP_SCALEDEPTH, old, scaleDepth);
+  }
+
+  /**
+   * Get the flag indicating if cut amplitude is proportional to radius of the
+   * shape.
+   *
+   * @return true=cutAmplitude is proportional
+   */
+  public boolean getScaleAmplitude() {
+    return scaleAmplitude;
+  }
+
+  /**
+   * Set the flag indicating if cut amplitude is proportional to radius of the
+   * shape. 
+   * This fires a PROP_SCALEAMPLITUDE property change with the old and new values. 
+   *
+   * @param scale true=cutDepth is proportional
+   */
+  public void setScaleAmplitude(boolean scale) {
+    boolean old = this.scaleAmplitude;
+    this.scaleAmplitude = scale;
+    makeDrawables();
+    pcs.firePropertyChange(PROP_SCALEAMPLITUDE, old, scaleAmplitude);
   }
 
   /**
@@ -230,6 +260,7 @@ public class SpiralLine extends SpiralCut {
     out.println(indent + "<SpiralLine"
         + xmlCutPointInfo2()     // don't write depth
         + " scaleDepth='" + scaleDepth + "'"
+        + " scaleAmplitude='" + scaleAmplitude + "'"
         + " endDepth='" + F4.format(endCutDepth) + "'"
         + ">");
     indentMore();
@@ -311,12 +342,21 @@ public class SpiralLine extends SpiralCut {
    */
   private double[] makePatternTwist(Point3D[] tw) {
     PatternBar pb = ((LinePoint) beginPt).getPatternBar();
+    double startR = beginPt.getX();
     double[] addTwist = new double[tw.length];
     double dist = 0.0;		// cummulative distance along tw
-    addTwist[0] = degreesForD(pb.getAmplitudeAt(dist), tw[0].getX());	// reminder: tw[].x is radius in lathe coords
+    if (scaleAmplitude) {
+      addTwist[0] = degreesForD(pb.getAmplitudeAt(dist) * tw[0].getX()/startR, tw[0].getX());	// reminder: tw[].x is radius in lathe coords
+    } else {
+      addTwist[0] = degreesForD(pb.getAmplitudeAt(dist), tw[0].getX());	// reminder: tw[].x is radius in lathe coords
+    }
     for (int i = 1; i < tw.length; i++) {
       dist += distance(tw[i - 1], tw[i]);
-      addTwist[i] = degreesForD(pb.getAmplitudeAt(dist), tw[i].getX());
+      if (scaleAmplitude) {
+        addTwist[i] = degreesForD(pb.getAmplitudeAt(dist) * tw[i].getX()/startR, tw[i].getX());
+      } else {
+        addTwist[i] = degreesForD(pb.getAmplitudeAt(dist), tw[i].getX());
+      }
     }
     return addTwist;
   }
@@ -336,8 +376,8 @@ public class SpiralLine extends SpiralCut {
   }
 
   /**
-   * Calculate the rotation in degrees for the given distance at the given
-   * radius.
+   * Calculate the rotation in degrees for the given distance along the
+   * circumference at the given radius.
    *
    * @param d distance along the circumference
    * @param r radius

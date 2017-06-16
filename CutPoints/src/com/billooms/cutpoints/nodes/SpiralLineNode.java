@@ -55,6 +55,10 @@ public class SpiralLineNode extends SpiralCutNode {
       scaleProp.setName("Scale Depth");
       scaleProp.setShortDescription("Scale the depth proportional to the radius");
       set.put(scaleProp);
+      Property<Boolean> scaleAmpProp = new PropertySupport.Reflection<>(cpt, boolean.class, "scaleAmplitude");
+      scaleAmpProp.setName("Scale Amplitude");
+      scaleAmpProp.setShortDescription("Scale the amplitude proportional to the radius");
+      set.put(scaleAmpProp);
     } catch (NoSuchMethodException ex) {
       ErrorManager.getDefault();
     }

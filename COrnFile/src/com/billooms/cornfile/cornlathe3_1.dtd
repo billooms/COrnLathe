@@ -235,6 +235,7 @@
     snap CDATA "true"
     cutter CDATA #REQUIRED
     scaleDepth CDATA #REQUIRED
+    scaleAmplitude CDATA "false"
     endDepth CDATA #REQUIRED
   >
 
