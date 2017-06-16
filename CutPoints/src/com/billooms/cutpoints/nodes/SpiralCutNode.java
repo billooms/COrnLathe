@@ -59,6 +59,11 @@ public class SpiralCutNode extends CutPointNode {
       endDepthProp.setName("End Cut Depth");
       endDepthProp.setShortDescription("Depth of the cut at the end of the spiral");
       set.put(endDepthProp);
+      
+      Property<Double> spiralLenProp = new PropertySupport.Reflection<>(spiralCut, double.class, "getTotalDistance", null);
+      spiralLenProp.setName("Spiral Length");
+      spiralLenProp.setShortDescription("Length of the spiral at the surface");
+      set.put(spiralLenProp);
 
     } catch (NoSuchMethodException ex) {
       ErrorManager.getDefault();
