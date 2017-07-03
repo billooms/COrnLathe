@@ -52,6 +52,17 @@ public class Curve extends AbstractDrawable {
     this.color = c;
     this.stroke = s;
   }
+  
+  /**
+   * Construct a new curve from the give curve.
+   * 
+ * @param curve given curve
+   */
+  public Curve(Curve curve) {
+    this.points = curve.getPoints();
+    this.color = curve.color;
+    this.stroke = curve.stroke;
+  }
 
   /**
    * A drawable curve with an empty array of points.
