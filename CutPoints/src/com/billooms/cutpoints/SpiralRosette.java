@@ -363,16 +363,18 @@ public class SpiralRosette extends SpiralCut {
         fullMask += mask;	// fill out to full length
       }
     }
-    if (((RosettePoint) beginPt).getRosette() instanceof Rosette) {
-      if (((Rosette)((RosettePoint) beginPt).getRosette()).usesSymmetryWid()) {
-        double[] angles = ((Rosette)((RosettePoint) beginPt).getRosette()).getAngleBreaks();
-        for (int i = 0; i < repeat; i++) {
-          Line3D line = new Line3D(getPointsForLine());
-          line.rotate(RotMatrix.Axis.Z, (phase / repeat) - angles[i]);
-          list3D.add(line);
-        }
+    if ((((RosettePoint) beginPt).getRosette() instanceof Rosette)
+        && (((Rosette) ((RosettePoint) beginPt).getRosette()).usesSymmetryWid())) {
+      // This is for simple rosettes that use Symmetry Widths
+      double[] angles = ((Rosette) ((RosettePoint) beginPt).getRosette()).getAngleBreaks();
+      for (int i = 0; i < repeat; i++) {
+        Line3D line = new Line3D(getPointsForLine());
+        line.rotate(RotMatrix.Axis.Z, (phase / repeat) - angles[i]);
+        list3D.add(line);
       }
     } else {
+      // Simple rosettes that do NOT use Symmetry Widths
+      // TODO: Compound Rosettes also use this, but repeat = 1 for only one line
       double ang = phase / repeat;
       for (int i = 0; i < repeat; i++) {
         if (mask.isEmpty() || (fullMask.charAt(i) != '0')) {
