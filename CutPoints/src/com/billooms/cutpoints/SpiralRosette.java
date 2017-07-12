@@ -1,5 +1,6 @@
 package com.billooms.cutpoints;
 
+import com.billooms.clclass.CLUtilities;
 import static com.billooms.clclass.CLclass.indent;
 import static com.billooms.clclass.CLclass.indentLess;
 import static com.billooms.clclass.CLclass.indentMore;
@@ -410,57 +411,55 @@ public class SpiralRosette extends SpiralCut {
     }
 
     double startDepth = beginPt.getDepth();
-    double deltaDepth = endCutDepth - startDepth;
-
     double rosStartAmp = ((RosettePoint)beginPt).getRosette().getPToP();
-    double deltaRosAmp = 0.0;
-    if (rosStartAmp == startDepth) {
-      deltaRosAmp = endCutDepth - rosStartAmp;  // taper the rocking/perp amplitude
-    }
     double rosStartPhase = ((RosettePoint)beginPt).getRosette().getPhase();
     int repeat = ((RosettePoint)beginPt).getRosette().getRepeat();
 
-    double ros2StartAmp = 0.0, deltaRos2Amp = 0.0, ros2StartPhase = 0.0;
+    double ros2StartAmp = 0.0, ros2StartPhase = 0.0;
     int repeat2 = 0;
     if (((RosettePoint)beginPt).getMotion().usesBoth()) {
       ros2StartAmp = ((RosettePoint)beginPt).getRosette2().getPToP();
-      if (ros2StartAmp == startDepth) {
-        deltaRos2Amp = endCutDepth - ros2StartAmp;  // taper the pumping amplitude
-      }
       ros2StartPhase = ((RosettePoint)beginPt).getRosette2().getPhase();
       repeat2 = ((RosettePoint)beginPt).getRosette2().getRepeat();
     }
     
     double cumLength = 0.0;
     double rStart = rzcSurface[0].getX();
-    double deltaR = rzcSurface[rzcSurface.length-1].getX() - rStart;
+    double rEnd = rzcSurface[rzcSurface.length-1].getX();
     for (int i = 0; i < rzcSurface.length; i++) {
       if (i > 0) {
         // This uses the same calculation as within getTotalDistance()
         cumLength += xyzSurface.get(i).distance(xyzSurface.get(i - 1));
       }
-      double scale;
-      if (deltaR != 0.0) {
-        // Cut depth (and rosette amplitude) should always scale with radius when deltaR != 0
-        scale = (rzcSurface[i].getX() - rStart) / deltaR;
+      
+      double radiusRatio = rzcSurface[i].getX() / rStart;
+      double cumRatio = cumLength / totLength;
+      double scaledDepth;
+      if (rEnd == 0.0) {
+        scaledDepth = startDepth * radiusRatio;
       } else {
-        // when radius is constant, scale with distance
-        scale = cumLength / totLength;
+        double scaledEndDepth = endCutDepth * rStart / rEnd;
+        scaledDepth = (startDepth + cumRatio * (scaledEndDepth - startDepth)) * radiusRatio;
       }
+      
     // newPt starts out as a copy of the beginPt then is modified along the length of the spiral
       RosettePoint newPt = new RosettePoint(beginPt.getPos2D(), (RosettePoint) beginPt);
-      newPt.setDepth(startDepth + deltaDepth * scale);
-      newPt.getRosette().setPToP(rosStartAmp + deltaRosAmp * scale);
+      newPt.setDepth(scaledDepth);
+      if (rosStartAmp == startDepth) {    // scale rosette amplitude if it's the same as the start depth
+        newPt.getRosette().setPToP(scaledDepth);
+      }
       newPt.getRosette().setPhase(rosStartPhase + rzcSurface[i].getZ() * (double)repeat);
       if (newPt.getMotion().usesBoth()) {
-        newPt.getRosette2().setPToP(ros2StartAmp + deltaRos2Amp * scale);
+        if (ros2StartAmp == startDepth) {   // scale rosette amplitude if it's the same as the start depth
+          newPt.getRosette2().setPToP(scaledDepth);
+        }
         newPt.getRosette2().setPhase(ros2StartPhase + rzcSurface[i].getZ() * (double)repeat2);
       }
       newPt.move(rzcCutter[i].getX(), rzcCutter[i].getY());
       list.add(newPt);
-//      System.out.println("x:" + F3.format(rzcSurface[i].getX())  + " -> " + F3.format(newPt.getX())
-//        + " z:" + F3.format(rzcSurface[i].getY()) + " -> " + F3.format(newPt.getZ())
-//        + " depth:" + F3.format(newPt.getDepth()) + " amp:" + F3.format(newPt.getRosette().getPToP()));
+      System.out.println("x:" + F3.format(rzcSurface[i].getX())  + " -> " + F3.format(newPt.getX())
+        + " z:" + F3.format(rzcSurface[i].getY()) + " -> " + F3.format(newPt.getZ())
+        + " depth:" + F3.format(newPt.getDepth()) + " amp:" + F3.format(newPt.getRosette().getPToP()));
     }
     return list;
   }
