@@ -441,6 +441,8 @@ public class SpiralRosette extends SpiralCut {
         scaledDepth = (startDepth + cumRatio * (scaledEndDepth - startDepth)) * radiusRatio;
       }
       
+      // If this changes, be sure to change Cutpoints.spiralToPoints too!!!
+      
     // newPt starts out as a copy of the beginPt then is modified along the length of the spiral
       RosettePoint newPt = new RosettePoint(beginPt.getPos2D(), (RosettePoint) beginPt);
       newPt.setDepth(scaledDepth);

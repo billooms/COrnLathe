@@ -876,20 +876,13 @@ public class CutPoints extends CLclass {
       num++;
       
       double rosStartAmp = beginRosPt.getRosette().getPToP();
-      double deltaRosAmp = 0.0;
-      if (rosStartAmp == startDepth) {
-        deltaRosAmp = endCutDepth - rosStartAmp;
-      }
       double rosStartPhase = beginRosPt.getRosette().getPhase();
       int repeat = beginRosPt.getRosette().getRepeat();
       
-      double ros2StartAmp = 0, deltaRos2Amp = 0.0, ros2StartPhase = 0;
+      double ros2StartAmp = 0, ros2StartPhase = 0;
       int repeat2 = 0;
       if (beginRosPt.getMotion().usesBoth()) {
         ros2StartAmp = beginRosPt.getRosette2().getPToP();
-        if (ros2StartAmp == startDepth) {
-          deltaRos2Amp = endCutDepth - ros2StartAmp;
-        }
         ros2StartPhase = beginRosPt.getRosette2().getPhase();
         repeat2 = beginRosPt.getRosette2().getRepeat();
       }
@@ -897,7 +890,7 @@ public class CutPoints extends CLclass {
       double target;
       double x = 0.0, z = 0.0, c = 0.0;
       double rStart = rzcSurface[0].getX();
-      double deltaR = rzcSurface[rzcSurface.length-1].getX() - rStart;
+      double rEnd = rzcSurface[rzcSurface.length-1].getX();
       for (int i = 1; i <= nInserts; i++) {
         RosettePoint newPt = new RosettePoint(spiralCutPt.getPos2D(), beginRosPt);   // position will be changed later
         switch (spiralCutPt.getCutter().getFrame()) {
@@ -916,20 +909,27 @@ public class CutPoints extends CLclass {
             break;
           }
         }
-        double scale;
-        if (deltaR != 0.0) {
-          // Cut depth (and rosette amplitude) should always scale with radius when deltaR != 0
-          scale = (x - rStart) / deltaR;
+        
+        double radiusRatio = rzcSurface[i].getX() / rStart;
+        double cumRatio = target / totLength;
+        double scaledDepth;
+        if (rEnd == 0.0) {
+          scaledDepth = startDepth * radiusRatio;
         } else {
-          // when deltaR == 0, scale with distance
-          scale = target / totLength;
+          double scaledEndDepth = endCutDepth * rStart / rEnd;
+          scaledDepth = (startDepth + cumRatio * (scaledEndDepth - startDepth)) * radiusRatio;
         }
-        newPt.setDepth(startDepth + deltaDepth * scale);
-        newPt.getRosette().setPToP(rosStartAmp + deltaRosAmp * scale);
+
+        newPt.setDepth(scaledDepth);
+        if (rosStartAmp == startDepth) {    // scale rosette amplitude if it's the same as the start depth
+          newPt.getRosette().setPToP(scaledDepth);
+        }
         newPt.getRosette().setPhase(rosStartPhase + c * (double) repeat);
         if (beginRosPt.getMotion().usesBoth()) {
-          newPt.getRosette2().setPToP(ros2StartAmp + deltaRos2Amp * scale);
-          newPt.getRosette2().setPhase(ros2StartPhase + c * (double)repeat2);
+          if (ros2StartAmp == startDepth) {   // scale rosette amplitude if it's the same as the start depth
+            newPt.getRosette2().setPToP(scaledDepth);
+          }
+          newPt.getRosette2().setPhase(ros2StartPhase + c * (double) repeat2);
         }
         Point2D.Double near = fineCut.nearestPoint(new Point2D.Double(x, z));
         newPt.move(near);     // this is on the the finer cutter curve -- not snapped
