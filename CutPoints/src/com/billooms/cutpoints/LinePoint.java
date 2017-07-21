@@ -59,7 +59,7 @@ public class LinePoint extends CutPoint {
   /** Color used for the maximum movement of the cut. */
   protected final static Color LINEPT_COLOR2 = Color.ORANGE;
   /** Go into the air by this much between cuts. */
-  protected final static double LINEPOINT_SAFETY = 0.020;
+  protected final static double LINEPOINT_SAFETY = 0.050;
 
   /** Number of cuts around the shape. */
   private int repeat = DEFAULT_REPEAT;

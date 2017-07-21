@@ -71,7 +71,7 @@ public class IndexPoint extends CutPoint implements ActiveEditorDrop {
   /** Color used for the maximum movement of the cut. */
   protected final static Color INDEX_COLOR2 = Color.CYAN;
   /** move cutter above cutCurve while moving for safety. */
-  protected final static double INDEX_SAFETY = 0.020;
+  protected final static double INDEX_SAFETY = 0.050;
   /** Number of points per circle for ECF circles. */
   private final static int CIRCLE_PTS = 32;
 
