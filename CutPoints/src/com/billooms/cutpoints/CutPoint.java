@@ -780,4 +780,19 @@ public abstract class CutPoint extends CLclass {
   protected boolean aboutEqual(double a, double b, double c) {
     return aboutEqual(a, b) && aboutEqual(b, c);
   }
+  
+  /**
+   * Find a value within y with the same proportions as the value within x.
+   * 
+   * @param x1 start of x interval
+   * @param x value within x interval
+   * @param x2 end of x interval
+   * @param y1 start of y interval
+   * @param y2 end of y interval
+   * @return 
+   */
+  public static double proportion(double x1, double x, double x2, double y1, double y2) {
+    return y1 + (y2 - y1)/(x2 - x1) * (x - x1);
+  }
+  
 }

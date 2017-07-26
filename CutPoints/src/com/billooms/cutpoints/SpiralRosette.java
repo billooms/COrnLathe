@@ -434,8 +434,12 @@ public class SpiralRosette extends SpiralCut {
       double radiusRatio = rzcSurface[i].getX() / rStart;
       double cumRatio = cumLength / totLength;
       double scaledDepth;
-      if (rEnd == 0.0) {
+      if (Math.abs(rEnd) < (outline.getResolution() / 2.0)) {
+        // if the end radius is essentially zero, then scale depth proportional to radius
         scaledDepth = startDepth * radiusRatio;
+      } else if (endCutDepth == 0.0) {
+        // if the end depth is zero, then scale depth proportional to change in radius
+        scaledDepth = proportion(rStart, rzcSurface[i].getX(), rEnd, startDepth, endCutDepth);
       } else {
         double scaledEndDepth = endCutDepth * rStart / rEnd;
         scaledDepth = (startDepth + cumRatio * (scaledEndDepth - startDepth)) * radiusRatio;
@@ -458,9 +462,9 @@ public class SpiralRosette extends SpiralCut {
       }
       newPt.move(rzcCutter[i].getX(), rzcCutter[i].getY());
       list.add(newPt);
-//      System.out.println("x:" + F3.format(rzcSurface[i].getX())  + " -> " + F3.format(newPt.getX())
-//        + " z:" + F3.format(rzcSurface[i].getY()) + " -> " + F3.format(newPt.getZ())
-//        + " depth:" + F3.format(newPt.getDepth()) + " amp:" + F3.format(newPt.getRosette().getPToP()));
+      System.out.println("x:" + F3.format(rzcSurface[i].getX())  + " -> " + F3.format(newPt.getX())
+        + " z:" + F3.format(rzcSurface[i].getY()) + " -> " + F3.format(newPt.getZ())
+        + " depth:" + F3.format(newPt.getDepth()) + " amp:" + F3.format(newPt.getRosette().getPToP()));
     }
     return list;
   }
