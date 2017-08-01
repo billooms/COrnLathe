@@ -920,6 +920,8 @@ public class CutPoints extends CLclass {
           // if the end depth is zero, then scale depth proportional to change in radius
           scaledDepth = CutPoint.proportion(rStart, x, rEnd, startDepth, endCutDepth);
         } else {
+          // This is the default when end is not zero depth or zero radius
+          // This was first used on bowl2
           double scaledEndDepth = endCutDepth * rStart / rEnd;
           scaledDepth = (startDepth + cumRatio * (scaledEndDepth - startDepth)) * radiusRatio;
         }

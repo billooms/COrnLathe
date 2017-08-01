@@ -441,6 +441,8 @@ public class SpiralRosette extends SpiralCut {
         // if the end depth is zero, then scale depth proportional to change in radius
         scaledDepth = proportion(rStart, rzcSurface[i].getX(), rEnd, startDepth, endCutDepth);
       } else {
+        // This is the default when end is not zero depth or zero radius
+        // This was first used on bowl2
         double scaledEndDepth = endCutDepth * rStart / rEnd;
         scaledDepth = (startDepth + cumRatio * (scaledEndDepth - startDepth)) * radiusRatio;
       }
