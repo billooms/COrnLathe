@@ -535,7 +535,7 @@ public class CutPoints extends CLclass {
   }
 
   /**
-   * Find the closest CutPoint (within minSep) to the given point that has the
+   * Find the closest visible CutPoint (within minSep) to the given point that has the
    * given cutter (or any if cutter is null).
    *
    * @param pt given point
@@ -552,6 +552,9 @@ public class CutPoints extends CLclass {
     for (CutPoint cutPt : list) {
       if (!cutPtMatchesCutter(cutPt, cutter)) {
         continue;   // skip CutPoints with a different cutter
+      }
+      if (!cutPt.isVisible()) {
+        continue;   // skip CutPoints that are not visible
       }
       if (cutPt instanceof OffsetGroup) {		// if coincident, find the CutPoint first (not the OffsetGroup)
         for (CutPoint cp : ((OffsetGroup) cutPt).getAllCutPoints()) {
