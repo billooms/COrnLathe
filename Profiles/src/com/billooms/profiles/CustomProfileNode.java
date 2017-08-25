@@ -4,10 +4,9 @@ import com.billooms.profiles.CustomProfile.CustomStyle;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import org.openide.ErrorManager;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Children;
 import org.openide.nodes.PropertySupport;
@@ -79,7 +78,7 @@ public class CustomProfileNode extends AbstractNode implements PropertyChangeLis
       displayNameProp.setShortDescription("Display name");
       set.put(displayNameProp);
     } catch (NoSuchMethodException ex) {
-      Logger.getLogger(CustomProfileNode.class.getName()).log(Level.SEVERE, null, ex);
+      ErrorManager.getDefault();
     }
 
     sheet.put(set);

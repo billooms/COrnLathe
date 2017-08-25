@@ -4,10 +4,9 @@ import com.billooms.patterns.CustomPattern.CustomStyle;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import org.openide.ErrorManager;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Children;
 import org.openide.nodes.PropertySupport;
@@ -84,7 +83,7 @@ public class CustomPatternNode extends AbstractNode implements PropertyChangeLis
       dualProp.setShortDescription("Flag indicating the pattern has dual lines");
       set.put(dualProp);
     } catch (NoSuchMethodException ex) {
-      Logger.getLogger(CustomPatternNode.class.getName()).log(Level.SEVERE, null, ex);
+      ErrorManager.getDefault();
     }
 
     sheet.put(set);
