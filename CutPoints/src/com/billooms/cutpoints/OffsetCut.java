@@ -49,7 +49,7 @@ public abstract class OffsetCut extends CutPoint {
   /** Valid values for repeat using a 24 or 35 hole index wheel. */
   public final ArrayList<Integer> VALID_REPEATS = new ArrayList<>(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 12, 24, 35));
   /** Default offset phase of the repeated pattern (currently set to 0). */
-  public final static int DEFAULT_OFFSET = 0;
+  public final static double DEFAULT_OFFSET = 0;
 
   /** Color of the drawn cut. */
   protected final static Color OFFSET_COLOR = Color.PINK;
@@ -57,7 +57,7 @@ public abstract class OffsetCut extends CutPoint {
   /** Number of repeats around the shape. */
   protected int repeat = Rosette.DEFAULT_REPEAT;
   /** Offset phase shift (number of holes in 24 or 35 hole index wheel). */
-  protected int indexOffset = DEFAULT_OFFSET;
+  protected double indexOffset = DEFAULT_OFFSET;
 
   /**
    * Construct a new OffsetCut from the given DOM Element.
@@ -127,7 +127,7 @@ public abstract class OffsetCut extends CutPoint {
    *
    * @return offset number of holes
    */
-  public int getIndexOffset() {
+  public double getIndexOffset() {
     return indexOffset;
   }
 
@@ -138,9 +138,9 @@ public abstract class OffsetCut extends CutPoint {
    *
    * @param offset number of holes
    */
-  public void setIndexOffset(int offset) {
+  public void setIndexOffset(double offset) {
     if (validOffset(offset)) {
-      int old = this.indexOffset;
+      double old = this.indexOffset;
       this.indexOffset = offset;
       makeDrawables();
       pcs.firePropertyChange(PROP_OFFSET, old, offset);
@@ -153,7 +153,7 @@ public abstract class OffsetCut extends CutPoint {
    * @param offset offset number of index holes
    * @return true == OK
    */
-  private boolean validOffset(int offset) {
+  private boolean validOffset(double offset) {
     return (offset < (indexWheelHoles() / repeat));
   }
 
@@ -317,11 +317,11 @@ public abstract class OffsetCut extends CutPoint {
     cutList.comment("  repeat is " + repeat);
     cutList.comment("    use " + indexWheelHoles() + " hole index wheel, offset " + (-indexOffset) + " holes");
     String str = "";
-    int n = -indexOffset;
+    double n = -indexOffset;
     if (n < 0) {
       n += indexWheelHoles() / repeat;
     }
-    for (int i = n; i < indexWheelHoles(); i += indexWheelHoles() / repeat) {
+    for (double i = n; i < indexWheelHoles(); i += indexWheelHoles() / repeat) {
       str = str + i + "  ";
     }
     cutList.comment("    skip " + indexWheelHoles() / repeat + " holes each repeat:  holes " + str);

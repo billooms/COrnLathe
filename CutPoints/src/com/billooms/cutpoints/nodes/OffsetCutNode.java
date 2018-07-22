@@ -57,7 +57,7 @@ public class OffsetCutNode extends CutPointNode {
       repeatProp.setShortDescription("Number of cuts around perimeter");
       set.put(repeatProp);
 
-      Property<Integer> offsetProp = new PropertySupport.Reflection<>(cpt, int.class, "IndexOffset");
+      Property<Double> offsetProp = new PropertySupport.Reflection<>(cpt, double.class, "IndexOffset");
       offsetProp.setName("IndexOffset");
       offsetProp.setShortDescription("Offset pattern by number of index holes");
       set.put(offsetProp);
