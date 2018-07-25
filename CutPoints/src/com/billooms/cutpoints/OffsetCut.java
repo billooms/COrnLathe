@@ -69,7 +69,7 @@ public abstract class OffsetCut extends CutPoint {
   public OffsetCut(Element element, Cutters cutMgr, Outline outline) {
     super(element, cutMgr, outline);
     this.repeat = CLUtilities.getInteger(element, "repeat", Rosette.DEFAULT_REPEAT);
-    this.indexOffset = CLUtilities.getInteger(element, "indexOffset", 0);
+    this.indexOffset = CLUtilities.getDouble(element, "indexOffset", 0);
   }
 
   /**

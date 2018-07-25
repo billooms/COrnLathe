@@ -369,7 +369,7 @@ public class OffsetGroup extends OffsetCut {
     out.println(indent + "<OffsetGroup"
         + " n='" + num + "'" // no depth or cutter
         + " repeat='" + repeat + "'"
-        + " indexOffset='" + indexOffset + "'"
+        + " indexOffset='" + F3.format(indexOffset) + "'"
         + ">");
     indentMore();
     super.writeXML(out);    // for point

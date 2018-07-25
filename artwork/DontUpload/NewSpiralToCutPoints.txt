@@ -1,0 +1,23 @@
+
+spiralToPoints totLength=2.304
+x:1.076 -> 1.587 z:-1.393 -> -1.361 radiusRatio:0.996 cumRatio:0.083 depth:0.199 amp:0.199
+x:1.067 -> 1.576 z:-1.289 -> -1.236 radiusRatio:0.988 cumRatio:0.167 depth:0.198 amp:0.198
+x:1.052 -> 1.556 z:-1.184 -> -1.095 radiusRatio:0.974 cumRatio:0.250 depth:0.195 amp:0.195
+x:1.028 -> 1.518 z:-1.078 -> -0.930 radiusRatio:0.951 cumRatio:0.333 depth:0.190 amp:0.190
+x:0.987 -> 1.442 z:-0.972 -> -0.739 radiusRatio:0.913 cumRatio:0.417 depth:0.183 amp:0.183
+x:0.920 -> 1.326 z:-0.870 -> -0.559 radiusRatio:0.852 cumRatio:0.500 depth:0.170 amp:0.170
+x:0.829 -> 1.174 z:-0.772 -> -0.393 radiusRatio:0.768 cumRatio:0.583 depth:0.154 amp:0.154
+x:0.708 -> 0.954 z:-0.683 -> -0.234 radiusRatio:0.656 cumRatio:0.667 depth:0.131 amp:0.131
+x:0.554 -> 0.733 z:-0.614 -> -0.134 radiusRatio:0.513 cumRatio:0.750 depth:0.103 amp:0.103
+x:0.379 -> 0.505 z:-0.558 -> -0.062 radiusRatio:0.351 cumRatio:0.833 depth:0.070 amp:0.070
+x:0.192 -> 0.251 z:-0.523 -> -0.014 radiusRatio:0.177 cumRatio:0.917 depth:0.035 amp:0.035
+spiralToPoints totLength=2.026
+x:1.081 -> 1.593 z:-1.607 -> -1.613 radiusRatio:1.001 cumRatio:0.100 depth:0.180 amp:0.180
+x:1.077 -> 1.589 z:-1.716 -> -1.743 radiusRatio:0.997 cumRatio:0.200 depth:0.160 amp:0.160
+x:1.068 -> 1.577 z:-1.827 -> -1.883 radiusRatio:0.989 cumRatio:0.300 depth:0.138 amp:0.138
+x:1.051 -> 1.554 z:-1.939 -> -2.037 radiusRatio:0.973 cumRatio:0.400 depth:0.117 amp:0.117
+x:1.023 -> 1.510 z:-2.051 -> -2.209 radiusRatio:0.947 cumRatio:0.500 depth:0.095 amp:0.095
+x:0.975 -> 1.424 z:-2.163 -> -2.409 radiusRatio:0.903 cumRatio:0.600 depth:0.072 amp:0.072
+x:0.895 -> 1.266 z:-2.268 -> -2.622 radiusRatio:0.829 cumRatio:0.700 depth:0.050 amp:0.050
+x:0.783 -> 1.072 z:-2.364 -> -2.786 radiusRatio:0.724 cumRatio:0.800 depth:0.029 amp:0.029
+x:0.634 -> 0.826 z:-2.443 -> -2.918 radiusRatio:0.587 cumRatio:0.900 depth:0.012 amp:0.012
