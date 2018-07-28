@@ -11,6 +11,7 @@ import com.billooms.cutpoints.surface.Line3D;
 import com.billooms.cutpoints.surface.Surface;
 import com.billooms.cutters.Cutter;
 import com.billooms.cutters.Cutters;
+import static com.billooms.drawables.Drawable.LIGHT_DOT;
 import static com.billooms.drawables.Drawable.SOLID_LINE;
 import com.billooms.drawables.simple.Arc;
 import com.billooms.drawables.vecmath.Vector2d;
@@ -193,6 +194,9 @@ public class OffRosettePoint extends RosettePoint implements OffPoint {
   protected synchronized void makeDrawables() {
     super.makeDrawables();    // text and cutter at rest
     text.setText(num + makeSuffix());
+    if (drawList.size() >= 2) {
+      drawList.remove(1);   // don't draw the original cutter
+    }
 
     if (parent == null) {
       return;   // can happen on initialization
@@ -234,6 +238,9 @@ public class OffRosettePoint extends RosettePoint implements OffPoint {
       // Profile of drill & Fixed at cut depth
       case Fixed:
       case Drill:
+        // Add the default cutter tip dotted outline
+        drawList.add(cutter.getProfile().getDrawable(pt.getPoint2D(), cutter.getTipWidth(),
+            -cutter.getUCFAngle() - parent.getTangentAngle(), ROSETTE_COLOR, LIGHT_DOT));
         p = new Point2D.Double(getX() + perpVectorS.x + moveVectorS.x, getZ() + perpVectorS.y + moveVectorS.y);
         drawList.add(cutter.getProfile().getDrawable(p, cutter.getTipWidth(),
             -cutter.getUCFAngle() - parent.getTangentAngle(), ROSETTE_COLOR2, SOLID_LINE));
