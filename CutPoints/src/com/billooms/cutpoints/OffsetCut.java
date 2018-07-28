@@ -265,7 +265,8 @@ public abstract class OffsetCut extends CutPoint {
     pt.setColor(OFFSET_COLOR);
     if (drawList.size() >= 2) {
       drawList.get(0).setColor(OFFSET_COLOR);	// the text
-      drawList.get(1).setColor(OFFSET_COLOR);	// the cutter
+//      drawList.get(1).setColor(OFFSET_COLOR);	// the cutter
+      drawList.remove(1);   // don't draw the cutter
     }
     // Compute the vector to the point on the curve
     // which is the direction perpendicular to curve for snapped points
