@@ -610,7 +610,7 @@ public class RosettePoint extends CutPoint implements ActiveEditorDrop {
    * @param z z-coordinate (lathe space)
    * @return offset from the given point
    */
-  private Vector2d rosetteMove(double angDeg, double x, double z) {
+  protected Vector2d rosetteMove(double angDeg, double x, double z) {
     Vector2d move = rosetteMove(angDeg);
     return new Vector2d(x + move.x, z + move.y);
   }
