@@ -113,9 +113,34 @@ public class OffRosettePoint extends RosettePoint implements OffPoint {
       rosette2.addPropertyChangeListener(this);
     }
   }
+  
+  /** 
+   * Get the move vector for PERP. 
+   * This is based on the parent origin rotated to top center.
+   * It is the direction of movement that will produce the rosette pattern. 
+   * It will be in a direction AWAY from the point of deepest cut.
+   * 
+   * @return normalized perpendicular vector
+   */
+  private Vector2d perpVectorNRel() {
+        return (super.perpVectorN()).rotate(parent.getTangentAngle());
+  }
+  
+  /** 
+   * Get the move vector for TANGENT. 
+   * This is based on the parent origin rotated to top center.
+   * It is the direction of movement that will produce the rosette pattern. 
+   * It will be in a direction AWAY from the point of deepest cut.
+   * 
+   * @return normalized tangent vector
+   */
+  private Vector2d tanVectorNRel() {
+        return (super.tanVectorN()).rotate(parent.getTangentAngle());
+  }
 
   /**
    * Get the scaled movement vector for the rosette. 
+   * This is to be used only by makeDrawables() because the angle is absolute (not relative to the offset).
    * It is the direction of movement that will produce the rosette pattern. 
    * It will be in a direction AWAY from the point of deepest cut. 
    * In the case of BOTH or PERPTAN, it is the movement of only the first rosette.
@@ -130,12 +155,13 @@ public class OffRosettePoint extends RosettePoint implements OffPoint {
       case BOTH:
         return (super.getMoveVectorS()).rotate(-parent.getTangentAngle());
       default:
-        return super.getMoveVectorS();
+        return super.getMoveVectorS();    // Note: TANGENT gets correct orientation from super.getMoveVectorS()
     }
   }
 
   /**
    * Get the scaled movement vector for rosette2. 
+   * This is to be used only by makeDrawables() because the angle is absolute (not relative to the offset).
    * It is the direction of movement that will produce the rosette pattern. 
    * It will be in a direction AWAY from the point of deepest cut. 
    * In the case of BOTH or PERPTAN, it is the movement of only the second rosette.
@@ -321,7 +347,7 @@ public class OffRosettePoint extends RosettePoint implements OffPoint {
     for (int i = 0; i < (NUM_3D_PTS + 1); i++) {
       double angDeg = (double) i * 360.0 / (double) NUM_3D_PTS;	// in degrees
       double angRad = Math.toRadians(angDeg);
-      Vector2d xz = rosetteMove(angDeg, x0, z0);   // xz location due to rosette motion
+      Vector2d xz = rosetteMoveRel(angDeg, x0, z0);   // xz location due to rosette motion
       double r = Math.hypot(xz.x, y0);		// cylindrical radius  NOTE: y should always be 0.0
       if (cutter.getLocation().isBack()) {	// if in back, add 180 degrees rotation
         angRad += Math.PI;
@@ -352,12 +378,73 @@ public class OffRosettePoint extends RosettePoint implements OffPoint {
     double spindleC, lastC = 0.0;
     int count;
     for (count = 0, spindleC = 0.0; count < nSectors; count++, spindleC += dAngle) {
-      cutXZ = rosetteMove(spindleC, x0, z0);
+      cutXZ = rosetteMoveRel(spindleC, x0, z0);
       surface.rotateZ(spindleC - lastC);		// incremental rotate the surface
       surface.cutSurface(cutter, cutXZ.x, cutXZ.y);
       lastC = spindleC;
     }
     surface.rotateZ(360.0 - lastC);		// bring it back to the starting point
+  }
+
+  /**
+   * Determine the offset from the given point caused by a rosette at a given
+   * angle. Note that the x,y value would be interpreted as x,z in lathe
+   * coordinate space.
+   * This is the same as super.rosetteMove() except that it uses perpVectorNRel 
+   * and tanVectorNRel.
+   *
+   * @param angDeg angle in degrees
+   * @param x x-coordinate
+   * @param z z-coordinate (lathe space)
+   * @return offset from the given point
+   */
+  protected Vector2d rosetteMoveRel(double angDeg, double x, double z) {
+    Vector2d move = rosetteMoveRel(angDeg);
+    return new Vector2d(x + move.x, z + move.y);
+  }
+
+  /**
+   * Determine the offset caused by a rosette at a given angle. Note that the
+   * x,y value would be interpreted as x,z in lathe coordinate space.
+   * This is the same as super.rosetteMove() except that it uses perpVectorNRel 
+   * and tanVectorNRel.
+   *
+   * @param angDeg angle in degrees
+   * @return x,z offset from zero.
+   */
+  protected Vector2d rosetteMoveRel(double angDeg) {
+    double xMove = 0.0, zMove = 0.0;
+    switch (motion) {
+      default:
+      case PERP:
+        Vector2d perpS = perpVectorNRel();
+        perpS.scale(rosette.getAmplitudeAt(angDeg, cutter.getLocation().isOutside()));
+        return perpS;
+      case TANGENT:
+        Vector2d tanS = tanVectorNRel();
+        tanS.scale(rosette.getAmplitudeAt(angDeg, cutter.getLocation().isOutside()));
+        return tanS;
+      case PERPTAN:
+        Vector2d perp = perpVectorNRel();
+        perp.scale(rosette.getAmplitudeAt(angDeg, cutter.getLocation().isOutside()));
+        Vector2d tan = tanVectorNRel();
+        tan.scale(rosette2.getAmplitudeAt(angDeg, cutter.getLocation().isOutside()));
+        return new Vector2d(perp.x + tan.x, perp.y + tan.y);
+        
+      case BOTH:
+        // get the z movement from rosette2 only when there is both
+        zMove = rosette2.getAmplitudeAt(angDeg, cutter.getLocation().isOutside());
+        // otherwise, always get the motion from the primary rosette
+        xMove = rosette.getAmplitudeAt(angDeg, cutter.getLocation().isOutside());
+        break;
+      case PUMP:
+        zMove = rosette.getAmplitudeAt(angDeg, cutter.getLocation().isOutside());
+        break;
+      case ROCK:
+        xMove = rosette.getAmplitudeAt(angDeg, cutter.getLocation().isOutside());
+        break;
+    }
+    return correctForCutter(xMove, zMove);
   }
 
   @Override
@@ -367,7 +454,7 @@ public class OffRosettePoint extends RosettePoint implements OffPoint {
     cutList.spindleWrapCheck();
 
     // move to position before applying depth
-    Vector2d start = rosetteMove(0.0, x, z);
+    Vector2d start = rosetteMoveRel(0.0, x, z);
     cutList.goToXZC(FAST, start, 0.0);
 
     // Increasing cut depth with the coarse depth per cut

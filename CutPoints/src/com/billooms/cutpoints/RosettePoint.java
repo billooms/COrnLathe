@@ -307,7 +307,7 @@ public class RosettePoint extends CutPoint implements ActiveEditorDrop {
    * 
    * @return normalized perpendicular vector
    */
-  private Vector2d perpVectorN() {
+  Vector2d perpVectorN() {
     Vector2d perpVectN = getPerpVector(1.0);
     return new Vector2d(-perpVectN.x, -perpVectN.y);	// Always opposite direction from perpVector
   }
@@ -319,7 +319,7 @@ public class RosettePoint extends CutPoint implements ActiveEditorDrop {
    * 
    * @return normalized tangent vector
    */
-  private Vector2d tanVectorN() {
+  Vector2d tanVectorN() {
     Vector2d perpVectN = getPerpVector(1.0);
     switch (cutter.getLocation()) {
       case FRONT_INSIDE:
@@ -610,7 +610,7 @@ public class RosettePoint extends CutPoint implements ActiveEditorDrop {
    * @param z z-coordinate (lathe space)
    * @return offset from the given point
    */
-  protected Vector2d rosetteMove(double angDeg, double x, double z) {
+  private Vector2d rosetteMove(double angDeg, double x, double z) {
     Vector2d move = rosetteMove(angDeg);
     return new Vector2d(x + move.x, z + move.y);
   }
@@ -622,7 +622,7 @@ public class RosettePoint extends CutPoint implements ActiveEditorDrop {
    * @param angDeg angle in degrees
    * @return x,z offset from zero.
    */
-  protected Vector2d rosetteMove(double angDeg) {
+  private Vector2d rosetteMove(double angDeg) {
     double xMove = 0.0, zMove = 0.0;
     switch (motion) {
       default:
