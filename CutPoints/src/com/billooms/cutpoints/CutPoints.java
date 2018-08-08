@@ -602,6 +602,9 @@ public class CutPoints extends CLclass {
     SpiralCut closest = null;
     double sep;
     for (CutPoint cc : list) {
+      if (!cc.isVisible()) {
+        continue;   // skip CutPoints that are not visible
+      }
       if (cc instanceof SpiralCut) {		// Look for just SpiralCutPoints
         sep = cc.separation(pt);
         if (sep < dist) {
@@ -624,6 +627,9 @@ public class CutPoints extends CLclass {
     OffsetGroup closest = null;
     double sep;
     for (CutPoint cc : list) {
+      if (!cc.isVisible()) {
+        continue;   // skip CutPoints that are not visible
+      }
       if (cc instanceof OffsetGroup) {		// Look for just OffsetGroup
         sep = cc.separation(pt);
         if (sep < dist) {
